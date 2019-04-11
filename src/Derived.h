@@ -13,7 +13,7 @@ class dataInt : public Base{
         dataInt* setData(int value) override;
         int getData();
         std::string getTypename() override;
-}
+};
 
 class dataDouble : public Base{
     double data;
@@ -24,7 +24,7 @@ class dataDouble : public Base{
         dataDouble* setData(double value) override;
         double getData();
         std::string getTypename() override;
-}
+};
 
 class dataString : public Base{
     std::string data;
@@ -32,7 +32,7 @@ class dataString : public Base{
         dataString();
         ~dataString();
         
-        datastd::String* setData(std::string value) override;
+        dataString* setData(std::string value) override;
         std::string getData();
         std::string getTypename() override;
-}
+};
