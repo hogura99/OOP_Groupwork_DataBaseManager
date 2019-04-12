@@ -1,38 +1,46 @@
 #pragma once
 
-#include "Base.h"
+#ifndef DERIVED_H
+#define DERIVED_H
 
+#include "Base.h"
 #include <string>
 
 class dataInt : public Base{
     int data;
     public:
-        dataInt();
+        dataInt(int v): data(v){};
         ~dataInt();
 
-        dataInt* setData(int value) override;
-        int getData();
+        dataInt* setData(int v) override;
+        int getValue();
         std::string getTypename() override;
 }
 
 class dataDouble : public Base{
     double data;
     public:
-        dataDouble();
+        dataDouble(double v): data(v){};
         ~dataDouble();
 
-        dataDouble* setData(double value) override;
-        double getData();
+        dataDouble* setData(double v) override;
+        double getValue();
         std::string getTypename() override;
 }
 
 class dataString : public Base{
     std::string data;
     public:
-        dataString();
+        dataString(std::string v): data(v) {};
         ~dataString();
         
-        datastd::String* setData(std::string value) override;
-        std::string getData();
+        dataString* setData(std::string v) override;
+        std::string getValue();
         std::string getTypename() override;
 }
+
+//following funcs need to be called with dynamic_cast;
+//getValue
+//operator maybe
+
+#endif
