@@ -5,7 +5,7 @@
 #include <string>
 
 class Data{
-	std::vector<std::pair<string, Base> > vec;
+	std::vector<std::pair<std::string, Base> > vec;
 public:
 	Data();
 	~Data();
