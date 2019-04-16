@@ -17,7 +17,7 @@ DataBaseManager::~DataBaseManager() {
 bool DataBaseManager::handleCommand(const string &command) {
 	using namespace std;
 	vector<string> param;
-	int cmd = ParamSpliter::Split(command, param, ParamSpliter::BASE_DEFAULT);
+	int cmd = ParamSpliter::Split(command, param/*, ParamSpliter::BASE_DEFAULT*/);
 	switch (cmd) {
 
 		case BASE_CREATE: {
