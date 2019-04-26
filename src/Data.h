@@ -15,7 +15,7 @@ public:
 	
 	Base* getData(std::string attrName);
 	Base* setData(std::string attrName, Base* src);
-	std::string getTypename(std::string attrName);
-}
+	int getTypename(std::string attrName);
+};
 
 #endif
