@@ -14,9 +14,11 @@ DataBaseManager::~DataBaseManager() {
 		delete it.second;
 }
 
-bool DataBaseManager::handleCommand(const string &command) {
+bool DataBaseManager::handleCommand(const std::string &Command) {
 	using namespace std;
 	vector<string> param;
+	string command;
+	cmprSpace(Command, command);
 	int cmd = ParamSpliter::Split(command, param/*, ParamSpliter::BASE_DEFAULT*/);
 	switch (cmd) {
 
