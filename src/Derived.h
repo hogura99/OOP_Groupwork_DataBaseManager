@@ -21,7 +21,7 @@ class dataInt : public Base{
         bool operator>(const dataInt& b) const;
         bool operator<(const dataInt& b) const;
         bool operator>=(const dataInt& b) const;
-        bool operator<=(const dataInt& b) const;       
+        bool operator<=(const dataInt& b) const;    
 };
 
 class dataDouble : public Base{
