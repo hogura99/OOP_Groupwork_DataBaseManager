@@ -1,7 +1,12 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <vector>
+#include <map>
+
+#include <cctype>
+#include <cmath>
 
 enum {
 	FORM_ERROR,
@@ -41,8 +46,8 @@ public:
 	//static void initMapping();
 	
 	static int  Split(const std::string &Command, std::vector<std::string> &param/*, int CmdType*/);
-	static void Split(const std::string &Command, std::vector<std::string> &param,
-												  std::vector<std::string> &not_null, std::string pri_key);
+	//static void Split(const std::string &Command, std::vector<std::string> &param,
+	//											  std::vector<std::string> &not_null, std::string pri_key);
 	static int split_use(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_show(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_drop(std::stringstream &ss, std::vector<std::string> &param);
@@ -51,16 +56,16 @@ public:
 	static int split_select(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_update(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_insert(std::stringstream &ss, std::vector<std::string> &param);
-	static void split_createTable(const std::string &Command, std::vector<std::string> &param,
+	static int split_createTable(const std::string &Command, std::vector<std::string> &param,
 										std::vector<std::string> &not_null, std::string pri_key);
 };
 
 void eraseSpace(std::string &str)
 {
-	while (!str.empty() && *str.back() == ' ')
+	while (!str.empty() && str.back() == ' ')
 		str.pop_back();
 	reverse(str.begin(), str.end());
-	while (!str.empty() && *str.back() == ' ')
+	while (!str.empty() && str.back() == ' ')
 		str.pop_back();
 	reverse(str.begin(), str.end());
 }
@@ -102,7 +107,7 @@ bool str2double(const std::string &str, double &val)
 				return false;
 			p = i;
 		}
-		else if (isdigit(c))
+		else if (isdigit(str[i]))
 			val = val * 10 + int(str[i] - '0');
 		else
 			return false;

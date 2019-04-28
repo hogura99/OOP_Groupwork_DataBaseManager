@@ -1,6 +1,6 @@
 #include "Data.h"
 
-Base* Data::getData(std::string attrName){
+Base* Data::getData(std::string attrName) const {
 	auto fd = varMap.find(attrName);
 	if(fd != varMap.end()){
 		return fd->second;

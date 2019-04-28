@@ -13,7 +13,7 @@ public:
 	Data();
 	~Data();
 	
-	Base* getData(std::string attrName);
+	Base* getData(std::string attrName) const;
 	Base* setData(std::string attrName, Base* src);
 	int getTypename(std::string attrName);
 };

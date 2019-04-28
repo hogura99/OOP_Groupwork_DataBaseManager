@@ -1,4 +1,6 @@
 #include "DataTable.h"
+
+#include <sstream>
 #include <assert.h>
 #define NAME first
 #define BASE second
@@ -37,7 +39,7 @@ bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attribute
 	for (auto iter = attributes.begin(); iter < attributes.end(); iter++)
 	{
 		if (iter->NAME == _DataTable.primaryKey)
-			primaryKeyValue = &iter->BASE;
+			primaryKeyValue = iter->BASE;
 	}
 	bool _exist = false;
 	for (auto iter = _DataTable.mData.begin(); iter != _DataTable.mData.end(); iter++)   //iter不能大小比较
@@ -104,7 +106,8 @@ void DataTable::insert(const std::vector< ATTRIBUTE > &attributes)
 	{
 		for (auto iter = attributes.begin(); iter < attributes.end(); iter++)
 		{
-			_data->setData(iter->NAME, &iter->BASE);
+			//Base* pt = &const_cast<Base>(iter->BASE); // 可能有bug！
+			_data->setData(iter->NAME, iter->BASE);
 		}
 		mData.insert(mData.end(), _data);
 		std::cerr << "Successfully inserted." << std::endl; //这里应该再输出更详细的信息的，这版就不写了
@@ -137,11 +140,11 @@ void DataTable::select(const std::string &attrName, std::vector<Base*> &attrList
 	}
 }
 
-bool checkSingleClause(const Data* it, const std::vector<std::string> &_param)
+bool DataTable::checkSingleClause(const Data* it, const std::vector<std::string> &_param)
 {
 	// 目前只解决param.size()==3的情况,即Attrbute?=value，并且未对参数进行检查
 	auto param = _param;
-	Base *pt_l == NULL, *pt_r == NULL;
+	Base *pt_l = NULL, *pt_r = NULL;
 	if (!attrTable.count(param[0]))
 		swap(param[0], param[2]);
 	if (!attrTable.count(param[0]))
@@ -175,7 +178,7 @@ bool checkSingleClause(const Data* it, const std::vector<std::string> &_param)
 	return res;
 }
 
-void __PopStack(std::stack<bool> &val, std::stack<int> &opr)
+void DataTable::__PopStack(std::stack<bool> &val, std::stack<int> &opr)
 {
 	bool se = val.top(); val.pop();
 	assert(!val.empty());
@@ -236,4 +239,9 @@ void DataTable::getDataWhere(const std::string &clause, std::list<Data*> &dataLi
 		if (calcExpr(it, clause))
 			dataList.push_back(it);
 	}
+}
+
+int DataTable::getTypeof(const std::string &attrName)
+{
+	return attrTable[attrName];
 }

@@ -7,7 +7,7 @@
 #include "ParamSpliter.h"
 #include "expression.h"
 #include "Data.h"
-#define ATTRIBUTE std::pair<std::string, Base>
+#define ATTRIBUTE std::pair<std::string, Base*>
 
 //typedef std::pair<std::string, Base> ATTRIBUTE;
 
@@ -19,6 +19,10 @@ class DataTable
         const std::string primaryKey;
         std::map<std::string, bool> notNullKey;
         std::map<std::string, int> attrTable; //实现一个接口
+    protected:
+        void __PopStack(std::stack<bool> &val, std::stack<int> &opr);
+        bool checkSingleClause(const Data* it, const std::vector<std::string> &_param);
+        bool calcExpr(const Data* it, const std::string &clause);
     public:
         DataTable(const std::string &_tableName, std::vector< std::pair<std::string, int> >& _attrTable, const std::string& _primaryKey, const std::vector<std::string>& _notNullKey);
         ~DataTable();
@@ -28,6 +32,7 @@ class DataTable
         void update(const ATTRIBUTE &attributes, std::list<Data*> &dataList);
         void select(const std::string &attrName, std::vector<Base*> &attrList, const std::list<Data*> &dataList);
         void getDataWhere(const std::string &clause, std::list<Data*> &dataList);
+        int getTypeof(const std::string &attrName);
         friend bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attributes);
-        std::map<std::string, int>& getattrTable() { return attrTable; }
+        std::map<std::string, int>& getAttrTable() { return attrTable; }
 };

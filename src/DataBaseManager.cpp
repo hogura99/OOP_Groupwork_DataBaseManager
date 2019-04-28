@@ -14,7 +14,7 @@ DataBaseManager::~DataBaseManager() {
 		delete it.second;
 }
 
-bool DataBaseManager::handleCommand(const std::string &Command) {
+void DataBaseManager::handleCommand(const std::string &Command) {
 	using namespace std;
 	vector<string> param;
 	string command;
@@ -44,7 +44,7 @@ bool DataBaseManager::handleCommand(const std::string &Command) {
 			break;
 		}
 		case TABLE_DROP: {
-			mWorkBase->dropBase(param[0]);
+			mWorkBase->dropTable(param[0]);
 			break;
 		}
 		case TABLE_SHOW_ALL: {
@@ -80,25 +80,23 @@ bool DataBaseManager::handleCommand(const std::string &Command) {
 	}
 }
 
-void DataBaseManager::createBase(const string &DBName) {
+void DataBaseManager::createBase(const std::string &DBName) {
 	mBase[DBName] = new DataBase(DBName);
 }
 
 void DataBaseManager::showBase() {
-	cout << " ++++++++++ \n ---------- " << endl;
+	using namespace std;
 	for (auto it: mBase) {
 		cout << it.first << endl;
-		it.second->printTable();
-		cout << " ---------- " << endl;
+		it.second->showTableAll();
 	}
-	cout << " ++++++++++\n " << endl;
 }
 
-void DataBaseManager::useBase(const string &DBName) {
+void DataBaseManager::useBase(const std::string &DBName) {
 	mWorkBase = mBase[DBName];
 }
 
-void DataBaseManager::dropBase(const string &DBName) {
+void DataBaseManager::dropBase(const std::string &DBName) {
 	auto it = mBase.find(DBName);
 	try {
 		if (it != mBase.end()) {

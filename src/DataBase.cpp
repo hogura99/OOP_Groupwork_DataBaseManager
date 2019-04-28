@@ -1,20 +1,40 @@
+#include "DataBase.h"
+#include <assert.h>
+
+DataBase::DataBase(const std::string &DBName): __name(DBName)
+{
+
+}
+
+DataBase::~DataBase()
+{
+	for (auto it: mTable)
+		delete it.second;
+}
+
 void DataBase::createTable(const std::string &command) {
 	using namespace std;
-	vector<string> param, attrType, not_null;
-	string pri_key;
+	vector<string> param, not_null;
+	vector<pair<string, int> > _attrType;
+	string pri_key = "\0";
 	auto res = ParamSpliter::split_createTable(command, param, not_null, pri_key);
 	assert(res == TABLE_CREATE); // !!!
 
 	for (int i = 1; i < param.size(); i += 2)
-		attrType.push_back(make_pair(param[i], param[i + 1]));
-	mTable[param[0]] = new DataTable(param[0], attrType, not_null);
+	{
+		pair<string, int> _attr;
+		_attr.first = param[i];
+		_attr.second = attrTypeMap[param[i + 1]];
+		_attrType.push_back(_attr);
+	}
+	mTable[param[0]] = new DataTable(param[0], _attrType, pri_key, not_null);
 }
 
 void DataBase::dropTable(const std::string &Name) {
 	try {
 		auto it = mTable.find(Name);
 		if (it != mTable.end()) {
-			delete it.second;
+			delete it->second;
 			mTable.erase(it);
 		} else
 			throw false;
@@ -29,10 +49,10 @@ void DataBase::showTable(const std::string &Name) {
 		auto it = mTable.find(Name);
 		if (it != mTable.end()) {
 
-			auto &_attrTable = mTable[Name];
+			auto &_attrTable = mTable[Name]->getAttrTable();
 			for (auto e: _attrTable)
 			{
-				cout << e.first << endl;
+				std::cout << e.first << std::endl;
 			}
 
 		} else
@@ -45,7 +65,7 @@ void DataBase::showTable(const std::string &Name) {
 
 void DataBase::showTableAll() { // temporarily function
 	for (auto it: mTable) {
-		cout << it.first << endl;
+		std::cout << it.first << std::endl;
 	}
 }
 
@@ -57,30 +77,36 @@ void DataBase::insertData(const std::vector<std::string> &param)
 		std::vector<ATTRIBUTE> _attributes;
 		for (int i = 1; i < param.size(); i += 2)
 		{
-			auto _attr_type = _table->getTypename(param[i]) ; // pay attention to the legality
+			auto _attr_type = _table->getTypeof(param[i]) ; // pay attention to the legality
 			Base *pt = NULL;
 			switch (_attr_type)
 			{
-				case DataTable::INT :
+				case INT :
+				{
 					int val = 0;
 					if (str2int(param[i + 1], val))
 						pt = new dataInt(val);
 					break;
-				case DataTable::DOUBLE :
+				}
+				case DOUBLE :
+				{
 					double val = 0;
 					if (str2double(param[i + 1], val))
 						pt = new dataDouble(val);
 					break;
-				case DataTable::STRING :
+				}
+				case STRING :
+				{
 					pt = new dataString(param[i + 1]);
 					break;
+				}
 			}
 			if (pt != NULL)
 			{
 				_attributes.push_back( ATTRIBUTE(param[i], pt) );
 			}
 		}
-		_table.insert(_attributes);
+		_table->insert(_attributes);
 	}
 	else
 	{
