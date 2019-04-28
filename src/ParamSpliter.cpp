@@ -2,41 +2,17 @@
 
 #include <stringstream>
 
-std::map<std::string, int> ParamSpliter::cmdType = std::map<std::string, int>;
-
-void eraseSpace(std::string &str)
+std::map<std::string, int> ParamSpliter::cmdType = 
 {
-	while (!str.empty() && *str.back() == ' ')
-		str.pop_back();
-	reverse(str.begin(), str.end());
-	while (!str.empty() && *str.back() == ' ')
-		str.pop_back();
-	reverse(str.begin(), str.end());
-}
-
-void cmprSpace(const std::string str1, std::string &str2)
-{
-	if (str1.empty())
-		return;
-	str2 = "";
-	str2.push_back(str1[0]);
-	for (size_t i = 0; i + 1 < str1.length(); i ++)
-		if (str1[i] == str1[i + 1] && str1[i] == ' ')
-			continue;
-		else
-			str2.push_back(str1[i + 1]);
-}
-
-void ParamSpliter::initMapping() {
-	cmdType["INSERT"] = cINSERT;
-	cmdType["CREATE"] = cCREATE;
-	cmdType["UPDATE"] = cUPDATE;
-	cmdType["DELETE"] = cDELETE;
-	cmdType["SELECT"] = cSELECT;
-	cmdType["DROP"] = cDROP;
-	cmdType["SHOW"] = cSHOW;
-	cmdType["USE"] = cUSE;
-}
+	{"INSERT", cINSERT},
+	{"CREATE", cCREATE},
+	{"UPDATE", cUPDATE},
+	{"DELETE", cDELETE},
+	{"SELECT", cSELECT},
+	{"DROP", cDROP},
+	{"SHOW", cSHOW},
+	{"USE", cUSE},
+};
 
 int ParamSpliter::Split(const std::string &Command, std::vector<std::string> &param/*, int CmdType*/)
 {
@@ -181,7 +157,7 @@ int ParamSpliter::split_delete(std::stringstream &ss, std::vector<std::string> &
 }
 
 void ParamSpliter::split_createTable(const std::string &Command, std::vector<std::string> &param,
-											std::vector<bool> &not_null, std::string pri_key)
+											std::vector<std::string> &not_null, std::string pri_key)
 {
 	std::stringstream ss(Command);
 	std::string str;
@@ -207,21 +183,19 @@ void ParamSpliter::split_createTable(const std::string &Command, std::vector<std
 		pt_r = Command.find_first_of(',', pt_l);
 		if (pt_r == string::npos || pt_r > brack_r)
 			pt_r = brack_r;
-		// find not null and ...
 		size_t pt_not_null = Command.find("NOT NULL", pt_l);
 		if (pt_not_null != string::npos && pt_not_null < pt_r)
 		{
 			str = Command.substr(pt_l, pt_not_null - pt_l);
 			eraseSpace(str);
 			param.push_back(str);
-			not_null.push_back(true);
+			not_null.push_back(str);
 		}
 		else
 		{
 			str = Command.substr(pt_l, pt_r - pt_l);
 			eraseSpace(str);
 			param.push_back(str);
-			not_null.push_back(false);
 		}
 		pt_l = pt_r + 1;
 	}

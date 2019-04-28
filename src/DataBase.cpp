@@ -1,7 +1,6 @@
 void DataBase::createTable(const std::string &command) {
 	using namespace std;
-	vector<string> param, attrType;
-	vector<bool> not_null;
+	vector<string> param, attrType, not_null;
 	string pri_key;
 	auto res = ParamSpliter::split_createTable(command, param, not_null, pri_key);
 	assert(res == TABLE_CREATE); // !!!
@@ -29,8 +28,13 @@ void DataBase::showTable(const std::string &Name) {
 	try {
 		auto it = mTable.find(Name);
 		if (it != mTable.end()) {
-			// xq should complete this showCol()
-			it.second->showCol(); // ? list each columns of table ? what is this ?
+
+			auto &_attrTable = mTable[Name];
+			for (auto e: _attrTable)
+			{
+				cout << e.first << endl;
+			}
+
 		} else
 			throw(false);
 	}
@@ -59,12 +63,12 @@ void DataBase::insertData(const std::vector<std::string> &param)
 			{
 				case DataTable::INT :
 					int val = 0;
-					if (myStr2Int(param[i + 1], val))
+					if (str2int(param[i + 1], val))
 						pt = new dataInt(val);
 					break;
 				case DataTable::DOUBLE :
 					double val = 0;
-					if (myStr2Double(param[i + 1], val))
+					if (str2double(param[i + 1], val))
 						pt = new dataDouble(val);
 					break;
 				case DataTable::STRING :
@@ -81,5 +85,28 @@ void DataBase::insertData(const std::vector<std::string> &param)
 	else
 	{
 		// show insert error
+	}
+}
+
+void DataBase::selectData(const std::vector<std::string> &param)
+{
+	using namespace std;
+	string _attrName = param[0];
+	string _tableName = param[1];
+
+	DataTable* _table = mTable[_tableName];
+	list<Data*> _dataList;
+	vector<Base*> _attrList;
+
+	if (param.size() == 2)
+		_table->getDataWhere(param[2], _dataList);
+	else
+		_table->getDataWhere("", _dataList);
+
+	_table->select(_attrName, _attrList, _dataList);
+	// ?? what to do next ?? //
+	for (auto it: _attrList)
+	{
+		cout << it->getTypename() << endl;
 	}
 }

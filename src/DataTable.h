@@ -4,6 +4,8 @@
 #include <vector>
 #include <list>
 #include <map>
+#include "ParamSpliter.h"
+#include "expression.h"
 #include "Data.h"
 #define ATTRIBUTE std::pair<std::string, Base>
 

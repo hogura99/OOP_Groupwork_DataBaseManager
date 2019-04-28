@@ -10,6 +10,7 @@ class Base{
         virtual ~Base(){}
         virtual Base* setData(){return NULL;}
         virtual int getTypename(){return -1;}
+}
 };
 
 #endif
