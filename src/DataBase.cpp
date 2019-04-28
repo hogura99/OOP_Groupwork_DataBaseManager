@@ -24,7 +24,7 @@ void DataBase::createTable(const std::string &command) {
 	{
 		pair<string, int> _attr;
 		_attr.first = param[i];
-		_attr.second = attrTypeMap[param[i + 1]];
+		_attr.second = attrTypeMap.at(param[i + 1]);
 		_attrType.push_back(_attr);
 	}
 	mTable[param[0]] = new DataTable(param[0], _attrType, pri_key, not_null);
@@ -71,6 +71,7 @@ void DataBase::showTableAll() { // temporarily function
 
 void DataBase::insertData(const std::vector<std::string> &param)
 {
+	//using namespace Params;
 	if (mTable.count(param[0]) || param.size() % 2 == 1)
 	{
 		auto _table = mTable[ param[0] ];
@@ -84,14 +85,14 @@ void DataBase::insertData(const std::vector<std::string> &param)
 				case INT :
 				{
 					int val = 0;
-					if (str2int(param[i + 1], val))
+					if (Params::str2int(param[i + 1], val))
 						pt = new dataInt(val);
 					break;
 				}
 				case DOUBLE :
 				{
 					double val = 0;
-					if (str2double(param[i + 1], val))
+					if (Params::str2double(param[i + 1], val))
 						pt = new dataDouble(val);
 					break;
 				}
@@ -135,4 +136,68 @@ void DataBase::selectData(const std::vector<std::string> &param)
 	{
 		cout << it->getTypename() << endl;
 	}
+}
+
+void DataBase::updateData(const std::vector<std::string> &param)
+{
+	// only set one attribute
+	using namespace std;
+	//using namespace Params;
+	string _tableName = param[0];
+	string _attrName  = param[1];
+	string _attrVStr  = param[2];
+	DataTable *_table = mTable[_tableName];
+	Base *_attrVal = NULL;
+	switch (_table->getTypeof(_attrName))
+	{
+		case INT:
+		{
+			int val;
+			if (Params::str2int(_attrVStr, val))
+				_attrVal = new dataInt(val);
+			break;
+		}
+		case DOUBLE:
+		{
+			double val;
+			if (Params::str2double(_attrVStr, val))
+				_attrVal = new dataDouble(val);
+			break;
+		}
+		case STRING:
+		{
+			_attrVal = new dataString(_attrVStr);
+			break;
+		}
+		default:
+		{
+			// throw an error, wrong type
+			break;
+		}
+	}
+	ATTRIBUTE _attribute = ATTRIBUTE(_attrName, _attrVal);
+
+	static list<Data*> _dataList;
+	if (param.size() == 4)
+		_table->getDataWhere(param[3], _dataList);
+	else
+		_table->getDataWhere("", _dataList);
+
+	_table->update(_attribute, _dataList);
+}
+
+void DataBase::deleteData(const std::vector<std::string> &param)
+{
+	using namespace std;
+
+	string _tableName = param[0];
+	DataTable *_table = mTable[_tableName];
+
+	static list<Data*> _dataList;
+	if (param.size() == 2)
+		_table->getDataWhere(param[1], _dataList);
+	else
+		_table->getDataWhere("", _dataList);
+
+	_table->remove(_dataList);
 }

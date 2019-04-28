@@ -2,7 +2,6 @@
 #include <vector>
 
 #include "DataBaseManager.h"
-#include "ParamSpliter.h"
 
 DataBaseManager::DataBaseManager() {
 	mWorkBase = NULL;
@@ -18,7 +17,7 @@ void DataBaseManager::handleCommand(const std::string &Command) {
 	using namespace std;
 	vector<string> param;
 	string command;
-	cmprSpace(Command, command);
+	Params::cmprSpace(Command, command);
 	int cmd = ParamSpliter::Split(command, param/*, ParamSpliter::BASE_DEFAULT*/);
 	switch (cmd) {
 

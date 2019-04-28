@@ -10,8 +10,8 @@
 class Data{
 	std::map<std::string, Base* > varMap;
 public:
-	Data();
-	~Data();
+	Data() {}
+	~Data() {}
 	
 	Base* getData(std::string attrName) const;
 	Base* setData(std::string attrName, Base* src);

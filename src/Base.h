@@ -15,7 +15,7 @@ enum attrType
     STRING
 };
 
-std::map<std::string, int> attrTypeMap =
+const std::map<std::string, int> attrTypeMap =
 {
 	{"int", INT},
 	{"double", DOUBLE},

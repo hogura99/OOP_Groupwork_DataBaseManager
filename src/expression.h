@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef EXPRESSION_H
+#define EXPRESSION_H
+
 #include <string>
 #include <stack>
 #include <map>
@@ -31,17 +34,24 @@ const int oprORDER[] =
 	3,
 };
 
-std::map<std::string, int> oprTYPE =
+namespace Exprs
 {
-	{ "==", opEQ },
-	{ ">" , opGI },
-	{ "<" , opLE },
-	{ ">=", opGIQ },
-	{ "<=", opLEQ },
-	{ "!=", opNEQ },
-	{ "OR", opOR },
-	{ "AND", opAND },
-	{ "NOT", opNOT },
-};
+
+	static std::map<std::string, int> oprTYPE =
+	{
+		{ "==", opEQ },
+		{ ">" , opGI },
+		{ "<" , opLE },
+		{ ">=", opGIQ },
+		{ "<=", opLEQ },
+		{ "!=", opNEQ },
+		{ "OR", opOR },
+		{ "AND", opAND },
+		{ "NOT", opNOT },
+	};
+
+}
 
 #define IS_LOGIC_OPRT(opr) ((opr) == "OR" || (opr) == "AND" || (opr) == "NOT")
+
+#endif

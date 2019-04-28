@@ -389,5 +389,15 @@ int ParamSpliter::split_drop(std::stringstream &ss, std::vector<std::string> &pa
 		return FORM_ERROR;
 }
 
+void eraseSpace(std::string &str)
+{
+	while (!str.empty() && str.back() == ' ')
+		str.pop_back();
+	reverse(str.begin(), str.end());
+	while (!str.empty() && str.back() == ' ')
+		str.pop_back();
+	reverse(str.begin(), str.end());
+}
+
 #undef GET_WEHRE_CLAUSE
 #undef CHECK_STR

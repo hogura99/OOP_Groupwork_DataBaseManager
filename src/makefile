@@ -1,5 +1,5 @@
 all: DataBaseManager.o DataBase.o ParamSpliter.o main.o Base.o Derived.o DataTable.o Data.o
-	g++ DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Base.o Derived.o Data.o main.o -o main -std=c++14 &> ErrorInfo.txt
+	g++ DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Base.o Derived.o Data.o main.o -o main -std=c++14
 
 main.o: main.cpp
 	g++ -c main.cpp -o main.o -std=c++14

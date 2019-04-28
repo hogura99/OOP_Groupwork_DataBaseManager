@@ -21,6 +21,8 @@ Base* Data::setData(std::string attrName, Base* src){
 	else{//insert
 		varMap.insert(std::make_pair(attrName, src));
 	}
+
+	return varMap[attrName];
 }
 
 int Data::getTypename(std::string attrName){

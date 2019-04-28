@@ -28,6 +28,11 @@ DataTable::DataTable(const std::string &_tableName, std::vector< std::pair<std::
 	}
 }
 
+DataTable::~DataTable()
+{
+	for (auto v: mData)
+		delete v;
+}
 
 bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attributes)
 {
@@ -143,6 +148,7 @@ void DataTable::select(const std::string &attrName, std::vector<Base*> &attrList
 bool DataTable::checkSingleClause(const Data* it, const std::vector<std::string> &_param)
 {
 	// 目前只解决param.size()==3的情况,即Attrbute?=value，并且未对参数进行检查
+	//using namespace Params;
 	auto param = _param;
 	Base *pt_l = NULL, *pt_r = NULL;
 	if (!attrTable.count(param[0]))
@@ -156,8 +162,8 @@ bool DataTable::checkSingleClause(const Data* it, const std::vector<std::string>
 	else
 		switch (attrTable[param[0]])
 		{
-			case INT: pt_r = new dataInt(str2int(param[2])); break;
-			case DOUBLE: pt_r = new dataInt(str2double(param[2])); break;
+			case INT: pt_r = new dataInt(Params::str2int(param[2])); break;
+			case DOUBLE: pt_r = new dataInt(Params::str2double(param[2])); break;
 			case STRING: pt_r = new dataString(param[2]); break;
 			default: break;
 		}
@@ -166,7 +172,7 @@ bool DataTable::checkSingleClause(const Data* it, const std::vector<std::string>
 	Base &val_r = *pt_r;
 
 	bool res = false;
-	switch (oprTYPE[param[1]])
+	switch (Exprs::oprTYPE[param[1]])
 	{
 		case opLE:  res = val_l <  val_r; break;
 		case opGI:  res = val_l >  val_r; break;
@@ -213,7 +219,7 @@ bool DataTable::calcExpr(const Data* it, const std::string &clause)
 			ss >> tmp;
 			if (IS_LOGIC_OPRT(tmp))
 			{
-				_opr = oprTYPE[tmp];
+				_opr = Exprs::oprTYPE[tmp];
 				break;
 			}
 			else

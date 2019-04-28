@@ -4,6 +4,7 @@
 #include <map>
 
 #include "DataBase.h"
+#include "ParamSpliter.h"
 
 class DataBaseManager {
 
