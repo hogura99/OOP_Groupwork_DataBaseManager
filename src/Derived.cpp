@@ -19,7 +19,7 @@ int dataInt::getValue()const{
 }
 
 int dataInt::getTypename(){
-	return 0;
+	return INT;
 }
 bool dataInt::operator==(const dataInt& b) const{
 	return data == b.getValue();
@@ -49,7 +49,7 @@ double dataDouble::getValue()const{
 }
 
 int dataDouble::getTypename(){
-	return 1;
+	return DOUBLE;
 }
 bool dataDouble::operator==(const dataDouble& b) const{
 	return data == b.getValue();
@@ -80,7 +80,7 @@ std::string dataString::getValue() const{
 }
 
 int dataString::getTypename(){
-	return 2;
+	return STRING;
 }
 bool dataString::operator==(const dataString& b) const{
 	return data == b.getValue();

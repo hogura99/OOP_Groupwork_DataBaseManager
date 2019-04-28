@@ -5,11 +5,31 @@
 #include <string>
 
 
+enum attrType
+{
+    NONE_TYPE,
+    INT,
+    DOUBLE,
+    STRING
+};
+
 class Base{
-    public:
-        virtual ~Base(){}
-        virtual Base* setData(){return NULL;}
-        virtual int getTypename(){return -1;}
+private:
+	virtual bool __compare(const Base *val_l, const Base *val_r, int type, int opr) const;
+protected:
+	int _typeName;
+public:
+	virtual Base() {_typeName = NONE_TYPE;}
+    virtual ~Base(){}
+    virtual Base* setData(){return NULL;}
+    virtual int getTypename();
+
+    bool operator==(const Base& b) const;
+    bool operator!=(const Base& b) const;
+    bool operator>(const Base& b) const;
+    bool operator<(const Base& b) const;
+    bool operator>=(const Base& b) const;
+    bool operator<=(const Base& b) const;    
 }
 };
 

@@ -20,12 +20,6 @@ class DataTable
         std::map<std::string, bool> notNullKey;
         std::map<std::string, int> attrTable; //实现一个接口
     public:
-        enum attrType
-        {
-            INT,
-            DOUBLE,
-            STRING
-        };
         DataTable(const std::string &_tableName, std::vector< std::pair<std::string, int> >& _attrTable, const std::string& _primaryKey, const std::vector<std::string>& _notNullKey);
         ~DataTable();
         void insert(const std::vector< ATTRIBUTE > &attributes);

@@ -6,6 +6,7 @@
 #include "Base.h"
 #include <string>
 
+
 class dataInt : public Base{
     int data;
     public:
