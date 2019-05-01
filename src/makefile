@@ -1,29 +1,32 @@
 all: DataBaseManager.o DataBase.o ParamSpliter.o main.o Base.o Derived.o DataTable.o Data.o
-	g++ DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Base.o Derived.o Data.o main.o -o main -std=c++14
+	g++ DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Base.o Derived.o Data.o main.o -o debug/main -std=c++14 -g
 
 main.o: main.cpp
-	g++ -c main.cpp -o main.o -std=c++14
+	g++ -c main.cpp -o main.o -std=c++14 -g
 
 DataBaseManager.o: DataBaseManager.cpp DataBaseManager.h
-	g++ -c DataBaseManager.cpp -o DataBaseManager.o -std=c++14
+	g++ -c DataBaseManager.cpp -o DataBaseManager.o -std=c++14 -g
 
 DataBase.o: DataBase.cpp DataBase.h DataTable.h DataTable.cpp
-	g++ -c DataBase.cpp -o DataBase.o -std=c++14
+	g++ -c DataBase.cpp -o DataBase.o -std=c++14 -g
 
 DataTable.o: DataTable.cpp DataTable.h ParamSpliter.h expression.h
-	g++ -c DataTable.cpp -o DataTable.o -std=c++14
+	g++ -c DataTable.cpp -o DataTable.o -std=c++14 -g
 
 ParamSpliter.o: ParamSpliter.cpp ParamSpliter.h
-	g++ -c ParamSpliter.cpp -o ParamSpliter.o -std=c++14
+	g++ -c ParamSpliter.cpp -o ParamSpliter.o -std=c++14 -g
 
 Data.o: Data.cpp Data.h
-	g++ -c Data.cpp -o Data.o -std=c++14
+	g++ -c Data.cpp -o Data.o -std=c++14 -g
 
 Base.o: Base.cpp Base.h Derived.h expression.h
-	g++ -c Base.cpp -o Base.o -std=c++14
+	g++ -c Base.cpp -o Base.o -std=c++14 -g
 
 Derived.o: Derived.h Derived.cpp
-	g++ -c Derived.cpp -o Derived.o -std=c++14
+	g++ -c Derived.cpp -o Derived.o -std=c++14 -g
+
+gdb:
+	gdb debug/main
 
 clean:
 	rm *.o

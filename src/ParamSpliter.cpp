@@ -4,6 +4,8 @@
 
 #include <sstream>
 
+#define IS_FROM(str) (str == "FROM" || str == "from")
+
 std::map<std::string, int> ParamSpliter::cmdType = 
 {
 	{"INSERT", cINSERT},
@@ -14,6 +16,15 @@ std::map<std::string, int> ParamSpliter::cmdType =
 	{"DROP", cDROP},
 	{"SHOW", cSHOW},
 	{"USE", cUSE},
+
+	{"insert", cINSERT},
+	{"create", cCREATE},
+	{"update", cUPDATE},
+	{"delete", cDELETE},
+	{"select", cSELECT},
+	{"drop", cDROP},
+	{"show", cSHOW},
+	{"use", cUSE},
 };
 
 int ParamSpliter::Split(const std::string &Command, std::vector<std::string> &param/*, int CmdType*/)
@@ -78,11 +89,11 @@ int ParamSpliter::split_create(std::stringstream &ss, std::vector<std::string> &
 	ss >> str;
 	if (str == "TABLE")
 		return TABLE_CREATE;
-	if (str != "BASE")
-		return FORM_ERROR;
-	ss >> str;
 	if (str != "DATABASE")
 		return FORM_ERROR;
+	/*ss >> str;
+	if (str != "DATABASE")
+		return FORM_ERROR;*/
 	ss >> str;
 	if (str.length() == 0)
 		return FORM_ERROR;
@@ -91,15 +102,34 @@ int ParamSpliter::split_create(std::stringstream &ss, std::vector<std::string> &
 	return BASE_CREATE;
 }
 
-#define GET_WEHRE_CLAUSE(ss, param) \
-{									\
-	std::string expr;				\
-	while (ss >> str) {				\
-		expr += str;				\
-		if (!ss.eof())				\
-			expr += " ";			\
-	}								\
-	param.push_back(expr);			\
+void ParamSpliter::split_where(std::stringstream &ss, std::vector<std::string> &param)
+{
+	std::string expr, expr2;
+	std::string str;
+	while (!ss.eof())
+	{
+		ss >> str;
+		for (int i = 0; i < str.length(); i ++)
+		{
+			bool flag = false;
+			for (int j = 3; j >= 1 && i + j <= str.length(); j --)
+			{
+				if (Exprs::oprTYPE.count(str.substr(i, j)))
+				{
+					expr += " " + str.substr(i, j) + " ";
+					i += j - 1;
+					flag = true;
+					break;
+				}
+			}
+			if (!flag)
+				expr += str[i];
+		}
+		if (!ss.eof())
+			expr += " ";
+	}
+	Params::cmprSpace(expr, expr2);
+	param.push_back(expr2);
 }
 
 int ParamSpliter::split_select(std::stringstream &ss, std::vector<std::string> &param)
@@ -107,12 +137,12 @@ int ParamSpliter::split_select(std::stringstream &ss, std::vector<std::string> &
 	std::string str;
 	param.clear();
 	while (ss >> str) {
-		if (str == "FROM")
+		if (IS_FROM(str))
 			break;
 		param.push_back(str);
 	}
 
-	if (str != "FROM")
+	if (!IS_FROM(str))
 		return FORM_ERROR;
 	if (!(ss >> str))
 		return FORM_ERROR;
@@ -127,7 +157,7 @@ int ParamSpliter::split_select(std::stringstream &ss, std::vector<std::string> &
 	if (str != "WHERE")
 		return FORM_ERROR;
 
-	GET_WEHRE_CLAUSE(ss, param);
+	ParamSpliter::split_where(ss, param);
 	return DATA_SELECT;
 }
 
@@ -135,7 +165,7 @@ int ParamSpliter::split_delete(std::stringstream &ss, std::vector<std::string> &
 {
 	std::string str;
 	ss >> str;
-	if (str != "FROM" || ss.eof())
+	if (!IS_FROM(str) || ss.eof())
 		return FORM_ERROR;
 	ss >> str;
 	param.clear();
@@ -149,7 +179,7 @@ int ParamSpliter::split_delete(std::stringstream &ss, std::vector<std::string> &
 	ss >> str;
 	if (str != "WHERE" || ss.eof())
 		return FORM_ERROR;
-	GET_WEHRE_CLAUSE(ss, param);
+	ParamSpliter::split_where(ss, param);
 	return DATA_DELETE;
 }
 
@@ -159,123 +189,73 @@ int ParamSpliter::split_delete(std::stringstream &ss, std::vector<std::string> &
 }
 
 int ParamSpliter::split_createTable(const std::string &Command, std::vector<std::string> &param,
-											std::vector<std::string> &not_null, std::string pri_key)
+											std::vector<std::string> &not_null, std::string &pri_key)
 {
-	std::stringstream ss(Command);
-	std::string str;
+	using namespace std;
+	string _command, str;
+	Params::replaceMark(Command, _command);
+	stringstream ss(_command);
 	ss >> str;
 	assert(str == "CREATE");
 	ss >> str;
 	assert(str == "TABLE");
-	size_t pt_l = Command.find("TABLE") + 5;
-	size_t pt_r = Command.find_first_of('(', pt_l);
-	CHECK_STR(pt_r);
 	param.clear();
 
-	str = Command.substr(pt_l, pt_r - pt_l); // table name
+	ss >> str;
 	param.push_back(str);
-	// 以下放弃处理非法读入情况
 
-	size_t brack_r = Command.find_first_of(')', pt_r);
-	CHECK_STR(brack_r);
-	pt_l = pt_r + 1;
-	pt_r = pt_l;
-	while (pt_l < brack_r)
+	str = "";
+	string _attrName = "", _attrType = "";
+	while (!ss.eof())
 	{
-		pt_r = Command.find_first_of(',', pt_l);
-		if (pt_r == std::string::npos || pt_r > brack_r)
-			pt_r = brack_r;
-		size_t pt_not_null = Command.find("NOT NULL", pt_l);
-		if (pt_not_null != std::string::npos && pt_not_null < pt_r)
+		ss >> _attrName >> _attrType;
+
+		if (_attrName == "PRIMARY" && _attrType == "KEY")
 		{
-			str = Command.substr(pt_l, pt_not_null - pt_l);
-			eraseSpace(str);
-			param.push_back(str);
+			ss >> str;
+			pri_key = str;
+			break;
+		}
+
+		if (_attrName == "NOT" && _attrType == "NULL")
+		{
+			if (str == "")
+				return FORM_ERROR;
 			not_null.push_back(str);
+			str = "";
+			continue;
 		}
-		else
-		{
-			str = Command.substr(pt_l, pt_r - pt_l);
-			eraseSpace(str);
-			param.push_back(str);
-		}
-		pt_l = pt_r + 1;
+
+		param.push_back(_attrName);
+		param.push_back(_attrType);
+		str = _attrName;
 	}
-
-	pt_r = Command.find("PRIMARY KEY", pt_l);
-	CHECK_STR(pt_r);
-	pt_l = Command.find_first_of('(', pt_r);
-	CHECK_STR(pt_l);
-	pt_l ++;
-	pt_r = Command.find_first_of(')', pt_l);
-	pri_key = Command.substr(pt_l, pt_r - pt_l);
-
 	return TABLE_CREATE;
 }
 
 int ParamSpliter::split_insert(std::stringstream &ss, std::vector<std::string> &param)
 {
-	std::string str, cmd;
-	ss >> str;
-	if (ss.eof() || str != "INTO")
+	using namespace std;
+	string Command = ss.str(), _command, str;
+	Params::replaceMark(Command, _command);
+	stringstream cmd(_command);
+
+	cmd >> str >> str; // INSERT INTO
+	if (cmd.eof() || str != "INTO")
 		return FORM_ERROR;
-	cmd = ss.str();
 
-	size_t pt_l = str.find("INTO") + 5;
-	size_t pt_r = str.find_first_of('(', pt_l);
-	CHECK_STR(pt_r);
-
-	str = cmd.substr(pt_l, pt_r - pt_l);
 	param.clear();
-	eraseSpace(str);
-	param.push_back(str); // the name of data table
+	cmd >> str;
+	param.push_back(str); // table name
 
-	int count_attr = 0;
-
-	size_t brack_r = cmd.find_first_of(')', pt_r);
-	CHECK_STR(brack_r);
-
-	pt_l = pt_r + 1;
-	while (pt_l < brack_r && cmd[pt_l] == ' ')
-		pt_l ++;
-	while (pt_r < brack_r)
+	while (!cmd.eof())
 	{
-		pt_r = cmd.find_first_of(',', pt_l);
-		if (pt_r == std::string::npos)
-			pt_r = brack_r;
-		str = cmd.substr(pt_l, pt_r - pt_l);
-		eraseSpace(str);
-		param.push_back(str);
-		pt_l = pt_r + 1;
-		count_attr ++;
+		cmd >> str;
+		if (str != "VALUES")
+			param.push_back(str);
 	}
 
-	pt_l = cmd.find("VALUES");
-	CHECK_STR(pt_l);
-	pt_l = cmd.find_first_of('(', pt_l);
-	CHECK_STR(pt_l);
-	brack_r = cmd.find_first_of(')', pt_l);
-	CHECK_STR(brack_r);
-
-	int count_value = 0;
-	pt_l = pt_l + 1;
-	pt_r = pt_l;
-	while (pt_r < brack_r)
-	{
-		pt_r = cmd.find_first_of(',', pt_l);
-		if (pt_r == std::string::npos)
-			pt_r = brack_r;
-		str = cmd.substr(pt_l, pt_r - pt_l);
-		eraseSpace(str);
-		param.push_back(str);
-		pt_l = pt_r + 1;
-		count_value ++;
-	}
-
-	if (count_value != count_attr)
-		return FORM_ERROR;
-	else
-		return DATA_INSERT;
+	return DATA_INSERT;
 }
 
 int ParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &param)
@@ -284,7 +264,7 @@ int ParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &
 		return FORM_ERROR;
 	param.clear();
 	std::string str;
-	ss >> str >> str;
+	ss >> str;
 	param.push_back(str);
 	ss >> str;
 	if (str != "SET" || ss.eof())
@@ -318,14 +298,14 @@ int ParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &
 			size_t p = str.find('=');
 			if (p == 0 || p + 1 == str.length())
 				return FORM_ERROR;
-			str1 = str.substr(0, p - 1);
+			str1 = str.substr(0, p);
 			str2 = str.substr(p + 1, str.length() - p);
 			param.push_back(str1);
 			param.push_back(str2);
 		}
 	}
 	if (str == "WHERE")
-		GET_WEHRE_CLAUSE(ss, param);
+		ParamSpliter::split_where(ss, param);
 	return DATA_UPDATE;
 }
 
@@ -350,20 +330,18 @@ int ParamSpliter::split_show(std::stringstream &ss, std::vector<std::string> &pa
 		return BASE_SHOW;
 	else if (str == "TABLES")
 		return TABLE_SHOW_ALL;
-	else if (str == "FROM")
+	else if (str != "columns")
 		return FORM_ERROR;
 
 	param.clear();
 	do {
-		param.push_back(str);
 		ss >> str;
-	} while (str != "FROM" && !ss.eof());
+	} while (!IS_FROM(str) && !ss.eof());
 	if (ss.eof())
 		return FORM_ERROR;
 	ss >> str;
-	if (ss.eof())
-		return FORM_ERROR;
-	ss >> str;
+	if (str.back() == ';')
+		str.pop_back();
 	param.push_back(str);
 
 	return TABLE_SHOW_COL;
@@ -399,5 +377,4 @@ void eraseSpace(std::string &str)
 	reverse(str.begin(), str.end());
 }
 
-#undef GET_WEHRE_CLAUSE
 #undef CHECK_STR

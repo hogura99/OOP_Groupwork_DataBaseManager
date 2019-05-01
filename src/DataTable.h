@@ -25,6 +25,7 @@ class DataTable
         void __PopStack(std::stack<bool> &val, std::stack<int> &opr);
         bool checkSingleClause(const Data* it, const std::vector<std::string> &_param);
         bool calcExpr(const Data* it, const std::string &clause);
+        Base* transValue(const Data* _attr, std::string val, int dataType);
     public:
         DataTable(const std::string &_tableName, std::vector< std::pair<std::string, int> >& _attrTable, const std::string& _primaryKey, const std::vector<std::string>& _notNullKey);
         ~DataTable();
@@ -37,4 +38,5 @@ class DataTable
         int getTypeof(const std::string &attrName);
         friend bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attributes);
         std::map<std::string, int>& getAttrTable() { return attrTable; }
+        virtual void printAttrTable();
 };

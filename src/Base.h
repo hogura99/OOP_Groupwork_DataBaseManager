@@ -2,6 +2,8 @@
 
 #ifndef BASE_H
 #define BASE_H
+
+#include <iostream>
 #include <string>
 #include <map>
 
@@ -17,9 +19,16 @@ enum attrType
 
 const std::map<std::string, int> attrTypeMap =
 {
-	{"int", INT},
-	{"double", DOUBLE},
-	{"string", STRING},
+	{"INT", INT},
+	{"DOUBLE", DOUBLE},
+	{"CHAR", STRING},
+};
+
+const std::map<int, std::string> attrTypeInvMap = 
+{
+    {INT, "int"},
+    {DOUBLE, "double"},
+    {STRING, "char"},
 };
 
 class Base{
@@ -39,6 +48,7 @@ public:
     bool operator<(const Base& b) const;
     bool operator>=(const Base& b) const;
     bool operator<=(const Base& b) const;   
+    friend std::ostream& operator<<(std::ostream& out, Base& b);
 };
 
 #endif

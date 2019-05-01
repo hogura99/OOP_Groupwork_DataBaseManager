@@ -34,8 +34,10 @@ DataTable::~DataTable()
 		delete v;
 }
 
-bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attributes)
+bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attributes) // This place will cause a segmentation fault, why ??? Guess that destruction function cause it.
 {
+	// not check temporarily
+
 	bool flag = true;   //函数返回值
 
 	//检查主键
@@ -103,7 +105,7 @@ bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attribute
 void DataTable::insert(const std::vector< ATTRIBUTE > &attributes)
 {
 	Data* _data = new Data;
-	if (!checkLegality(*this, attributes))
+	if (0 /* this place will cuase a segmentation fault, why ??? */ && checkLegality(*this, attributes))
 	{
 		std::cerr << "Failed to insert. Please check your input. "<< std::endl;
 	}
@@ -145,28 +147,63 @@ void DataTable::select(const std::string &attrName, std::vector<Base*> &attrList
 	}
 }
 
-bool DataTable::checkSingleClause(const Data* it, const std::vector<std::string> &_param)
+void DataTable::printAttrTable()
+{
+	using namespace std;
+	/*{
+		cout << PRINT_TABLE_TYPE[0];
+		for (int i = 1; i < PRINT_TABLE_TYPE_COUNT; i ++)
+		{
+			cout << PRINT_TABLE_TYPE[i] << "\t";
+		}
+		cout << endl;
+	}*/
+	cout << "Field\tType\tNull\tKey\tDefault\tExtra" << endl;
+	for (auto _attr: attrTable)
+	{
+		string _attrName = _attr.first;
+		int _attrType = _attr.second;
+		cout << _attrName;
+		cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << _attrType << ")";
+		if (notNullKey[_attrName])
+			cout << "\t" << "NO";
+		else
+			cout << "\t" << "YES";
+		if (primaryKey == _attrName)
+			cout << "\t" << "PRI" << "\t" << "NULL";
+		else
+			cout << "\t" << "NULL";
+		cout << endl;
+	}
+}
+
+Base* DataTable::transValue(const Data*_attr, std::string val, int _dataType)
+{
+	Base *res = NULL;
+	if (attrTable.count(val))
+		return _attr->getData(val);
+	else
+		switch (_dataType)
+		{
+			case INT: res = new dataInt(Params::str2int(val)); break;
+			case DOUBLE: res = new dataInt(Params::str2double(val)); break;
+			case STRING: res = new dataString(val); break;
+			default: res = NULL; break;
+		}
+	return res;
+}
+
+bool DataTable::checkSingleClause(const Data* attr, const std::vector<std::string> &param)
 {
 	// 目前只解决param.size()==3的情况,即Attrbute?=value，并且未对参数进行检查
-	//using namespace Params;
-	auto param = _param;
 	Base *pt_l = NULL, *pt_r = NULL;
-	if (!attrTable.count(param[0]))
-		swap(param[0], param[2]);
-	if (!attrTable.count(param[0]))
-		return false;
-
-	pt_l = it->getData(param[0]);
+	int dataType = -1;
+	if (attrTable.count(param[0]))
+		dataType = attrTable[param[0]];
 	if (attrTable.count(param[2]))
-		pt_r = it->getData(param[2]);
-	else
-		switch (attrTable[param[0]])
-		{
-			case INT: pt_r = new dataInt(Params::str2int(param[2])); break;
-			case DOUBLE: pt_r = new dataInt(Params::str2double(param[2])); break;
-			case STRING: pt_r = new dataString(param[2]); break;
-			default: break;
-		}
+		dataType = attrTable[param[2]];
+	pt_l = transValue(attr, param[0], dataType);
+	pt_r = transValue(attr, param[2], dataType);
 
 	Base &val_l = *pt_l;
 	Base &val_r = *pt_r;
@@ -181,6 +218,8 @@ bool DataTable::checkSingleClause(const Data* it, const std::vector<std::string>
 		case opGIQ: res = val_l >= val_r; break;
 		case opNEQ: res = val_l != val_r; break;
 	}
+
+	std::cerr << val_l << " " << param[1] << " " << val_r << " = " << res << std::endl;
 	return res;
 }
 
@@ -213,7 +252,7 @@ bool DataTable::calcExpr(const Data* it, const std::string &clause)
 	{
 		vector<string> param;
 		string tmp;
-		int _opr = 0;
+		int _opr = -1;
 		while (!ss.eof())
 		{
 			ss >> tmp;
@@ -225,10 +264,11 @@ bool DataTable::calcExpr(const Data* it, const std::string &clause)
 			else
 				param.push_back(tmp);
 		}
+		val.push(checkSingleClause(it, param));
 		while (!opr.empty() && oprORDER[opr.top()] > oprORDER[_opr])
 			__PopStack(val, opr);
-		val.push(checkSingleClause(it, param));
-		opr.push(_opr);
+		if (~_opr)
+			opr.push(_opr);
 	}
 
 	while (!opr.empty()) // 这里可以考虑用一个函数指针来扩展逻辑运算符

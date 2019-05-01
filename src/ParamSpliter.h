@@ -11,6 +11,8 @@
 #include <cctype>
 #include <cmath>
 
+#include "expression.h"
+
 enum {
 	FORM_ERROR,
 	BASE_DEFAULT,
@@ -60,7 +62,9 @@ public:
 	static int split_update(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_insert(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_createTable(const std::string &Command, std::vector<std::string> &param,
-										std::vector<std::string> &not_null, std::string pri_key);
+										std::vector<std::string> &not_null, std::string &pri_key);
+
+	static void split_where(std::stringstream &ss, std::vector<std::string> &param);
 };
 
 void eraseSpace(std::string &str);
@@ -91,6 +95,27 @@ public:
 			else
 				return false;
 		return true;
+	}
+
+	static void replaceMark(const std::string &src, std::string &dst)
+	{
+		dst.clear();
+		bool _in_string = 0;
+		for (char c: src)
+		{
+			if (c == '\"')
+				_in_string ^= 1;
+			if (_in_string)
+			{
+				dst.push_back(c);
+				continue;
+			}
+			if (c != '(' && c != ')' && c != ',' && c != ';') // this place can be replace with a self-definition function
+				dst.push_back(c);
+			else
+				dst.push_back(' ');
+		}
+		eraseSpace(dst);
 	}
 
 	static bool str2double(const std::string &str, double &val)

@@ -39,7 +39,7 @@ namespace Exprs
 
 	static std::map<std::string, int> oprTYPE =
 	{
-		{ "==", opEQ },
+		{ "=", opEQ },
 		{ ">" , opGI },
 		{ "<" , opLE },
 		{ ">=", opGIQ },

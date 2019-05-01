@@ -49,11 +49,12 @@ void DataBase::showTable(const std::string &Name) {
 		auto it = mTable.find(Name);
 		if (it != mTable.end()) {
 
-			auto &_attrTable = mTable[Name]->getAttrTable();
+			mTable[Name]->printAttrTable();
+			/*auto &_attrTable = mTable[Name]->getAttrTable();
 			for (auto e: _attrTable)
 			{
 				std::cout << e.first << std::endl;
-			}
+			}*/
 
 		} else
 			throw(false);
@@ -72,11 +73,12 @@ void DataBase::showTableAll() { // temporarily function
 void DataBase::insertData(const std::vector<std::string> &param)
 {
 	//using namespace Params;
-	if (mTable.count(param[0]) || param.size() % 2 == 1)
+	if (mTable.count(param[0]) && param.size() % 2 == 1)
 	{
 		auto _table = mTable[ param[0] ];
 		std::vector<ATTRIBUTE> _attributes;
-		for (int i = 1; i < param.size(); i += 2)
+		int n = param.size() / 2;
+		for (int i = 1; i <= n; i ++)
 		{
 			auto _attr_type = _table->getTypeof(param[i]) ; // pay attention to the legality
 			Base *pt = NULL;
@@ -85,20 +87,20 @@ void DataBase::insertData(const std::vector<std::string> &param)
 				case INT :
 				{
 					int val = 0;
-					if (Params::str2int(param[i + 1], val))
+					if (Params::str2int(param[i + n], val))
 						pt = new dataInt(val);
 					break;
 				}
 				case DOUBLE :
 				{
 					double val = 0;
-					if (Params::str2double(param[i + 1], val))
+					if (Params::str2double(param[i + n], val))
 						pt = new dataDouble(val);
 					break;
 				}
 				case STRING :
 				{
-					pt = new dataString(param[i + 1]);
+					pt = new dataString(param[i + n]);
 					break;
 				}
 			}
@@ -123,18 +125,47 @@ void DataBase::selectData(const std::vector<std::string> &param)
 
 	DataTable* _table = mTable[_tableName];
 	list<Data*> _dataList;
-	vector<Base*> _attrList;
+	vector< pair<string, vector<Base*> > > _attrList; // ? static ?
+	_attrList.clear();
 
-	if (param.size() == 2)
+	if (param.size() == 3)
 		_table->getDataWhere(param[2], _dataList);
 	else
 		_table->getDataWhere("", _dataList);
 
-	_table->select(_attrName, _attrList, _dataList);
-	// ?? what to do next ?? //
-	for (auto it: _attrList)
+	if (_attrName == "*")
 	{
-		cout << it->getTypename() << endl;
+		auto &_attrTable = _table->getAttrTable();
+		for (auto _attr: _attrTable)
+		{
+			_attrName = _attr.first;
+			_attrList.resize(_attrList.size() + 1);
+			_attrList.back().first = _attrName;
+			_table->select(_attrName, _attrList.back().second, _dataList);
+		}
+	}
+	else
+	{
+		_attrList.resize(1);
+		_attrList[0].first = _attrName;
+		_table->select(_attrName, _attrList[0].second, _dataList);
+	}
+
+	int n = _attrList[0].second.size();
+	if (!n)
+		return;
+	
+	for (int i = 0; i < _attrList.size(); i ++)
+		cout << _attrList[i].first << "\t";
+	//cout << _attrList.back().first << endl;
+	cout << endl;
+
+	for (int i = 0; i < n; i ++)
+	{
+		for (int j = 0; j < _attrList.size(); j ++)
+			cout << *(_attrList[j].second[i]) << "\t";
+		//cout << (_attrList.back().second[i]) << endl;
+		cout << endl;
 	}
 }
 
