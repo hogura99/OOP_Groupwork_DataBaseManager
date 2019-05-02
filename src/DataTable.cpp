@@ -187,8 +187,8 @@ Value* DataTable::transValue(const Data*_attr, std::string val, int _dataType)
 	else
 		switch (_dataType)
 		{
-			case INT: res = new dataInt(Params::str2int(val)); break;
-			case DOUBLE: res = new dataInt(Params::str2double(val)); break;
+			case INT: res = new dataInt(stralgo::str2int(val)); break;
+			case DOUBLE: res = new dataInt(stralgo::str2double(val)); break;
 			case STRING: res = new dataString(val); break;
 			default: res = NULL; break;
 		}

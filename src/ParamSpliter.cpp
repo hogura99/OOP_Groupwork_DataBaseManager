@@ -128,7 +128,7 @@ void ParamSpliter::split_where(std::stringstream &ss, std::vector<std::string> &
 		if (!ss.eof())
 			expr += " ";
 	}
-	Params::cmprSpace(expr, expr2);
+	stralgo::CompressSpace(expr, expr2);
 	param.push_back(expr2);
 }
 
@@ -188,12 +188,12 @@ int ParamSpliter::split_delete(std::stringstream &ss, std::vector<std::string> &
 		return FORM_ERROR;	\
 }
 
-int ParamSpliter::split_createTable(const std::string &Command, std::vector<std::string> &param,
+int ParamSpliter::split_create_table(const std::string &Command, std::vector<std::string> &param,
 											std::vector<std::string> &not_null, std::string &pri_key)
 {
 	using namespace std;
 	string _command, str;
-	Params::replaceMark(Command, _command);
+	stralgo::ReplaceMark(Command, _command);
 	stringstream ss(_command);
 	ss >> str;
 	assert(str == "CREATE");
@@ -237,7 +237,7 @@ int ParamSpliter::split_insert(std::stringstream &ss, std::vector<std::string> &
 {
 	using namespace std;
 	string Command = ss.str(), _command, str;
-	Params::replaceMark(Command, _command);
+	stralgo::ReplaceMark(Command, _command);
 	stringstream cmd(_command);
 
 	cmd >> str >> str; // INSERT INTO
@@ -365,16 +365,6 @@ int ParamSpliter::split_drop(std::stringstream &ss, std::vector<std::string> &pa
 		return TABLE_DROP;
 	else
 		return FORM_ERROR;
-}
-
-void eraseSpace(std::string &str)
-{
-	while (!str.empty() && str.back() == ' ')
-		str.pop_back();
-	reverse(str.begin(), str.end());
-	while (!str.empty() && str.back() == ' ')
-		str.pop_back();
-	reverse(str.begin(), str.end());
 }
 
 #undef CHECK_STR

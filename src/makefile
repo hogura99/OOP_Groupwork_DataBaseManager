@@ -1,5 +1,5 @@
-all: DataBaseManager.o DataBase.o ParamSpliter.o main.o Value.o Derived.o DataTable.o Data.o
-	g++ DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Value.o Derived.o Data.o main.o -o main -std=c++14 -g
+all: DataBaseManager.o DataBase.o ParamSpliter.o main.o Value.o Derived.o DataTable.o Data.o str_algorithm.o
+	g++ str_algorithm.o DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Value.o Derived.o Data.o main.o -o main -std=c++14 -g
 
 main.o: main.cpp
 	g++ -c main.cpp -o main.o -std=c++14 -g
@@ -13,7 +13,7 @@ DataBase.o: DataBase.cpp DataBase.h DataTable.h DataTable.cpp
 DataTable.o: DataTable.cpp DataTable.h ParamSpliter.h expression.h
 	g++ -c DataTable.cpp -o DataTable.o -std=c++14 -g
 
-ParamSpliter.o: ParamSpliter.cpp ParamSpliter.h
+ParamSpliter.o: ParamSpliter.cpp ParamSpliter.h str_algorithm.h
 	g++ -c ParamSpliter.cpp -o ParamSpliter.o -std=c++14 -g
 
 Data.o: Data.cpp Data.h
@@ -24,6 +24,9 @@ Value.o: Value.cpp Value.h Derived.h expression.h
 
 Derived.o: Derived.h Derived.cpp
 	g++ -c Derived.cpp -o Derived.o -std=c++14 -g
+
+str_algorithm.o: str_algorithm.h str_algorithm.cpp
+	g++ -c str_algorithm.cpp -o str_algorithm.o -std=c++14 -g
 
 gdb:
 	gdb debug/main

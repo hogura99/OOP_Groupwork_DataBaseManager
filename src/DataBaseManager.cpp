@@ -13,62 +13,62 @@ DataBaseManager::~DataBaseManager() {
 		delete it.second;
 }
 
-void DataBaseManager::handleCommand(const std::string &Command) {
+void DataBaseManager::Query(const std::string &Command) {
 	using namespace std;
 	vector<string> param;
 	string command;
-	Params::cmprSpace(Command, command);
-	int cmd = ParamSpliter::Split(command, param/*, ParamSpliter::BASE_DEFAULT*/);
+	stralgo::CompressSpace(Command, command);
+	int cmd = ParamSpliter::Split(command, param);
 	switch (cmd) {
 
 		case BASE_CREATE: {
-			createBase(param[0]);
+			CreateBase(param[0]);
 			break;
 		}
 		case BASE_SHOW: {
-			showBase();
+			ShowBase();
 			break;
 		}
 		case BASE_DROP: {
-			dropBase(param[0]);
+			DropBase(param[0]);
 			break;
 		}
 		case BASE_USE: {
-			useBase(param[0]);
+			UseBase(param[0]);
 			break;
 		}
 
 		case TABLE_CREATE: {
-			mWorkBase->createTable(command);
+			mWorkBase->CreateTable(command);
 			break;
 		}
 		case TABLE_DROP: {
-			mWorkBase->dropTable(param[0]);
+			mWorkBase->DropTable(param[0]);
 			break;
 		}
 		case TABLE_SHOW_ALL: {
-			mWorkBase->showTableAll();
+			mWorkBase->ShowTableAll();
 			break;
 		}
 		case TABLE_SHOW_COL: {
-			mWorkBase->showTable(param[0]);
+			mWorkBase->ShowTableCol(param[0]);
 			break;
 		}
 
 		case DATA_INSERT: {
-			mWorkBase->insertData(param);
+			mWorkBase->InsertData(param);
 			break;
 		}
 		case DATA_DELETE: {
-			mWorkBase->deleteData(param);
+			mWorkBase->DeleteData(param);
 			break;
 		}
 		case DATA_UPDATE: {
-			mWorkBase->updateData(param);
+			mWorkBase->UpdateData(param);
 			break;
 		}
 		case DATA_SELECT: {
-			mWorkBase->selectData(param);
+			mWorkBase->SelectData(param);
 			break;
 		}
 
@@ -79,24 +79,24 @@ void DataBaseManager::handleCommand(const std::string &Command) {
 	}
 }
 
-void DataBaseManager::createBase(const std::string &DBName) {
+void DataBaseManager::CreateBase(const std::string &DBName) {
 	mBase[DBName] = new DataBase(DBName);
 }
 
-void DataBaseManager::showBase() {
+void DataBaseManager::ShowBase() {
 	using namespace std;
 	cout << "Database" << endl;
 	for (auto it: mBase) {
 		cout << it.first << endl;
-		it.second->showTableAll();
+		it.second->ShowTableAll();
 	}
 }
 
-void DataBaseManager::useBase(const std::string &DBName) {
+void DataBaseManager::UseBase(const std::string &DBName) {
 	mWorkBase = mBase[DBName];
 }
 
-void DataBaseManager::dropBase(const std::string &DBName) {
+void DataBaseManager::DropBase(const std::string &DBName) {
 	auto it = mBase.find(DBName);
 	try {
 		if (it != mBase.end()) {

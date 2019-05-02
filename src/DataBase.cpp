@@ -12,12 +12,12 @@ DataBase::~DataBase()
 		delete it.second;
 }
 
-void DataBase::createTable(const std::string &command) {
+void DataBase::CreateTable(const std::string &command) {
 	using namespace std;
 	vector<string> param, not_null;
 	vector<pair<string, int> > _attrType;
 	string pri_key = "\0";
-	auto res = ParamSpliter::split_createTable(command, param, not_null, pri_key);
+	auto res = ParamSpliter::split_create_table(command, param, not_null, pri_key);
 	assert(res == TABLE_CREATE); // !!!
 
 	for (int i = 1; i < param.size(); i += 2)
@@ -30,7 +30,7 @@ void DataBase::createTable(const std::string &command) {
 	mTable[param[0]] = new DataTable(param[0], _attrType, pri_key, not_null);
 }
 
-void DataBase::dropTable(const std::string &Name) {
+void DataBase::DropTable(const std::string &Name) {
 	try {
 		auto it = mTable.find(Name);
 		if (it != mTable.end()) {
@@ -44,17 +44,12 @@ void DataBase::dropTable(const std::string &Name) {
 	}
 }
 
-void DataBase::showTable(const std::string &Name) {
+void DataBase::ShowTableCol(const std::string &Name) {
 	try {
 		auto it = mTable.find(Name);
 		if (it != mTable.end()) {
 
 			mTable[Name]->PrintAttributeTable();
-			/*auto &_attrTable = mTable[Name]->getAttrTable();
-			for (auto e: _attrTable)
-			{
-				std::cout << e.first << std::endl;
-			}*/
 
 		} else
 			throw(false);
@@ -64,16 +59,16 @@ void DataBase::showTable(const std::string &Name) {
 	}
 }
 
-void DataBase::showTableAll() { // temporarily function
+void DataBase::ShowTableAll() { // temporarily function
 	std::cout << "Tables_in_" << __name << std::endl;
 	for (auto it: mTable) {
 		std::cout << it.first << std::endl;
 	}
 }
 
-void DataBase::insertData(const std::vector<std::string> &param)
+void DataBase::InsertData(const std::vector<std::string> &param)
 {
-	//using namespace Params;
+	//using namespace stralgo;
 	if (mTable.count(param[0]) && param.size() % 2 == 1)
 	{
 		auto _table = mTable[ param[0] ];
@@ -88,14 +83,14 @@ void DataBase::insertData(const std::vector<std::string> &param)
 				case INT :
 				{
 					int val = 0;
-					if (Params::str2int(param[i + n], val))
+					if (stralgo::str2int(param[i + n], val))
 						pt = new dataInt(val);
 					break;
 				}
 				case DOUBLE :
 				{
 					double val = 0;
-					if (Params::str2double(param[i + n], val))
+					if (stralgo::str2double(param[i + n], val))
 						pt = new dataDouble(val);
 					break;
 				}
@@ -118,7 +113,7 @@ void DataBase::insertData(const std::vector<std::string> &param)
 	}
 }
 
-void DataBase::selectData(const std::vector<std::string> &param)
+void DataBase::SelectData(const std::vector<std::string> &param)
 {
 	using namespace std;
 	string _attrName = param[0];
@@ -170,11 +165,11 @@ void DataBase::selectData(const std::vector<std::string> &param)
 	}
 }
 
-void DataBase::updateData(const std::vector<std::string> &param)
+void DataBase::UpdateData(const std::vector<std::string> &param)
 {
 	// only set one attribute
 	using namespace std;
-	//using namespace Params;
+	//using namespace stralgo;
 	string _tableName = param[0];
 	string _attrName  = param[1];
 	string _attrVStr  = param[2];
@@ -185,14 +180,14 @@ void DataBase::updateData(const std::vector<std::string> &param)
 		case INT:
 		{
 			int val;
-			if (Params::str2int(_attrVStr, val))
+			if (stralgo::str2int(_attrVStr, val))
 				_attrVal = new dataInt(val);
 			break;
 		}
 		case DOUBLE:
 		{
 			double val;
-			if (Params::str2double(_attrVStr, val))
+			if (stralgo::str2double(_attrVStr, val))
 				_attrVal = new dataDouble(val);
 			break;
 		}
@@ -218,7 +213,7 @@ void DataBase::updateData(const std::vector<std::string> &param)
 	_table->Update(_attribute, _dataList);
 }
 
-void DataBase::deleteData(const std::vector<std::string> &param)
+void DataBase::DeleteData(const std::vector<std::string> &param)
 {
 	using namespace std;
 

@@ -16,9 +16,11 @@ private:
 public:
 	DataBaseManager();
 	~DataBaseManager();
-	void handleCommand(const std::string &command);
-	void createBase(const std::string &DBname);
-	void dropBase(const std::string &DBname);
-	void useBase(const std::string &DBname);
-	void showBase();
+
+	void Query(const std::string &command);
+
+	void CreateBase(const std::string &DBname);
+	void DropBase(const std::string &DBname);
+	void UseBase(const std::string &DBname);
+	void ShowBase();
 };

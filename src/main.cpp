@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 
 	while (readCommand(cmd, maxCmdLen, std::cin))
 	{
-		master->handleCommand(cmd);
+		master->Query(cmd);
 	}
 
 	return 0;

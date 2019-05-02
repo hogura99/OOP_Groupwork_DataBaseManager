@@ -9,11 +9,11 @@
 #include <map>
 
 #include <cctype>
-#include <cmath>
 
+#include "str_algorithm.h"
 #include "expression.h"
 
-enum {
+enum DATA_BASE_OPEARTION {
 	FORM_ERROR,
 	BASE_DEFAULT,
 	BASE_CREATE,
@@ -30,7 +30,7 @@ enum {
 	DATA_SELECT,
 };
 
-enum {
+enum DATA_BASE_COMMAND {
 	cILLEAL,
 	cCREATE,
 	cINSERT,
@@ -47,12 +47,8 @@ private:
 	static std::map<std::string, int> cmdType;
 
 public:
-
-	//static void initMapping();
 	
-	static int  Split(const std::string &Command, std::vector<std::string> &param/*, int CmdType*/);
-	//static void Split(const std::string &Command, std::vector<std::string> &param,
-	//											  std::vector<std::string> &not_null, std::string pri_key);
+	static int Split(const std::string &Command, std::vector<std::string> &param);
 	static int split_use(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_show(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_drop(std::stringstream &ss, std::vector<std::string> &param);
@@ -61,99 +57,10 @@ public:
 	static int split_select(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_update(std::stringstream &ss, std::vector<std::string> &param);
 	static int split_insert(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_createTable(const std::string &Command, std::vector<std::string> &param,
+	static int split_create_table(const std::string &Command, std::vector<std::string> &param,
 										std::vector<std::string> &not_null, std::string &pri_key);
 
 	static void split_where(std::stringstream &ss, std::vector<std::string> &param);
-};
-
-void eraseSpace(std::string &str);
-
-class Params
-{
-public:
-
-	static void cmprSpace(const std::string &str1, std::string &str2)
-	{
-		if (str1.empty())
-			return;
-		str2 = "";
-		str2.push_back(str1[0]);
-		for (size_t i = 0; i + 1 < str1.length(); i ++)
-			if (str1[i] == str1[i + 1] && str1[i] == ' ')
-				continue;
-			else
-				str2.push_back(str1[i + 1]);
-	}
-
-	static bool str2int(const std::string &str, int &val)
-	{
-		val = 0;
-		for (char c: str)
-			if (isdigit(c))
-				val = val * 10 + c - '0';
-			else
-				return false;
-		return true;
-	}
-
-	static void replaceMark(const std::string &src, std::string &dst)
-	{
-		dst.clear();
-		bool _in_string = 0;
-		for (char c: src)
-		{
-			if (c == '\"')
-				_in_string ^= 1;
-			if (_in_string)
-			{
-				dst.push_back(c);
-				continue;
-			}
-			if (c != '(' && c != ')' && c != ',' && c != ';') // this place can be replace with a self-definition function
-				dst.push_back(c);
-			else
-				dst.push_back(' ');
-		}
-		eraseSpace(dst);
-	}
-
-	static bool str2double(const std::string &str, double &val)
-	{
-		val = 0;
-		int p = -1;
-		for (size_t i = 0; i < str.length(); i ++)
-		{
-			if (str[i] == '.')
-			{
-				if (~p)
-					return false;
-				p = i;
-			}
-			else if (isdigit(str[i]))
-				val = val * 10 + int(str[i] - '0');
-			else
-				return false;
-		}
-		if (~p)
-			val = val / pow(10, str.length() - p - 1);
-		return true;
-	}
-
-	static int str2int(const std::string &str)
-	{
-		int val = 0;
-		str2int(str, val);
-		return val;
-	}
-
-	static double str2double(const std::string &str)
-	{
-		double val = 0;
-		str2double(str, val);
-		return val;
-	}
-
 };
 
 #endif
