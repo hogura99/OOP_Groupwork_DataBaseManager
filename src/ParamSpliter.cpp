@@ -214,7 +214,7 @@ int ParamSpliter::split_createTable(const std::string &Command, std::vector<std:
 		{
 			ss >> str;
 			pri_key = str;
-			break;
+			continue;
 		}
 
 		if (_attrName == "NOT" && _attrType == "NULL")

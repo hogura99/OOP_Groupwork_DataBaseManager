@@ -48,14 +48,7 @@ void DataBase::showTable(const std::string &Name) {
 	try {
 		auto it = mTable.find(Name);
 		if (it != mTable.end()) {
-
 			mTable[Name]->printAttrTable();
-			/*auto &_attrTable = mTable[Name]->getAttrTable();
-			for (auto e: _attrTable)
-			{
-				std::cout << e.first << std::endl;
-			}*/
-
 		} else
 			throw(false);
 	}
@@ -65,6 +58,7 @@ void DataBase::showTable(const std::string &Name) {
 }
 
 void DataBase::showTableAll() { // temporarily function
+	std::cout << "Tables_in_" << __name << std::endl;
 	for (auto it: mTable) {
 		std::cout << it.first << std::endl;
 	}
@@ -154,7 +148,7 @@ void DataBase::selectData(const std::vector<std::string> &param)
 	int n = _attrList[0].second.size();
 	if (!n)
 		return;
-	
+
 	for (int i = 0; i < _attrList.size(); i ++)
 		cout << _attrList[i].first << "\t";
 	//cout << _attrList.back().first << endl;

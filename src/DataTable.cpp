@@ -164,7 +164,7 @@ void DataTable::printAttrTable()
 		string _attrName = _attr.first;
 		int _attrType = _attr.second;
 		cout << _attrName;
-		cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << _attrType << ")";
+		cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << attrTypeWidth.at(_attrType) << ")";
 		if (notNullKey[_attrName])
 			cout << "\t" << "NO";
 		else

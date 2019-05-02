@@ -85,7 +85,7 @@ void DataBaseManager::createBase(const std::string &DBName) {
 
 void DataBaseManager::showBase() {
 	using namespace std;
-	cout << "DataBase" << endl;
+	cout << "Database" << endl;
 	for (auto it: mBase) {
 		cout << it.first << endl;
 		it.second->showTableAll();

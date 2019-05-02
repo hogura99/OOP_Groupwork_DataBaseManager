@@ -31,6 +31,13 @@ const std::map<int, std::string> attrTypeInvMap =
     {STRING, "char"},
 };
 
+const std::map<int, int> attrTypeWidth = 
+{
+    {INT, 11},
+    {DOUBLE, 2},
+    {STRING, 1},
+};
+
 class Base{
 private:
 	virtual bool __compare(const Base *val_l, const Base *val_r, int type, int opr) const;
