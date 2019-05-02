@@ -1,5 +1,5 @@
 #include "Value.h"
-#include "Derived.h"
+#include "AttributeValue.h"
 
 #include <assert.h>
 
@@ -16,23 +16,23 @@ bool Value::__compare(const Value *val_l, const Value *val_r, int type, int opr)
 	bool res = false;
 	switch (type) {
 		case INT: {
-			//assert(dynamic_cast<dataInt*>(val_l) != NULL && dynamic_cast<dataInt*>(val_r) != NULL);
-			const dataInt *pt_l = dynamic_cast<dataInt*>(_val_l);
-			const dataInt *pt_r = dynamic_cast<dataInt*>(_val_r);
+			//assert(dynamic_cast<AttributeValue<int>*>(val_l) != NULL && dynamic_cast<AttributeValue<int>*>(val_r) != NULL);
+			const AttributeValue<int> *pt_l = dynamic_cast<AttributeValue<int>*>(_val_l);
+			const AttributeValue<int> *pt_r = dynamic_cast<AttributeValue<int>*>(_val_r);
 			assert(pt_l != NULL && pt_r != NULL);
 			SWITCH_OPRT(pt_l, pt_r, opr);
 			break;
 		}
 		case DOUBLE: {
-			const dataDouble *pt_l = dynamic_cast<dataDouble*>(_val_l);
-			const dataDouble *pt_r = dynamic_cast<dataDouble*>(_val_r);
+			const AttributeValue<double> *pt_l = dynamic_cast<AttributeValue<double>*>(_val_l);
+			const AttributeValue<double> *pt_r = dynamic_cast<AttributeValue<double>*>(_val_r);
 			assert(pt_l != NULL && pt_r != NULL);
 			SWITCH_OPRT(pt_l, pt_r, opr);
 			break;
 		}
 		case STRING: {
-			const dataString *pt_l = dynamic_cast<dataString*>(_val_l);
-			const dataString *pt_r = dynamic_cast<dataString*>(_val_r);
+			const AttributeValue<std::string> *pt_l = dynamic_cast<AttributeValue<std::string>*>(_val_l);
+			const AttributeValue<std::string> *pt_r = dynamic_cast<AttributeValue<std::string>*>(_val_r);
 			assert(pt_l != NULL && pt_r != NULL);
 			if (opr == opEQ)
 				res = pt_l->operator==(*pt_r);
@@ -95,13 +95,13 @@ std::ostream& operator<<(std::ostream& out, Value &b) {
 	{
 		case INT:
 		{
-			dataInt &val = dynamic_cast<dataInt&>(b);
+			AttributeValue<int> &val = dynamic_cast<AttributeValue<int>&>(b);
 			out << val.getValue();
 			break;
 		}
 		case STRING:
 		{
-			dataString &val = dynamic_cast<dataString&>(b);
+			AttributeValue<std::string> &val = dynamic_cast<AttributeValue<std::string>&>(b);
 			std::string tmp = val.getValue();
 			if (tmp.length() > 2)
 				out << tmp.substr(1, tmp.length() - 2);
@@ -111,7 +111,7 @@ std::ostream& operator<<(std::ostream& out, Value &b) {
 		}
 		case DOUBLE:
 		{
-			dataDouble &val = dynamic_cast<dataDouble&>(b);
+			AttributeValue<double> &val = dynamic_cast<AttributeValue<double>&>(b);
 			out << val.getValue();
 			break;
 		}

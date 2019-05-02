@@ -1,6 +1,6 @@
 #include "Data.h"
 
-Value* Data::getData(std::string attrName) const {
+Value* Data::getValue(std::string attrName) const{
 	auto fd = varMap.find(attrName);
 	if(fd != varMap.end()){
 		return fd->second;
@@ -9,8 +9,8 @@ Value* Data::getData(std::string attrName) const {
 		return NULL;
 	}
 }
-//传入Element* src之后是复制还是直接放?
-Value* Data::setData(std::string attrName, Value* src){
+//传入Value* src之后是复制还是直接放?
+Value* Data::setValue(std::string attrName, Value* src){
 	
 	auto fd = varMap.find(attrName);
 
@@ -25,7 +25,7 @@ Value* Data::setData(std::string attrName, Value* src){
 	return varMap[attrName];
 }
 
-int Data::getTypename(std::string attrName){
+int Data::getTypename(std::string attrName) const{
 	auto fd = varMap.find(attrName);
 	
 	if(fd != varMap.end()){
