@@ -76,6 +76,11 @@ void DataBase::InsertData(const std::vector<std::string> &param)
 		int n = param.size() / 2;
 		for (int i = 1; i <= n; i ++)
 		{
+			if (!_table->CheckAttributeName(param[i]))
+			{
+				std::cerr << "Failed to insert. Please check your input." << std::endl;
+				break;
+			}
 			auto _attr_type = _table->GetTypeof(param[i]) ; // pay attention to the legality
 			Value *pt = NULL;
 			switch (_attr_type)
@@ -109,7 +114,7 @@ void DataBase::InsertData(const std::vector<std::string> &param)
 	}
 	else
 	{
-		// show insert error
+		std::cerr << "Failed to insert. Please check your input." << std::endl;
 	}
 }
 
@@ -120,6 +125,13 @@ void DataBase::SelectData(const std::vector<std::string> &param)
 	string _tableName = param[1];
 
 	DataTable* _table = mTable[_tableName];
+
+	if (!_table->CheckAttributeName(_attrName))
+	{
+		cerr << "Failed to select Data. Please check your input." << endl;
+		return;
+	}
+
 	vector<Data*> _dataList;
 	vector< pair<string, vector<Value*> > > _attrList; // ? static ?
 	_attrList.clear();
@@ -174,6 +186,10 @@ void DataBase::UpdateData(const std::vector<std::string> &param)
 	string _attrName  = param[1];
 	string _attrVStr  = param[2];
 	DataTable *_table = mTable[_tableName];
+	if (!_table->CheckAttributeName(_tableName))
+	{
+		cerr << "Failed to update data. Please check your input." << endl;
+	}
 	Value *_attrVal = NULL;
 	switch (_table->GetTypeof(_attrName))
 	{

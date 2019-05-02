@@ -30,11 +30,15 @@ class DataTable
         //records the names and types of the attributes.
         std::map<std::string, int> attribute_table_;
 
+        //record the names and types of the attributes in the same sequence as initialized.
+        std::vector< std::pair<std::string, int> > sequential_attribute_table_;
+
     protected:
         void __PopStack(std::stack<bool> &val, std::stack<int> &opr);
         bool checkSingleClause(const Data* it, const std::vector<std::string> &_param);
         bool calcExpr(const Data* it, const std::string &clause);
         Value* transValue(const Data* _attr, std::string val, int dataType);
+
 
     public:
         //@param table_name: the name of the table.
@@ -69,9 +73,23 @@ class DataTable
         
         int GetTypeof(const std::string &attrName);
 
-        friend bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attributes);
-
         std::map<std::string, int>& GetAttributeTable();
         
         virtual void PrintAttributeTable();
+
+        //check whether there are more than one data with the same primary key.
+        //use the copy constructor of Value. May cause bugs.
+        bool CheckPrimaryKey(const std::vector<ATTRIBUTE>& attributes);
+
+        bool CheckPrimaryKey(const ATTRIBUTE& attribute);
+
+        //check whether there are uninitialized attribute which should be not null.
+        bool CheckNotNullKey(const std::vector<ATTRIBUTE>& attributes);
+
+        //check whether there are unexist attribute name in the input.
+        bool CheckAttributeName(const std::vector<ATTRIBUTE>& attributes);
+
+        bool CheckAttributeName(const ATTRIBUTE& attribute);
+
+        bool CheckAttributeName(const std::string& attribute_name);
 };
