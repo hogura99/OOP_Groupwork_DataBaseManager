@@ -49,7 +49,7 @@ void DataBase::showTable(const std::string &Name) {
 		auto it = mTable.find(Name);
 		if (it != mTable.end()) {
 
-			mTable[Name]->printAttrTable();
+			mTable[Name]->PrintAttributeTable();
 			/*auto &_attrTable = mTable[Name]->getAttrTable();
 			for (auto e: _attrTable)
 			{
@@ -80,8 +80,8 @@ void DataBase::insertData(const std::vector<std::string> &param)
 		int n = param.size() / 2;
 		for (int i = 1; i <= n; i ++)
 		{
-			auto _attr_type = _table->getTypeof(param[i]) ; // pay attention to the legality
-			Base *pt = NULL;
+			auto _attr_type = _table->GetTypeof(param[i]) ; // pay attention to the legality
+			Value *pt = NULL;
 			switch (_attr_type)
 			{
 				case INT :
@@ -109,7 +109,7 @@ void DataBase::insertData(const std::vector<std::string> &param)
 				_attributes.push_back( ATTRIBUTE(param[i], pt) );
 			}
 		}
-		_table->insert(_attributes);
+		_table->Insert(_attributes);
 	}
 	else
 	{
@@ -124,31 +124,31 @@ void DataBase::selectData(const std::vector<std::string> &param)
 	string _tableName = param[1];
 
 	DataTable* _table = mTable[_tableName];
-	list<Data*> _dataList;
-	vector< pair<string, vector<Base*> > > _attrList; // ? static ?
+	vector<Data*> _dataList;
+	vector< pair<string, vector<Value*> > > _attrList; // ? static ?
 	_attrList.clear();
 
 	if (param.size() == 3)
-		_table->getDataWhere(param[2], _dataList);
+		_table->GetDataWhere(param[2], _dataList);
 	else
-		_table->getDataWhere("", _dataList);
+		_table->GetDataWhere("", _dataList);
 
 	if (_attrName == "*")
 	{
-		auto &_attrTable = _table->getAttrTable();
+		auto &_attrTable = _table->GetAttributeTable();
 		for (auto _attr: _attrTable)
 		{
 			_attrName = _attr.first;
 			_attrList.resize(_attrList.size() + 1);
 			_attrList.back().first = _attrName;
-			_table->select(_attrName, _attrList.back().second, _dataList);
+			_table->Select(_attrName, _attrList.back().second, _dataList);
 		}
 	}
 	else
 	{
 		_attrList.resize(1);
 		_attrList[0].first = _attrName;
-		_table->select(_attrName, _attrList[0].second, _dataList);
+		_table->Select(_attrName, _attrList[0].second, _dataList);
 	}
 
 	int n = _attrList[0].second.size();
@@ -178,8 +178,8 @@ void DataBase::updateData(const std::vector<std::string> &param)
 	string _attrName  = param[1];
 	string _attrVStr  = param[2];
 	DataTable *_table = mTable[_tableName];
-	Base *_attrVal = NULL;
-	switch (_table->getTypeof(_attrName))
+	Value *_attrVal = NULL;
+	switch (_table->GetTypeof(_attrName))
 	{
 		case INT:
 		{
@@ -208,13 +208,13 @@ void DataBase::updateData(const std::vector<std::string> &param)
 	}
 	ATTRIBUTE _attribute = ATTRIBUTE(_attrName, _attrVal);
 
-	static list<Data*> _dataList;
+	static vector<Data*> _dataList;
 	if (param.size() == 4)
-		_table->getDataWhere(param[3], _dataList);
+		_table->GetDataWhere(param[3], _dataList);
 	else
-		_table->getDataWhere("", _dataList);
+		_table->GetDataWhere("", _dataList);
 
-	_table->update(_attribute, _dataList);
+	_table->Update(_attribute, _dataList);
 }
 
 void DataBase::deleteData(const std::vector<std::string> &param)
@@ -224,11 +224,11 @@ void DataBase::deleteData(const std::vector<std::string> &param)
 	string _tableName = param[0];
 	DataTable *_table = mTable[_tableName];
 
-	static list<Data*> _dataList;
+	static vector<Data*> _dataList;
 	if (param.size() == 2)
-		_table->getDataWhere(param[1], _dataList);
+		_table->GetDataWhere(param[1], _dataList);
 	else
-		_table->getDataWhere("", _dataList);
+		_table->GetDataWhere("", _dataList);
 
-	_table->remove(_dataList);
+	_table->Remove(_dataList);
 }

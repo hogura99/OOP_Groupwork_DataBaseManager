@@ -3,7 +3,7 @@
 #include <sstream>
 #include <assert.h>
 #define NAME first
-#define BASE second
+#define VALUE second
 
 /*
 	未完成任务：
@@ -13,27 +13,29 @@
 		若干处红标未解决
 */
 
-DataTable::DataTable(const std::string &_tableName, std::vector< std::pair<std::string, int> >& _attrTable, const std::string& _primaryKey, const std::vector<std::string>& _notNullKey)
-: tableName(_tableName), primaryKey(_primaryKey)
+DataTable::DataTable(const std::string& table_name, std::vector< std::pair<std::string, int> >& attribute_table,
+  const std::string& primary_key, const std::vector<std::string>& not_null_key)
+  : table_name_(table_name), primary_key_(primary_key)
 {
-	for (auto iter = _attrTable.begin(); iter != _attrTable.end(); iter++)
+	for (auto iter = attribute_table.begin(); iter != attribute_table.end(); iter++)
 	{
-		notNullKey[iter->first] = false;
-		attrTable[iter->first] = iter->second;
+		not_null_key_[iter->first] = false;
+		attribute_table_[iter->first] = iter->second;
 
 	}
-	for (auto iter = _notNullKey.begin(); iter != _notNullKey.end(); iter++)
+	for (auto iter = not_null_key.begin(); iter != not_null_key.end(); iter++)
 	{
-		notNullKey[*iter] = true;
+		not_null_key_[*iter] = true;
 	}
 }
 
 DataTable::~DataTable()
 {
-	for (auto v: mData)
+	for (auto v: mData_)
 		delete v;
 }
 
+//Incompleted
 bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attributes) // This place will cause a segmentation fault, why ??? Guess that destruction function cause it.
 {
 	// not check temporarily
@@ -41,17 +43,17 @@ bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attribute
 	bool flag = true;   //函数返回值
 
 	//检查主键
-	const Base* primaryKeyValue;
+	const Value* primaryKeyValue;
 	std::map<std::string, bool> checkNotNull;
 	for (auto iter = attributes.begin(); iter < attributes.end(); iter++)
 	{
-		if (iter->NAME == _DataTable.primaryKey)
-			primaryKeyValue = iter->BASE;
+		if (iter->NAME == _DataTable.primary_key_)
+			primaryKeyValue = iter->VALUE;
 	}
 	bool _exist = false;
-	for (auto iter = _DataTable.mData.begin(); iter != _DataTable.mData.end(); iter++)   //iter不能大小比较
+	for (auto iter = _DataTable.mData_.begin(); iter != _DataTable.mData_.end(); iter++)
 	{
-		if ((*iter)->getData(_DataTable.primaryKey) == primaryKeyValue)
+		if ((*iter)->getData(_DataTable.primary_key_) == primaryKeyValue)
 			_exist = true;
 	}
 	if (_exist)
@@ -64,24 +66,24 @@ bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attribute
 	for (auto iter = attributes.begin(); iter < attributes.end(); iter++)
 	{
 		/*
-		switch (_DataTable.attrTable[iter->NAME])
+		switch (_DataTable.attribute_table_[iter->NAME])
 		{
 			case _DataTable.INT:
-				if (typeid(iter->BASE) != typeid(dataInt))  //基类不等于派生类
+				if (typeid(iter->VALUE) != typeid(dataInt))  //基类不等于派生类
 				{
 					std::cerr << "The type of \"" << iter->NAME << "\" should be \"int\"." << std::endl;
 					flag = false;
 				}
 				break;
 			case _DataTable.DOUBLE:
-				if (typeid(iter->BASE) != typeid(dataDouble))
+				if (typeid(iter->VALUE) != typeid(dataDouble))
 				{
 					std::cerr << "The type of \"" << iter->NAME << "\" should be \"double\"." << std::endl;
 					flag = false;
 				}
 				break;
 			case _DataTable.STRING:
-				if (typeid(iter->BASE) != typeid(dataString))
+				if (typeid(iter->VALUE) != typeid(dataString))
 				{
 					std::cerr << "The type of \"" << iter->NAME << "\" should be \"string\"." << std::endl;
 					flag = false;
@@ -91,7 +93,7 @@ bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attribute
 		*/
 	   checkNotNull[iter->NAME] = true;
 	}
-	for (auto iter = _DataTable.notNullKey.begin(); iter != _DataTable.notNullKey.end(); iter++)
+	for (auto iter = _DataTable.not_null_key_.begin(); iter != _DataTable.not_null_key_.end(); iter++)
 	{
 		if ( iter->second && !checkNotNull[iter->first])
 		{
@@ -102,52 +104,52 @@ bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attribute
 	return flag;
 }
 
-void DataTable::insert(const std::vector< ATTRIBUTE > &attributes)
+void DataTable::Insert(const std::vector< ATTRIBUTE > &attributes)
 {
-	Data* _data = new Data;
+	Data* data = new Data;
 	if (0 /* this place will cuase a segmentation fault, why ??? */ && checkLegality(*this, attributes))
 	{
 		std::cerr << "Failed to insert. Please check your input. "<< std::endl;
 	}
 	else
 	{
-		for (auto iter = attributes.begin(); iter < attributes.end(); iter++)
+		for (auto iter = attributes.begin(); iter != attributes.end(); iter++)
 		{
-			//Base* pt = &const_cast<Base>(iter->BASE); // 可能有bug！
-			_data->setData(iter->NAME, iter->BASE);
+			//Value* pt = &const_cast<Value>(iter->VALUE); // 可能有bug！
+			data->setData(iter->NAME, iter->VALUE);
 		}
-		mData.insert(mData.end(), _data);
-		std::cerr << "Successfully inserted." << std::endl; //这里应该再输出更详细的信息的，这版就不写了
+		mData_.insert(mData_.end(), data);
 	}
 }
 
-void DataTable::remove(std::list<Data*> &dataList)
+void DataTable::Remove(std::vector<Data*> &data_list)
 {
-	for (auto iter = dataList.begin(); iter != dataList.end(); iter++)
+	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)	//似乎有问题
 	{
 		delete *iter;
-		mData.remove(*iter);
+		mData_.erase(*iter);
 	}
 }
 
-void DataTable::update(const ATTRIBUTE &attributes, std::list<Data*> &dataList)
+void DataTable::Update(const ATTRIBUTE &attribute, std::vector<Data*> &data_list)
 {
-	for (auto iter = dataList.begin(); iter != dataList.end(); iter++)
+	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)
 	{
-		(*iter)->setData(attributes.NAME, attributes.BASE);
+		(*iter)->setData(attribute.NAME, attribute.VALUE);
 	}
 }
 
-void DataTable::select(const std::string &attrName, std::vector<Base*> &attrList, const std::list<Data*> &dataList)
+void DataTable::Select(const std::string &attribute_name, const std::vector<Data*> &data_list, std::vector<Value*> &attribute_value)
 {
-	for (auto iter = dataList.begin(); iter != dataList.end(); iter++)
+	attribute_value.clear();
+	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)
 	{
-		Base* temp = (*iter)->getData(attrName);
-		attrList.insert(attrList.end(), temp);
+		Value* temp = (*iter)->getData(attribute_name);
+		attribute_value.insert(attribute_value.end(), temp);
 	}
 }
 
-void DataTable::printAttrTable()
+void DataTable::PrintAttributeTable()
 {
 	using namespace std;
 	/*{
@@ -159,17 +161,17 @@ void DataTable::printAttrTable()
 		cout << endl;
 	}*/
 	cout << "Field\tType\tNull\tKey\tDefault\tExtra" << endl;
-	for (auto _attr: attrTable)
+	for (auto _attr: attribute_table_)
 	{
 		string _attrName = _attr.first;
 		int _attrType = _attr.second;
 		cout << _attrName;
 		cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << _attrType << ")";
-		if (notNullKey[_attrName])
+		if (not_null_key_[_attrName])
 			cout << "\t" << "NO";
 		else
 			cout << "\t" << "YES";
-		if (primaryKey == _attrName)
+		if (primary_key_ == _attrName)
 			cout << "\t" << "PRI" << "\t" << "NULL";
 		else
 			cout << "\t" << "NULL";
@@ -177,10 +179,10 @@ void DataTable::printAttrTable()
 	}
 }
 
-Base* DataTable::transValue(const Data*_attr, std::string val, int _dataType)
+Value* DataTable::transValue(const Data*_attr, std::string val, int _dataType)
 {
-	Base *res = NULL;
-	if (attrTable.count(val))
+	Value *res = NULL;
+	if (attribute_table_.count(val))
 		return _attr->getData(val);
 	else
 		switch (_dataType)
@@ -196,17 +198,17 @@ Base* DataTable::transValue(const Data*_attr, std::string val, int _dataType)
 bool DataTable::checkSingleClause(const Data* attr, const std::vector<std::string> &param)
 {
 	// 目前只解决param.size()==3的情况,即Attrbute?=value，并且未对参数进行检查
-	Base *pt_l = NULL, *pt_r = NULL;
+	Value *pt_l = NULL, *pt_r = NULL;
 	int dataType = -1;
-	if (attrTable.count(param[0]))
-		dataType = attrTable[param[0]];
-	if (attrTable.count(param[2]))
-		dataType = attrTable[param[2]];
+	if (attribute_table_.count(param[0]))
+		dataType = attribute_table_[param[0]];
+	if (attribute_table_.count(param[2]))
+		dataType = attribute_table_[param[2]];
 	pt_l = transValue(attr, param[0], dataType);
 	pt_r = transValue(attr, param[2], dataType);
 
-	Base &val_l = *pt_l;
-	Base &val_r = *pt_r;
+	Value &val_l = *pt_l;
+	Value &val_r = *pt_r;
 
 	bool res = false;
 	switch (Exprs::oprTYPE[param[1]])
@@ -277,17 +279,22 @@ bool DataTable::calcExpr(const Data* it, const std::string &clause)
 	return val.top();
 }
 
-void DataTable::getDataWhere(const std::string &clause, std::list<Data*> &dataList)
+void DataTable::GetDataWhere(const std::string &clause, std::vector<Data*> &data_list)
 {
-	dataList.clear();
-	for (auto it : mData)
+	data_list.clear();
+	for (auto it : mData_)
 	{
 		if (calcExpr(it, clause))
-			dataList.push_back(it);
+			data_list.push_back(it);
 	}
 }
 
-int DataTable::getTypeof(const std::string &attrName)
+int DataTable::GetTypeof(const std::string &attrName)
 {
-	return attrTable[attrName];
+	return attribute_table_[attrName];
+}
+
+std::map<std::string, int>& DataTable::GetAttributeTable()
+{
+	return attribute_table_;
 }

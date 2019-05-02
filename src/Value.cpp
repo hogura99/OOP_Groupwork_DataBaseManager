@@ -1,4 +1,4 @@
-#include "Base.h"
+#include "Value.h"
 #include "Derived.h"
 
 #include <assert.h>
@@ -10,9 +10,9 @@
 	}														\
 }
 
-bool Base::__compare(const Base *val_l, const Base *val_r, int type, int opr) const {
-	Base *_val_l = const_cast<Base*>(val_l);
-	Base *_val_r = const_cast<Base*>(val_r);
+bool Value::__compare(const Value *val_l, const Value *val_r, int type, int opr) const {
+	Value *_val_l = const_cast<Value*>(val_l);
+	Value *_val_r = const_cast<Value*>(val_r);
 	bool res = false;
 	switch (type) {
 		case INT: {
@@ -47,50 +47,50 @@ bool Base::__compare(const Base *val_l, const Base *val_r, int type, int opr) co
 	return res;
 }
 
-int Base::getTypename() const {
+int Value::getTypename() const {
 	return NONE_TYPE;
 }
 
-bool Base::operator<(const Base& b) const{
+bool Value::operator<(const Value& b) const{
 	if (getTypename() != b.getTypename())
 		return false;
 	else
 		return __compare(this, &b, getTypename(), opLE);
 }
 
-bool Base::operator==(const Base& b) const{
+bool Value::operator==(const Value& b) const{
 	if (getTypename() != b.getTypename())
 		return false;
 	else
 		return __compare(this, &b, getTypename(), opEQ);
 }
 
-bool Base::operator!=(const Base& b) const{
+bool Value::operator!=(const Value& b) const{
 	return !b.operator==(*this);
 }
 
-bool Base::operator>(const Base& b) const{
+bool Value::operator>(const Value& b) const{
 	if (getTypename() != b.getTypename())
 		return false;
 	else
 		return !(operator<(b) || operator==(b));
 }
 
-bool Base::operator>=(const Base& b) const{
+bool Value::operator>=(const Value& b) const{
 	if (getTypename() != b.getTypename())
 		return false;
 	else
 		return !operator<(b);
 }
 
-bool Base::operator<=(const Base& b) const{
+bool Value::operator<=(const Value& b) const{
 	if (getTypename() != b.getTypename())
 		return false;
 	else
 		return !operator>(b);
 }
 
-std::ostream& operator<<(std::ostream& out, Base &b) {
+std::ostream& operator<<(std::ostream& out, Value &b) {
 	switch (b.getTypename())
 	{
 		case INT:
