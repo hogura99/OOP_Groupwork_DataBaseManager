@@ -23,7 +23,7 @@ class AttributeValue : public Value{
         }
         ~AttributeValue(){}
 
-        const AttributeValue<T>*& setValue(T attrValue) const;
+        AttributeValue<T>* setValue(T attrValue);
         T getValue() const;
         int getTypename() const override;
         bool operator==(const AttributeValue<T>& b) const;
