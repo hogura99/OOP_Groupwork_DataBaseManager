@@ -2,20 +2,20 @@
 
 #ifndef DATA_H
 #define DATA_H
-#include "Derived.h"
+#include "AttributeValue.h"
 
 #include <string>
 #include <map>
 
 class Data{
-	std::map<std::string, Base* > varMap;
+	std::map<std::string, Value* > varMap;
 public:
-	Data();
-	~Data();
+	Data() {}
+	~Data() {}
 	
-	Base* getData(std::string attrName);
-	Base* setData(std::string attrName, Base* src);
-	int getTypename(std::string attrName);
+	Value* getValue(std::string attrName) const;
+	Value* setValue(std::string attrName, Value* src);
+	int getTypename(std::string attrName) const;
 };
 
 #endif
