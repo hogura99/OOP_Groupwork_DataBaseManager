@@ -3,11 +3,11 @@
 #ifndef DERIVED_H
 #define DERIVED_H
 
-#include "Base.h"
+#include "Value.h"
 #include <string>
 
 
-class dataInt : public Base{
+class dataInt : public Value{
     int data;
     public:
         dataInt(int v): data(v){}
@@ -25,7 +25,7 @@ class dataInt : public Base{
         bool operator<=(const dataInt& b) const;    
 };
 
-class dataDouble : public Base{
+class dataDouble : public Value{
     double data;
     public:
         dataDouble(double v): data(v){}
@@ -42,7 +42,7 @@ class dataDouble : public Base{
         bool operator<=(const dataDouble& b) const;
 };
 
-class dataString : public Base{
+class dataString : public Value{
     std::string data;
     public:
         dataString(std::string v): data(v) {}
