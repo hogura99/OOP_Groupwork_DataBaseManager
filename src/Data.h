@@ -13,9 +13,9 @@ public:
 	Data() {}
 	~Data() {}
 	
-	Value* getValue(std::string attrName) const;
-	Value* setValue(std::string attrName, Value* src);
-	int getTypename(std::string attrName) const;
+	virtual Value* getValue(std::string attrName) const;
+	virtual Value* setValue(std::string attrName, Value* src);
+	virtual int getTypename(std::string attrName) const;
 };
 
 #endif

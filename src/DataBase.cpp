@@ -84,19 +84,19 @@ void DataBase::InsertData(const std::vector<std::string> &param)
 				{
 					int val = 0;
 					if (stralgo::str2int(param[i + n], val))
-						pt = new dataInt(val);
+						pt = new AttributeValue<int>(val);
 					break;
 				}
 				case DOUBLE :
 				{
 					double val = 0;
 					if (stralgo::str2double(param[i + n], val))
-						pt = new dataDouble(val);
+						pt = new AttributeValue<double>(val);
 					break;
 				}
 				case STRING :
 				{
-					pt = new dataString(param[i + n]);
+					pt = new AttributeValue<std::string>(param[i + n]);
 					break;
 				}
 			}
@@ -181,19 +181,19 @@ void DataBase::UpdateData(const std::vector<std::string> &param)
 		{
 			int val;
 			if (stralgo::str2int(_attrVStr, val))
-				_attrVal = new dataInt(val);
+				_attrVal = new AttributeValue<int>(val);
 			break;
 		}
 		case DOUBLE:
 		{
 			double val;
 			if (stralgo::str2double(_attrVStr, val))
-				_attrVal = new dataDouble(val);
+				_attrVal = new AttributeValue<double>(val);
 			break;
 		}
 		case STRING:
 		{
-			_attrVal = new dataString(_attrVStr);
+			_attrVal = new AttributeValue<std::string>(_attrVStr);
 			break;
 		}
 		default:
