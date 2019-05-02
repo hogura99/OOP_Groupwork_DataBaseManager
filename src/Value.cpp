@@ -10,6 +10,10 @@
 	}														\
 }
 
+/*extern template class AttributeValue<int>;
+extern template class AttributeValue<double>;
+extern template class AttributeValue<std::string>;*/
+
 bool Value::__compare(const Value *val_l, const Value *val_r, int type, int opr) const {
 	Value *_val_l = const_cast<Value*>(val_l);
 	Value *_val_r = const_cast<Value*>(val_r);
