@@ -5,17 +5,9 @@
 #define NAME first
 #define VALUE second
 
-/*
-	未完成任务：
-		checkLegality的封装问题
-		notNull的检查
-		update的合法性检查
-		若干处红标未解决
-*/
-
 DataTable::DataTable(const std::string& table_name, std::vector< std::pair<std::string, int> >& attribute_table,
   const std::string& primary_key, const std::vector<std::string>& not_null_key)
-  : table_name_(table_name), primary_key_(primary_key)
+  : table_name_(table_name), primary_key_(primary_key), sequential_attribute_table_(attribute_table)
 {
 	for (auto iter = attribute_table.begin(); iter != attribute_table.end(); iter++)
 	{
@@ -35,79 +27,81 @@ DataTable::~DataTable()
 		delete v;
 }
 
-//Incompleted
-bool checkLegality(DataTable _DataTable, const std::vector<ATTRIBUTE>& attributes) // This place will cause a segmentation fault, why ??? Guess that destruction function cause it.
+bool DataTable::CheckPrimaryKey(const std::vector<ATTRIBUTE>& attributes)
 {
-	// not check temporarily
-
-	bool flag = true;   //函数返回值
-
-	//检查主键
-	const Value* primaryKeyValue;
-	std::map<std::string, bool> checkNotNull;
-	for (auto iter = attributes.begin(); iter < attributes.end(); iter++)
+	Value* primary_key_value;
+	for (auto iter = attributes.begin(); iter != attributes.end(); iter++)
 	{
-		if (iter->NAME == _DataTable.primary_key_)
-			primaryKeyValue = iter->VALUE;
-	}
-	bool _exist = false;
-	for (auto iter = _DataTable.mData_.begin(); iter != _DataTable.mData_.end(); iter++)
-	{
-		if ((*iter)->getData(_DataTable.primary_key_) == primaryKeyValue)
-			_exist = true;
-	}
-	if (_exist)
-	{
-		std::cerr << "This Primary Key already exists." << std::endl;   //输出用cerr
-		flag = false;
-	}
-
-	//检查类型&非空(这里应该还要检查类型名输入是否正确的。。。好烦啊这个version不写了，用户难道自己心里没点B数🐎)
-	for (auto iter = attributes.begin(); iter < attributes.end(); iter++)
-	{
-		/*
-		switch (_DataTable.attribute_table_[iter->NAME])
+		if (iter->NAME == primary_key_)
 		{
-			case _DataTable.INT:
-				if (typeid(iter->VALUE) != typeid(dataInt))  //基类不等于派生类
-				{
-					std::cerr << "The type of \"" << iter->NAME << "\" should be \"int\"." << std::endl;
-					flag = false;
-				}
-				break;
-			case _DataTable.DOUBLE:
-				if (typeid(iter->VALUE) != typeid(dataDouble))
-				{
-					std::cerr << "The type of \"" << iter->NAME << "\" should be \"double\"." << std::endl;
-					flag = false;
-				}
-				break;
-			case _DataTable.STRING:
-				if (typeid(iter->VALUE) != typeid(dataString))
-				{
-					std::cerr << "The type of \"" << iter->NAME << "\" should be \"string\"." << std::endl;
-					flag = false;
-				}
-				break;
-		}
-		*/
-	   checkNotNull[iter->NAME] = true;
-	}
-	for (auto iter = _DataTable.not_null_key_.begin(); iter != _DataTable.not_null_key_.end(); iter++)
-	{
-		if ( iter->second && !checkNotNull[iter->first])
-		{
-			flag = false;
-			std::cerr << iter->first << "can not be Null." << std::endl;
+			primary_key_value = iter->VALUE;
 		}
 	}
-	return flag;
+	for (auto iter = mData_.begin(); iter != mData_.end(); iter++)
+	{
+		if (*(*iter)->getData(primary_key_) == *primary_key_value)
+			return false;
+	}
+	return true;
+}
+
+bool DataTable::CheckPrimaryKey(const ATTRIBUTE& attribute)
+{
+	for (auto iter = mData_.begin(); iter != mData_.end(); iter++)
+	{
+		if (*(*iter)->getData(primary_key_) == *attribute.VALUE)
+			return false;
+	}
+	return true;
+}
+
+bool DataTable::CheckNotNullKey(const std::vector<ATTRIBUTE>& attributes)
+{
+	std::map<std::string, bool> check_not_null;
+	for (auto iter = attributes.begin(); iter != attributes.end(); iter++)
+	{
+		check_not_null[iter->NAME] = true;
+	}
+	for (auto iter = not_null_key_.begin(); iter != not_null_key_.end(); iter++)
+	{
+		if (iter->second && !check_not_null[iter->first])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool DataTable::CheckAttributeName(const std::vector<ATTRIBUTE>& attributes)
+{
+	for (auto iter = attributes.begin(); iter != attributes.end(); iter++)
+	{
+		if (attribute_table_.find(iter->NAME) == attribute_table_.end())
+		{
+			return false;
+		}
+	}
+	return true;
+} 
+
+bool DataTable::CheckAttributeName(const ATTRIBUTE& attribute)
+{
+	if (attribute_table_.find(attribute.NAME) == attribute_table_.end())
+		return false;
+	return true;
+}
+
+bool DataTable::CheckAttributeName(const std::string& attribute_name)
+{
+	if (attribute_table_.find(attribute_name) == attribute_table_.end())
+		return false;
+	return true;
 }
 
 void DataTable::Insert(const std::vector< ATTRIBUTE > &attributes)
 {
 	Data* data = new Data;
-	if (0 /* this place will cuase a segmentation fault, why ??? */ && checkLegality(*this, attributes))
+	if (!CheckAttributeName(attributes) || !CheckPrimaryKey(attributes) || !CheckNotNullKey(attributes))
 	{
 		std::cerr << "Failed to insert. Please check your input. "<< std::endl;
 	}
@@ -124,10 +118,10 @@ void DataTable::Insert(const std::vector< ATTRIBUTE > &attributes)
 
 void DataTable::Remove(std::vector<Data*> &data_list)
 {
-	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)	//似乎有问题
+	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)
 	{
 		delete *iter;
-		mData_.erase(*iter);
+		mData_.remove(*iter);
 	}
 }
 
@@ -135,7 +129,14 @@ void DataTable::Update(const ATTRIBUTE &attribute, std::vector<Data*> &data_list
 {
 	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)
 	{
-		(*iter)->setData(attribute.NAME, attribute.VALUE);
+		if ((attribute.NAME == primary_key_ && !CheckPrimaryKey(attribute)) || CheckAttributeName(attribute))	//if update the primary key
+		{
+			std::cerr << "Failed to update. please check your input." << std::endl;
+		}
+		else
+		{
+			(*iter)->setData(attribute.NAME, attribute.VALUE);
+		}
 	}
 }
 
