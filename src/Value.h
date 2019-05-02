@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef BASE_H
-#define BASE_H
+#ifndef VALUE_H
+#define VALUE_H
 
 #include <iostream>
 #include <string>
@@ -38,24 +38,24 @@ const std::map<int, int> attrTypeWidth =
     {STRING, 1},
 };
 
-class Base{
+class Value{
 private:
-	virtual bool __compare(const Base *val_l, const Base *val_r, int type, int opr) const;
+	virtual bool __compare(const Value *val_l, const Value *val_r, int type, int opr) const;
 protected:
 	int _typeName;
 public:
-	Base() {_typeName = NONE_TYPE;}
-    virtual ~Base(){}
-    virtual Base* setData(){return NULL;}
+	Value() {_typeName = NONE_TYPE;}
+    virtual ~Value(){}
+    virtual Value* setData(){return NULL;}
     virtual int getTypename() const;
 
-    bool operator==(const Base& b) const;
-    bool operator!=(const Base& b) const;
-    bool operator>(const Base& b) const;
-    bool operator<(const Base& b) const;
-    bool operator>=(const Base& b) const;
-    bool operator<=(const Base& b) const;   
-    friend std::ostream& operator<<(std::ostream& out, Base& b);
+    bool operator==(const Value& b) const;
+    bool operator!=(const Value& b) const;
+    bool operator>(const Value& b) const;
+    bool operator<(const Value& b) const;
+    bool operator>=(const Value& b) const;
+    bool operator<=(const Value& b) const;   
+    friend std::ostream& operator<<(std::ostream& out, Value& b);
 };
 
 #endif

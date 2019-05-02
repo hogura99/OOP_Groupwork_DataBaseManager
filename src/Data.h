@@ -8,13 +8,13 @@
 #include <map>
 
 class Data{
-	std::map<std::string, Base* > varMap;
+	std::map<std::string, Value* > varMap;
 public:
 	Data() {}
 	~Data() {}
 	
-	Base* getData(std::string attrName) const;
-	Base* setData(std::string attrName, Base* src);
+	Value* getData(std::string attrName) const;
+	Value* setData(std::string attrName, Value* src);
 	int getTypename(std::string attrName);
 };
 
