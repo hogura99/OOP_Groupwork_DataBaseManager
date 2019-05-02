@@ -31,13 +31,6 @@ const std::map<int, std::string> attrTypeInvMap =
     {STRING, "char"},
 };
 
-const std::map<int, int> attrTypeWidth = 
-{
-    {INT, 11},
-    {DOUBLE, 2},
-    {STRING, 1},
-};
-
 class Value{
 private:
 	virtual bool __compare(const Value *val_l, const Value *val_r, int type, int opr) const;
@@ -46,7 +39,7 @@ protected:
 public:
 	Value() {_typeName = NONE_TYPE;}
     virtual ~Value(){}
-    virtual Value* setData(){return NULL;}
+    virtual Value* setValue(){return NULL;}
     virtual int getTypename() const;
 
     bool operator==(const Value& b) const;
@@ -54,7 +47,7 @@ public:
     bool operator>(const Value& b) const;
     bool operator<(const Value& b) const;
     bool operator>=(const Value& b) const;
-    bool operator<=(const Value& b) const;   
+    bool operator<=(const Value& b) const;
     friend std::ostream& operator<<(std::ostream& out, Value& b);
 };
 
