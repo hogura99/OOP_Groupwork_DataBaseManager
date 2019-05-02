@@ -2,7 +2,7 @@
 
 #ifndef DATA_H
 #define DATA_H
-#include "Derived.h"
+#include "AttributeValue.h"
 
 #include <string>
 #include <map>
@@ -13,9 +13,9 @@ public:
 	Data() {}
 	~Data() {}
 	
-	Value* getData(std::string attrName) const;
-	Value* setData(std::string attrName, Value* src);
-	int getTypename(std::string attrName);
+	virtual Value* getValue(std::string attrName) const;
+	virtual Value* setValue(std::string attrName, Value* src);
+	virtual int getTypename(std::string attrName) const;
 };
 
 #endif

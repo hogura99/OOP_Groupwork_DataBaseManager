@@ -39,7 +39,7 @@ protected:
 public:
 	Value() {_typeName = NONE_TYPE;}
     virtual ~Value(){}
-    virtual Value* setData(){return NULL;}
+    virtual Value* setValue(){return NULL;}
     virtual int getTypename() const;
 
     bool operator==(const Value& b) const;
@@ -47,7 +47,7 @@ public:
     bool operator>(const Value& b) const;
     bool operator<(const Value& b) const;
     bool operator>=(const Value& b) const;
-    bool operator<=(const Value& b) const;   
+    bool operator<=(const Value& b) const;
     friend std::ostream& operator<<(std::ostream& out, Value& b);
 };
 

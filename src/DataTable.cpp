@@ -39,7 +39,7 @@ bool DataTable::CheckPrimaryKey(const std::vector<ATTRIBUTE>& attributes)
 	}
 	for (auto iter = mData_.begin(); iter != mData_.end(); iter++)
 	{
-		if (*(*iter)->getData(primary_key_) == *primary_key_value)
+		if (*(*iter)->getValue(primary_key_) == *primary_key_value)
 			return false;
 	}
 	return true;
@@ -49,7 +49,7 @@ bool DataTable::CheckPrimaryKey(const ATTRIBUTE& attribute)
 {
 	for (auto iter = mData_.begin(); iter != mData_.end(); iter++)
 	{
-		if (*(*iter)->getData(primary_key_) == *attribute.VALUE)
+		if (*(*iter)->getValue(primary_key_) == *attribute.VALUE)
 			return false;
 	}
 	return true;
@@ -110,7 +110,7 @@ void DataTable::Insert(const std::vector< ATTRIBUTE > &attributes)
 		for (auto iter = attributes.begin(); iter != attributes.end(); iter++)
 		{
 			//Value* pt = &const_cast<Value>(iter->VALUE); // 可能有bug！
-			data->setData(iter->NAME, iter->VALUE);
+			data->setValue(iter->NAME, iter->VALUE);
 		}
 		mData_.insert(mData_.end(), data);
 	}
@@ -135,7 +135,7 @@ void DataTable::Update(const ATTRIBUTE &attribute, std::vector<Data*> &data_list
 		}
 		else
 		{
-			(*iter)->setData(attribute.NAME, attribute.VALUE);
+			(*iter)->setValue(attribute.NAME, attribute.VALUE);
 		}
 	}
 }
@@ -145,7 +145,7 @@ void DataTable::Select(const std::string &attribute_name, const std::vector<Data
 	attribute_value.clear();
 	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)
 	{
-		Value* temp = (*iter)->getData(attribute_name);
+		Value* temp = (*iter)->getValue(attribute_name);
 		attribute_value.insert(attribute_value.end(), temp);
 	}
 }
@@ -184,13 +184,13 @@ Value* DataTable::transValue(const Data*_attr, std::string val, int _dataType)
 {
 	Value *res = NULL;
 	if (attribute_table_.count(val))
-		return _attr->getData(val);
+		return _attr->getValue(val);
 	else
 		switch (_dataType)
 		{
-			case INT: res = new dataInt(Params::str2int(val)); break;
-			case DOUBLE: res = new dataInt(Params::str2double(val)); break;
-			case STRING: res = new dataString(val); break;
+			case INT: res = new AttributeValue<int>(stralgo::str2int(val)); break;
+			case DOUBLE: res = new AttributeValue<double>(stralgo::str2double(val)); break;
+			case STRING: res = new AttributeValue<std::string>(val); break;
 			default: res = NULL; break;
 		}
 	return res;
