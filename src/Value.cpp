@@ -5,8 +5,8 @@
 
 #define SWITCH_OPRT(pt_l, pt_r, opr) {						\
 	switch (opr) {											\
-		case opLE: res = pt_l->operator<(*pt_r); break;	\
-		case opEQ: res = pt_l->operator==(*pt_r); break;	\
+		case opLE: res = (*pt_l)< (*pt_r); break;	\
+		case opEQ: res = (*pt_l)==(*pt_r); break;	\
 	}														\
 }
 
@@ -17,8 +17,8 @@ bool Value::__compare(const Value *val_l, const Value *val_r, int type, int opr)
 	switch (type) {
 		case INT: {
 			//assert(dynamic_cast<AttributeValue<int>*>(val_l) != NULL && dynamic_cast<AttributeValue<int>*>(val_r) != NULL);
-			const AttributeValue<int> *pt_l = dynamic_cast<AttributeValue<int>*>(_val_l);
-			const AttributeValue<int> *pt_r = dynamic_cast<AttributeValue<int>*>(_val_r);
+			AttributeValue<int> *pt_l = dynamic_cast<AttributeValue<int>*>(_val_l);
+			AttributeValue<int> *pt_r = dynamic_cast<AttributeValue<int>*>(_val_r);
 			assert(pt_l != NULL && pt_r != NULL);
 			SWITCH_OPRT(pt_l, pt_r, opr);
 			break;

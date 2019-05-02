@@ -5,6 +5,7 @@
 
 #include "Value.h"
 #include <string>
+#include <typeinfo>
 
 template<class T>
 class AttributeValue : public Value{
@@ -24,6 +25,7 @@ class AttributeValue : public Value{
         ~AttributeValue(){}
 
         AttributeValue<T>* setValue(T attrValue);
+
         T getValue() const;
         int getTypename() const override;
         bool operator==(const AttributeValue<T>& b) const;
@@ -33,40 +35,5 @@ class AttributeValue : public Value{
         bool operator>=(const AttributeValue<T>& b) const;
         bool operator<=(const AttributeValue<T>& b) const;
 };
-/*
-class ValueDouble : public Value{
-    double Value;
-    public:
-        ValueDouble(double v): Value(v){}
-        ~ValueDouble();
-
-        ValueDouble* setValue(double v);
-        double getValue() const;
-        int getTypename() const override;
-        bool operator==(const ValueDouble& b) const;
-        bool operator!=(const ValueDouble& b) const;
-        bool operator>(const ValueDouble& b) const;
-        bool operator<(const ValueDouble& b) const;
-        bool operator>=(const ValueDouble& b) const;
-        bool operator<=(const ValueDouble& b) const;
-};
-
-class ValueString : public Value{
-    std::string Value;
-    public:
-        ValueString(std::string v): Value(v) {}
-        ~ValueString();
-        
-        ValueString* setValue(std::string v);
-        std::string getValue() const;
-        int getTypename() const override;
-        bool operator==(const ValueString& b) const;
-        bool operator!=(const ValueString& b) const;
-        
-};
-*/
-//following funcs need to be called with dynamic_cast;
-//getValue
-//operator maybe
 
 #endif
