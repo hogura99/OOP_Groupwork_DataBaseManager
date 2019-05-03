@@ -14,19 +14,7 @@ Value* Data::setValue(std::string attrName, Value* src){
 	
 	auto fd = varMap.find(attrName);
 
-	Value* copy_src;
-	if (src->getTypename() == INT){
-		AttributeValue<int>* tmp_ptr = dynamic_cast<AttributeValue<int>*>(src);
-		copy_src = new AttributeValue<int>(*tmp_ptr);
-	}
-	else if(src->getTypename() == STRING){
-		AttributeValue<std::string>* tmp_ptr = dynamic_cast<AttributeValue<std::string>*>(src);
-		copy_src = new AttributeValue<std::string>(*tmp_ptr);
-	}
-	else if (src->getTypename() == DOUBLE){
-		AttributeValue<double>* tmp_ptr = dynamic_cast<AttributeValue<double>*>(src);
-		copy_src = new AttributeValue<double>(*tmp_ptr);
-	}
+	Value* copy_src = src->getCopy();
 
 	if(fd != varMap.end()){//update
 		delete fd->second;

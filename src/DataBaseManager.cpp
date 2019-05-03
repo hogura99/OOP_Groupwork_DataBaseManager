@@ -88,7 +88,7 @@ void DataBaseManager::ShowBase() {
 	cout << "Database" << endl;
 	for (auto it: mBase) {
 		cout << it.first << endl;
-		it.second->ShowTableAll();
+		it.second->ShowTableAll(false);
 	}
 }
 

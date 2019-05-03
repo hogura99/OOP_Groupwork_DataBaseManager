@@ -22,7 +22,7 @@ bool readCommand(char *cmd, int maxLen, std::istream &inf)
 
 int main(int argc, char **argv) {
 
-	freopen("8.sql", "r", stdin);
+	freopen("10.sql", "r", stdin);
 
 
 	const int maxCmdLen = (1 << 16) + 3;

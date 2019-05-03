@@ -20,7 +20,7 @@ public:
 	void CreateTable(const std::string &command);
 	void DropTable(const std::string &tableName);
 	void ShowTableCol(const std::string &tableName);
-	void ShowTableAll();
+	void ShowTableAll(bool PrintTableName = true);
 
 	void InsertData(const std::vector<std::string> &param);
 	void DeleteData(const std::vector<std::string> &param);

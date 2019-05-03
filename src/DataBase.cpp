@@ -59,8 +59,9 @@ void DataBase::ShowTableCol(const std::string &Name) {
 	}
 }
 
-void DataBase::ShowTableAll() { // temporarily function
-	std::cout << "Tables_in_" << __name << std::endl;
+void DataBase::ShowTableAll(bool PrintTableName) { // temporarily function
+	if (PrintTableName)
+		std::cout << "Tables_in_" << __name << std::endl;
 	for (auto it: mTable) {
 		std::cout << it.first << std::endl;
 	}
@@ -171,7 +172,10 @@ void DataBase::SelectData(const std::vector<std::string> &param)
 	for (int i = 0; i < n; i ++)
 	{
 		for (int j = 0; j < _attrList.size(); j ++)
-			cout << *(_attrList[j].second[i]) << "\t";
+			if (_attrList[j].second[i] != NULL)
+				cout << *(_attrList[j].second[i]) << "\t";
+			else
+				cout << "NULL" << "\t";
 		//cout << (_attrList.back().second[i]) << endl;
 		cout << endl;
 	}

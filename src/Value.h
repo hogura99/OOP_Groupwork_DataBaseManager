@@ -49,6 +49,7 @@ public:
     
     virtual ~Value(){ std::cerr << "delete Value -->   " << this << std::endl; }
     virtual Value* setValue(){return NULL;}
+    virtual Value* getCopy();
     int getTypename() const;
 
     bool operator==(const Value& b) const;

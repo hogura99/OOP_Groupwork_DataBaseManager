@@ -55,6 +55,28 @@ int Value::getTypename() const {
 	return _typeName;
 }
 
+Value* Value::getCopy() {
+	Value* copy_src = NULL;
+	switch (_typeName) {
+		case INT: {
+			AttributeValue<int>* tmp_ptr = dynamic_cast<AttributeValue<int>*>(this);
+			copy_src = new AttributeValue<int>(*tmp_ptr);
+			break;
+		}
+		case STRING: {
+			AttributeValue<std::string>* tmp_ptr = dynamic_cast<AttributeValue<std::string>*>(this);
+			copy_src = new AttributeValue<std::string>(*tmp_ptr);
+			break;
+		}
+		case DOUBLE: {
+			AttributeValue<double>* tmp_ptr = dynamic_cast<AttributeValue<double>*>(this);
+			copy_src = new AttributeValue<double>(*tmp_ptr);
+			break;
+		}
+	}
+	return copy_src;
+}
+
 bool Value::operator<(const Value& b) const{
 	if (getTypename() != b.getTypename())
 		return false;

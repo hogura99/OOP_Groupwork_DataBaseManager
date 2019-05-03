@@ -211,6 +211,9 @@ bool DataTable::checkSingleClause(const Data* attr, const std::vector<std::strin
 	pt_l = transValue(attr, param[0], dataType);
 	pt_r = transValue(attr, param[2], dataType);
 
+	if (pt_l == NULL || pt_r == NULL)
+		return false;
+
 	Value &val_l = *pt_l;
 	Value &val_r = *pt_r;
 
