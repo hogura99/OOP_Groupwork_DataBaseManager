@@ -2,7 +2,7 @@
 
 
 template<class T>
-const AttributeValue<T>*& AttributeValue<T>::setValue(T attrValue) {
+AttributeValue<T>* AttributeValue<T>::setValue(T attrValue) {
 	_attrValue = attrValue;
 	return this;
 }
