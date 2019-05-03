@@ -40,7 +40,7 @@ public:
 	Value() {_typeName = NONE_TYPE;}
     virtual ~Value(){}
     virtual Value* setValue(){return NULL;}
-    virtual int getTypename() const;
+    int getTypename() const;
 
     bool operator==(const Value& b) const;
     bool operator!=(const Value& b) const;
