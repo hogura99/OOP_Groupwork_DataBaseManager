@@ -22,10 +22,13 @@ class AttributeValue : public Value{
                 _typeName = DOUBLE;
             }
         }
+        AttributeValue(const AttributeValue& src){
+            _attrValue = src.getValue();
+            _typeName = src.getTypename();
+        }
         ~AttributeValue() {
             std::cerr << "delete Value(" << attrTypeInvMap.at(_typeName) << ") -->   " << this << std::endl;
         }
-
         const AttributeValue<T>* setValue(T attrValue) ;
         T getValue() const;
         int getTypename() const;

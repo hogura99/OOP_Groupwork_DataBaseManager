@@ -1,5 +1,5 @@
 all: DataBaseManager.o DataBase.o ParamSpliter.o main.o Value.o AttributeValue.o DataTable.o Data.o str_algorithm.o
-	g++ str_algorithm.o DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Value.o AttributeValue.o Data.o main.o -o debug/main -std=c++14 -g
+	g++ str_algorithm.o DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Value.o AttributeValue.o Data.o main.o -o  debug/main -std=c++14 -g
 
 main.o: main.cpp
 	g++ -c main.cpp -o main.o -std=c++14 -g
