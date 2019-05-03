@@ -11,18 +11,21 @@ template<class T>
 class AttributeValue : public Value{
     T _attrValue;
     public:
-        AttributeValue(T attrValue): _attrValue(attrValue){
-            if(typeid(int).name() == typeid(T).name()){
+        AttributeValue(T attrValue):Value(), _attrValue(attrValue){
+            if(typeid(int) == typeid(T)){
                 _typeName = INT;
             }
-            else if(typeid(std::string).name() == typeid(T).name()){
+            else if(typeid(std::string) == typeid(T)){
                 _typeName = STRING;
             }
-            else if(typeid(double).name() == typeid(T).name()){
+            else if(typeid(double) == typeid(T)){
                 _typeName = DOUBLE;
             }
         }
-        ~AttributeValue(){}
+
+        ~AttributeValue() {
+            std::cerr << "delete Value(" << attrTypeInvMap.at(_typeName) << ") -->   " << this << std::endl;
+        }
         const AttributeValue<T>* setValue(T attrValue) ;
         T getValue() const;
         int getTypename() const;

@@ -7,6 +7,7 @@
 
 #include "ParamSpliter.h"
 #include "expression.h"
+#include "Value.h"
 #include "Data.h"
 
 //name and the corresponding value of the attribute
@@ -73,7 +74,7 @@ class DataTable
         
         int GetTypeof(const std::string &attrName);
 
-        std::map<std::string, int>& GetAttributeTable();
+        std::vector< std::pair<std::string, int> > GetAttributeTable();
         
         virtual void PrintAttributeTable();
 

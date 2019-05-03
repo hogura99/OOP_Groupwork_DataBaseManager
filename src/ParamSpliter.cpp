@@ -112,7 +112,7 @@ void ParamSpliter::split_where(std::stringstream &ss, std::vector<std::string> &
 		for (int i = 0; i < str.length(); i ++)
 		{
 			bool flag = false;
-			for (int j = 3; j >= 1 && i + j <= str.length(); j --)
+			for (int j = std::min(3, (int)str.length() - i); j >= 1; j --)
 			{
 				if (Exprs::oprTYPE.count(str.substr(i, j)))
 				{
