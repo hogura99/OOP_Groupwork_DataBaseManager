@@ -52,7 +52,7 @@ bool Value::__compare(const Value *val_l, const Value *val_r, int type, int opr)
 }
 
 int Value::getTypename() const {
-	return NONE_TYPE;
+	return _typeName;
 }
 
 bool Value::operator<(const Value& b) const{

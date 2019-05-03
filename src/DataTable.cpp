@@ -76,7 +76,7 @@ bool DataTable::CheckAttributeName(const std::vector<ATTRIBUTE>& attributes)
 {
 	for (auto iter = attributes.begin(); iter != attributes.end(); iter++)
 	{
-		if (attribute_table_.find(iter->NAME) == attribute_table_.end())
+		if (!CheckAttributeName(iter->NAME))
 		{
 			return false;
 		}
@@ -86,14 +86,14 @@ bool DataTable::CheckAttributeName(const std::vector<ATTRIBUTE>& attributes)
 
 bool DataTable::CheckAttributeName(const ATTRIBUTE& attribute)
 {
-	if (attribute_table_.find(attribute.NAME) == attribute_table_.end())
+	if (!CheckAttributeName(attribute.NAME))
 		return false;
 	return true;
 }
 
 bool DataTable::CheckAttributeName(const std::string& attribute_name)
 {
-	if (attribute_table_.find(attribute_name) == attribute_table_.end())
+	if (attribute_name != "*" && attribute_table_.find(attribute_name) == attribute_table_.end())
 		return false;
 	return true;
 }
@@ -129,7 +129,7 @@ void DataTable::Update(const ATTRIBUTE &attribute, std::vector<Data*> &data_list
 {
 	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)
 	{
-		if ((attribute.NAME == primary_key_ && !CheckPrimaryKey(attribute)) || CheckAttributeName(attribute))	//if update the primary key
+		if ((attribute.NAME == primary_key_ && !CheckPrimaryKey(attribute)) || !CheckAttributeName(attribute))	//if update the primary key
 		{
 			std::cerr << "Failed to update. please check your input." << std::endl;
 		}
@@ -167,7 +167,10 @@ void DataTable::PrintAttributeTable()
 		string _attrName = _attr.first;
 		int _attrType = _attr.second;
 		cout << _attrName;
-		cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << _attrType << ")";
+		if (attrTypeWidth.at(_attrType))
+			cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << attrTypeWidth.at(_attrType) << ")";
+		else
+			cout << "\t" << attrTypeInvMap.at(_attrType);
 		if (not_null_key_[_attrName])
 			cout << "\t" << "NO";
 		else
@@ -295,7 +298,7 @@ int DataTable::GetTypeof(const std::string &attrName)
 	return attribute_table_[attrName];
 }
 
-std::map<std::string, int>& DataTable::GetAttributeTable()
+std::vector< std::pair<std::string, int> > DataTable::GetAttributeTable()
 {
-	return attribute_table_;
+	return sequential_attribute_table_;
 }

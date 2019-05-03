@@ -31,6 +31,13 @@ const std::map<int, std::string> attrTypeInvMap =
     {STRING, "char"},
 };
 
+const std::map<int, int> attrTypeWidth = 
+{
+    {INT, 11},
+    {DOUBLE, 0},
+    {STRING, 1},
+};
+
 class Value{
 private:
 	virtual bool __compare(const Value *val_l, const Value *val_r, int type, int opr) const;
@@ -38,7 +45,7 @@ protected:
 	int _typeName;
 public:
 	Value() {_typeName = NONE_TYPE;}
-    virtual ~Value(){}
+    virtual ~Value(){ std::cerr << "delete Value -->   " << this << std::endl; }
     virtual Value* setValue(){return NULL;}
     int getTypename() const;
 

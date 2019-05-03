@@ -143,7 +143,7 @@ void DataBase::SelectData(const std::vector<std::string> &param)
 
 	if (_attrName == "*")
 	{
-		auto &_attrTable = _table->GetAttributeTable();
+		auto _attrTable = _table->GetAttributeTable();
 		for (auto _attr: _attrTable)
 		{
 			_attrName = _attr.first;
@@ -186,7 +186,7 @@ void DataBase::UpdateData(const std::vector<std::string> &param)
 	string _attrName  = param[1];
 	string _attrVStr  = param[2];
 	DataTable *_table = mTable[_tableName];
-	if (!_table->CheckAttributeName(_tableName))
+	if (!_table->CheckAttributeName(_attrName))
 	{
 		cerr << "Failed to update data. Please check your input." << endl;
 	}
