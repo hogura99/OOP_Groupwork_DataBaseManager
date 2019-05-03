@@ -45,6 +45,8 @@ protected:
 	int _typeName;
 public:
 	Value() {_typeName = NONE_TYPE;}
+    Value(const Value& src) {_typeName = src.getTypename();}
+    
     virtual ~Value(){ std::cerr << "delete Value -->   " << this << std::endl; }
     virtual Value* setValue(){return NULL;}
     int getTypename() const;
