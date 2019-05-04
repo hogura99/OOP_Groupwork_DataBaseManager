@@ -116,9 +116,21 @@ void DataTable::SortData()
 void DataTable::Insert(const std::vector< ATTRIBUTE > &attributes)
 {
 	Data* data = new Data;
-	if (!CheckAttributeName(attributes) || !CheckPrimaryKey(attributes) || !CheckNotNullKey(attributes))
+	/*if (!CheckAttributeName(attributes) || !CheckPrimaryKey(attributes) || !CheckNotNullKey(attributes))
 	{
 		std::cerr << "Failed to insert. Please check your input. "<< std::endl;
+	}*/
+	if (!CheckAttributeName(attributes))
+	{
+		throw (kERROR_ATTRIBUTE_NOT_EXIST);
+	}
+	else if (!CheckPrimaryKey(attributes))
+	{
+		throw (kERROR_PRIMARY_KEY_REPEATED);
+	}
+	else if (!CheckNotNullKey(attributes))
+	{
+		throw (kERROR_NOT_NULL_KEY_NULL);
 	}
 	else
 	{
@@ -152,18 +164,23 @@ void DataTable::Remove(std::vector<Data*> &data_list)
 
 void DataTable::Update(const ATTRIBUTE &attribute, std::vector<Data*> &data_list)
 {
+	if (!CheckAttributeName(attribute))
+	{
+		throw (kERROR_ATTRIBUTE_NOT_EXIST);
+		return;
+	}
+
 	for (auto iter = data_list.begin(); iter != data_list.end(); iter++)
 	{
-		if ((attribute.NAME == primary_key_ && !CheckPrimaryKey(attribute)) || !CheckAttributeName(attribute))	//if update the primary key
-		{
-			std::cerr << "Failed to update. please check your input." << std::endl;
-		}
-		else
-		{
-			(*iter)->setValue(attribute.NAME, attribute.VALUE);
-		}
+		(*iter)->setValue(attribute.NAME, attribute.VALUE);
 	}
 	this->SortData();
+
+	if ((attribute.NAME == primary_key_ && !CheckPrimaryKey(attribute))) //if update the primary key
+	{
+		throw (kERROR_PRIMARY_KEY_REPEATED);
+		return;
+	}
 }
 
 void DataTable::Select(const std::string &attribute_name, const std::vector<Data*> &data_list, std::vector<Value*> &attribute_value)
@@ -193,7 +210,7 @@ void DataTable::PrintAttributeTable()
 		string _attrName = _attr.first;
 		int _attrType = _attr.second;
 		cout << _attrName;
-		if (attrTypeWidth.at(_attrType))
+		if (attrTypeWidth.count(_attrType))
 			cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << attrTypeWidth.at(_attrType) << ")";
 		else
 			cout << "\t" << attrTypeInvMap.at(_attrType);
@@ -283,7 +300,7 @@ bool DataTable::calcExpr(const Data* it, const std::string &clause)
 	stack<bool> val;
 	stack<int> opr;
 
-	while (!ss.eof()) // 这里可以考虑用AC自动机
+	while (!ss.eof())
 	{
 		vector<string> param;
 		string tmp;

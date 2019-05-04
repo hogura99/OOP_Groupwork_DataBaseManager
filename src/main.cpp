@@ -22,7 +22,7 @@ bool readCommand(char *cmd, int maxLen, std::istream &inf)
 
 int main(int argc, char **argv) {
 
-	//freopen("10.sql", "r", stdin);
+	freopen("input.sql", "r", stdin);
 
 	const int maxCmdLen = (1 << 16) + 3;
 	static char cmd[maxCmdLen];
@@ -31,7 +31,14 @@ int main(int argc, char **argv) {
 
 	while (readCommand(cmd, maxCmdLen, std::cin))
 	{
-		master->Query(cmd);
+		try {
+			master->Query(cmd);
+		}
+		catch (DataBaseErrorEvent &error) {
+			if (error.getType() != ERROR_NONE)
+				std::cerr << error.what() << std::endl;
+			error = ERROR_NONE;
+		}
 	}
 
 	return 0;

@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 
+#include "errorstream.h"
 #include "DataBase.h"
 #include "ParamSpliter.h"
 

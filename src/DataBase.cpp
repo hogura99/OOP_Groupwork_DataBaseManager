@@ -24,39 +24,35 @@ void DataBase::CreateTable(const std::string &command) {
 	{
 		pair<string, int> _attr;
 		_attr.first = param[i];
-		_attr.second = attrTypeMap.at(param[i + 1]);
+		param[i + 1] = upperized(param[i + 1]);
+		if (attrTypeMap.count(param[i + 1]))
+			_attr.second = attrTypeMap.at(param[i + 1]);
+		else
+			throw kERROR_TYPE_NOT_SUPPORT;
 		_attrType.push_back(_attr);
 	}
-	mTable[param[0]] = new DataTable(param[0], _attrType, pri_key, not_null);
+	if (!mTable.count(param[0]))
+		mTable[param[0]] = new DataTable(param[0], _attrType, pri_key, not_null);
+	else
+		throw (kERROR_TABLE_EXIST);
 }
 
 void DataBase::DropTable(const std::string &Name) {
-	try {
-		auto it = mTable.find(Name);
-		if (it != mTable.end()) {
-			delete it->second;
-			mTable.erase(it);
-		} else
-			throw false;
-	}
-	catch (bool) {
-		// deletion error
+	auto it = mTable.find(Name);
+	if (it != mTable.end()) {
+		delete it->second;
+		mTable.erase(it);
+	} else {
+		throw (kERROR_TABLE_NOT_EXIST);
 	}
 }
 
 void DataBase::ShowTableCol(const std::string &Name) {
-	try {
-		auto it = mTable.find(Name);
-		if (it != mTable.end()) {
-
-			mTable[Name]->PrintAttributeTable();
-
-		} else
-			throw(false);
-	}
-	catch (bool) {
-		// show table error
-	}
+	auto it = mTable.find(Name);
+	if (it != mTable.end())
+		mTable[Name]->PrintAttributeTable();
+	else
+		throw (kERROR_TABLE_NOT_EXIST);
 }
 
 void DataBase::ShowTableAll(bool PrintTableName) { // temporarily function
@@ -79,8 +75,9 @@ void DataBase::InsertData(const std::vector<std::string> &param)
 		{
 			if (!_table->CheckAttributeName(param[i]))
 			{
-				std::cerr << "Failed to insert. Please check your input." << std::endl;
-				break;
+				throw (kERROR_ATTRIBUTE_NOT_EXIST);
+				//std::cerr << "Failed to insert. Please check your input." << std::endl;
+				return;
 			}
 			auto _attr_type = _table->GetTypeof(param[i]) ; // pay attention to the legality
 			Value *pt = NULL;
@@ -107,15 +104,19 @@ void DataBase::InsertData(const std::vector<std::string> &param)
 				}
 			}
 			if (pt != NULL)
-			{
 				_attributes.push_back( ATTRIBUTE(param[i], pt) );
-			}
+			else		
+				throw (kERROR_INSERT_DATA_ATTRIBUTE_TYPE_MISMATCH);
 		}
 		_table->Insert(_attributes);
 	}
 	else
 	{
-		std::cerr << "Failed to insert. Please check your input." << std::endl;
+		//std::cerr << "Failed to insert. Please check your input." << std::endl;
+		if (!mTable.count(param[0]))
+			throw (kERROR_TABLE_NOT_EXIST);
+		else
+			throw (kERROR_COMMAND_FORM);
 	}
 }
 
@@ -129,7 +130,8 @@ void DataBase::SelectData(const std::vector<std::string> &param)
 
 	if (!_table->CheckAttributeName(_attrName))
 	{
-		cerr << "Failed to select Data. Please check your input." << endl;
+		//cerr << "Failed to select Data. Please check your input." << endl;
+		throw kERROR_ATTRIBUTE_NOT_EXIST;
 		return;
 	}
 
@@ -192,7 +194,9 @@ void DataBase::UpdateData(const std::vector<std::string> &param)
 	DataTable *_table = mTable[_tableName];
 	if (!_table->CheckAttributeName(_attrName))
 	{
-		cerr << "Failed to update data. Please check your input." << endl;
+		//cerr << "Failed to update data. Please check your input." << endl;
+		throw kERROR_ATTRIBUTE_NOT_EXIST;
+		return;
 	}
 	Value *_attrVal = NULL;
 	switch (_table->GetTypeof(_attrName))
@@ -219,6 +223,7 @@ void DataBase::UpdateData(const std::vector<std::string> &param)
 		default:
 		{
 			// throw an error, wrong type
+			throw (kERROR_ATTRIBUTE_NOT_EXIST);
 			break;
 		}
 	}

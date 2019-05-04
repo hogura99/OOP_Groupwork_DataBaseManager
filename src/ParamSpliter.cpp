@@ -4,7 +4,7 @@
 
 #include <sstream>
 
-#define IS_FROM(str) (str == "FROM" || str == "from")
+#define IS_FROM(str) (upperized(str) == "FROM")
 
 std::map<std::string, int> ParamSpliter::cmdType = 
 {
@@ -88,9 +88,9 @@ int ParamSpliter::split_create(std::stringstream &ss, std::vector<std::string> &
 {
 	std::string str;
 	ss >> str;
-	if (str == "TABLE")
+	if (upperized(str) == "TABLE")
 		return TABLE_CREATE;
-	if (str != "DATABASE")
+	if (upperized(str) != "DATABASE")
 		return FORM_ERROR;
 	/*ss >> str;
 	if (str != "DATABASE")
@@ -155,7 +155,7 @@ int ParamSpliter::split_select(std::stringstream &ss, std::vector<std::string> &
 		return DATA_SELECT;
 	}
 
-	if (str != "WHERE")
+	if (upperized(str) != "WHERE")
 		return FORM_ERROR;
 
 	ParamSpliter::split_where(ss, param);
@@ -197,9 +197,9 @@ int ParamSpliter::split_create_table(const std::string &Command, std::vector<std
 	stralgo::ReplaceMark(Command, _command);
 	stringstream ss(_command);
 	ss >> str;
-	assert(str == "CREATE");
+	//assert(str == "CREATE");
 	ss >> str;
-	assert(str == "TABLE");
+	//assert(str == "TABLE");
 	param.clear();
 
 	ss >> str;
@@ -211,14 +211,14 @@ int ParamSpliter::split_create_table(const std::string &Command, std::vector<std
 	{
 		ss >> _attrName >> _attrType;
 
-		if (_attrName == "PRIMARY" && _attrType == "KEY")
+		if (upperized(_attrName) == "PRIMARY" && upperized(_attrType) == "KEY")
 		{
 			ss >> str;
 			pri_key = str;
 			continue;
 		}
 
-		if (_attrName == "NOT" && _attrType == "NULL")
+		if (upperized(_attrName) == "NOT" && upperized(_attrType) == "NULL")
 		{
 			if (str == "")
 				return FORM_ERROR;
@@ -242,7 +242,7 @@ int ParamSpliter::split_insert(std::stringstream &ss, std::vector<std::string> &
 	stringstream cmd(_command);
 
 	cmd >> str >> str; // INSERT INTO
-	if (cmd.eof() || str != "INTO")
+	if (cmd.eof() || upperized(str) != "INTO")
 		return FORM_ERROR;
 
 	param.clear();
@@ -252,7 +252,7 @@ int ParamSpliter::split_insert(std::stringstream &ss, std::vector<std::string> &
 	while (!cmd.eof())
 	{
 		cmd >> str;
-		if (str != "VALUES")
+		if (upperized(str) != "VALUES")
 			param.push_back(str);
 	}
 
@@ -268,14 +268,14 @@ int ParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &
 	ss >> str;
 	param.push_back(str);
 	ss >> str;
-	if (str != "SET" || ss.eof())
+	if (upperized(str) != "SET" || ss.eof())
 		return FORM_ERROR;
 
 	while (!ss.eof())
 	{
 		std::string expr, str1, str2;
 		ss >> str;
-		if (str == "WHERE")
+		if (upperized(str) == "WHERE")
 			break;
 		if (str.find('=') == std::string::npos || str.back() == '=')
 		{
@@ -305,7 +305,7 @@ int ParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &
 			param.push_back(str2);
 		}
 	}
-	if (str == "WHERE")
+	if (upperized(str) == "WHERE")
 		ParamSpliter::split_where(ss, param);
 	return DATA_UPDATE;
 }
@@ -327,11 +327,11 @@ int ParamSpliter::split_show(std::stringstream &ss, std::vector<std::string> &pa
 	if (ss.eof())
 		return FORM_ERROR;
 	ss >> str;
-	if (str == "DATABASES")
+	if (upperized(str) == "DATABASES")
 		return BASE_SHOW;
-	else if (str == "TABLES")
+	else if (upperized(str) == "TABLES")
 		return TABLE_SHOW_ALL;
-	else if (str != "columns")
+	else if (upperized(str) != "COLUMNS")
 		return FORM_ERROR;
 
 	param.clear();
@@ -360,9 +360,9 @@ int ParamSpliter::split_drop(std::stringstream &ss, std::vector<std::string> &pa
 	param.clear();
 	ss >> str2;
 	param.push_back(str2);
-	if (str == "DATABASE")
+	if (upperized(str) == "DATABASE")
 		return BASE_DROP;
-	else if (str == "TABLE")
+	else if (upperized(str) == "TABLE")
 		return TABLE_DROP;
 	else
 		return FORM_ERROR;

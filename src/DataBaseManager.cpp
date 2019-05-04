@@ -72,15 +72,21 @@ void DataBaseManager::Query(const std::string &Command) {
 			break;
 		}
 
-		default: {
-			
+		case FORM_ERROR: {
+			throw (kERROR_COMMAND_FORM);
 			break;
+		}
+		default: {
+			throw (kERROR_UNKNOWN);
 		}
 	}
 }
 
 void DataBaseManager::CreateBase(const std::string &DBName) {
-	mBase[DBName] = new DataBase(DBName);
+	if (!mBase.count(DBName))
+		mBase[DBName] = new DataBase(DBName);
+	else
+		throw (kERROR_BASE_EXIST);
 }
 
 void DataBaseManager::ShowBase() {
@@ -98,14 +104,10 @@ void DataBaseManager::UseBase(const std::string &DBName) {
 
 void DataBaseManager::DropBase(const std::string &DBName) {
 	auto it = mBase.find(DBName);
-	try {
-		if (it != mBase.end()) {
-			delete it->second;
-			mBase.erase(it);
-		} else
-			throw false;
-	}
-	catch (bool) {
-		// deletion fail
+	if (it != mBase.end()) {
+		delete it->second;
+		mBase.erase(it);
+	} else {
+		throw (kERROR_BASE_NOT_EXIST);
 	}
 }

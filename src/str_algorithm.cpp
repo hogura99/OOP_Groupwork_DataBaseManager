@@ -19,7 +19,7 @@ void CompressSpace(const std::string &str1, std::string &str2)
 	str2 = "";
 	str2.push_back(str1[0]);
 	for (size_t i = 0; i + 1 < str1.length(); i ++)
-		if (str1[i] == str1[i + 1] && str1[i] == ' ')
+		if ((str1[i] == str1[i + 1] && str1[i] == ' ') || str1[i + 1] == '\r' || str1[i + 1] == '\n')
 			continue;
 		else
 			str2.push_back(str1[i + 1]);

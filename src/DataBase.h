@@ -6,6 +6,8 @@
 #include <map>
 
 #include "DataTable.h"
+#include "errorstream.h"
+#include "errorstream.h"
 
 class DataBase {
 

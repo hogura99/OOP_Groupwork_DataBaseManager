@@ -6,6 +6,7 @@
 #include <map>
 
 #include "ParamSpliter.h"
+#include "errorstream.h"
 #include "expression.h"
 #include "Value.h"
 #include "Data.h"

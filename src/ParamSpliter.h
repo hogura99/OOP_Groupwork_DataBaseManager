@@ -13,6 +13,7 @@
 
 #include "str_algorithm.h"
 #include "expression.h"
+#include "errorstream.h"
 
 enum DATA_BASE_OPEARTION {
 	FORM_ERROR,
