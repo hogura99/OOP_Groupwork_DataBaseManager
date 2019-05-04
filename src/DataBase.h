@@ -15,6 +15,11 @@ private:
 	std::map<std::string, DataTable*> mTable;
 	std::string __name;
 
+protected:
+	virtual Value* transValue(const std::string &VStr, int type) const;
+
+	virtual void PrintSelectData(std::vector< std::pair<std::string, std::vector<Value*> > >& _attrList);
+
 public:
 	DataBase(const std::string &DBName);
 	~DataBase();

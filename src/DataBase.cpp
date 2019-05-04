@@ -12,6 +12,34 @@ DataBase::~DataBase()
 		delete it.second;
 }
 
+Value* DataBase::transValue(const std::string &VStr, int type) const
+{
+	Value *pt = NULL;
+	switch (type)
+	{
+		case INT :
+		{
+			int val = 0;
+			if (stralgo::str2int(VStr, val))
+				pt = new AttributeValue<int>(val);
+			break;
+		}
+		case DOUBLE :
+		{
+			double val = 0;
+			if (stralgo::str2double(VStr, val))
+				pt = new AttributeValue<double>(val);
+			break;
+		}
+		case STRING :
+		{
+			pt = new AttributeValue<std::string>(VStr);
+			break;
+		}
+	}
+	return pt;
+}
+
 void DataBase::CreateTable(const std::string &command) {
 	using namespace std;
 	vector<string> param, not_null;
@@ -76,33 +104,10 @@ void DataBase::InsertData(const std::vector<std::string> &param)
 			if (!_table->CheckAttributeName(param[i]))
 			{
 				throw (kERROR_ATTRIBUTE_NOT_EXIST);
-				//std::cerr << "Failed to insert. Please check your input." << std::endl;
 				return;
 			}
-			auto _attr_type = _table->GetTypeof(param[i]) ; // pay attention to the legality
-			Value *pt = NULL;
-			switch (_attr_type)
-			{
-				case INT :
-				{
-					int val = 0;
-					if (stralgo::str2int(param[i + n], val))
-						pt = new AttributeValue<int>(val);
-					break;
-				}
-				case DOUBLE :
-				{
-					double val = 0;
-					if (stralgo::str2double(param[i + n], val))
-						pt = new AttributeValue<double>(val);
-					break;
-				}
-				case STRING :
-				{
-					pt = new AttributeValue<std::string>(param[i + n]);
-					break;
-				}
-			}
+			auto _attr_type = _table->GetTypeof(param[i]);
+			Value *pt = this->transValue(param[i + n], _attr_type);
 			if (pt != NULL)
 				_attributes.push_back( ATTRIBUTE(param[i], pt) );
 			else		
@@ -112,11 +117,32 @@ void DataBase::InsertData(const std::vector<std::string> &param)
 	}
 	else
 	{
-		//std::cerr << "Failed to insert. Please check your input." << std::endl;
 		if (!mTable.count(param[0]))
 			throw (kERROR_TABLE_NOT_EXIST);
 		else
 			throw (kERROR_COMMAND_FORM);
+	}
+}
+
+void DataBase::PrintSelectData(std::vector< std::pair<std::string, std::vector<Value*> > >& attrList)
+{
+	using namespace std;
+	int n = attrList[0].second.size();
+	if (!n)
+		return;
+
+	for (int i = 0; i < attrList.size(); i ++)
+		cout << attrList[i].first << "\t";
+	cout << endl;
+
+	for (int i = 0; i < n; i ++)
+	{
+		for (int j = 0; j < attrList.size(); j ++)
+			if (attrList[j].second[i] != NULL)
+				cout << *(attrList[j].second[i]) << "\t";
+			else
+				cout << "NULL" << "\t";
+		cout << endl;
 	}
 }
 
@@ -130,13 +156,12 @@ void DataBase::SelectData(const std::vector<std::string> &param)
 
 	if (!_table->CheckAttributeName(_attrName))
 	{
-		//cerr << "Failed to select Data. Please check your input." << endl;
 		throw kERROR_ATTRIBUTE_NOT_EXIST;
 		return;
 	}
 
 	vector<Data*> _dataList;
-	vector< pair<string, vector<Value*> > > _attrList; // ? static ?
+	vector< pair<string, vector<Value*> > > _attrList;
 	_attrList.clear();
 
 	if (param.size() == 3)
@@ -162,71 +187,32 @@ void DataBase::SelectData(const std::vector<std::string> &param)
 		_table->Select(_attrName, _dataList, _attrList[0].second);
 	}
 
-	int n = _attrList[0].second.size();
-	if (!n)
-		return;
+	// print select data ...
 
-	for (int i = 0; i < _attrList.size(); i ++)
-		cout << _attrList[i].first << "\t";
-	//cout << _attrList.back().first << endl;
-	cout << endl;
-
-	for (int i = 0; i < n; i ++)
-	{
-		for (int j = 0; j < _attrList.size(); j ++)
-			if (_attrList[j].second[i] != NULL)
-				cout << *(_attrList[j].second[i]) << "\t";
-			else
-				cout << "NULL" << "\t";
-		//cout << (_attrList.back().second[i]) << endl;
-		cout << endl;
-	}
+	this->PrintSelectData(_attrList);
 }
 
 void DataBase::UpdateData(const std::vector<std::string> &param)
 {
 	// only set one attribute
 	using namespace std;
-	//using namespace stralgo;
 	string _tableName = param[0];
 	string _attrName  = param[1];
 	string _attrVStr  = param[2];
 	DataTable *_table = mTable[_tableName];
 	if (!_table->CheckAttributeName(_attrName))
 	{
-		//cerr << "Failed to update data. Please check your input." << endl;
 		throw kERROR_ATTRIBUTE_NOT_EXIST;
 		return;
 	}
-	Value *_attrVal = NULL;
-	switch (_table->GetTypeof(_attrName))
+
+	Value *_attrVal = this->transValue(_attrVStr, _table->GetTypeof(_attrName));
+	if (_attrVal == NULL)
 	{
-		case INT:
-		{
-			int val;
-			if (stralgo::str2int(_attrVStr, val))
-				_attrVal = new AttributeValue<int>(val);
-			break;
-		}
-		case DOUBLE:
-		{
-			double val;
-			if (stralgo::str2double(_attrVStr, val))
-				_attrVal = new AttributeValue<double>(val);
-			break;
-		}
-		case STRING:
-		{
-			_attrVal = new AttributeValue<std::string>(_attrVStr);
-			break;
-		}
-		default:
-		{
-			// throw an error, wrong type
-			throw (kERROR_ATTRIBUTE_NOT_EXIST);
-			break;
-		}
+		throw kERROR_ATTRIBUTE_NOT_EXIST;
+		return;
 	}
+
 	ATTRIBUTE _attribute = ATTRIBUTE(_attrName, _attrVal);
 
 	static vector<Data*> _dataList;
