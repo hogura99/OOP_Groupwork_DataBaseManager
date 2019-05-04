@@ -98,6 +98,21 @@ bool DataTable::CheckAttributeName(const std::string& attribute_name)
 	return true;
 }
 
+void DataTable::SortData()
+{
+	using namespace std;
+	static vector<Data*> DataList;
+	vector<Data*>().swap(DataList);
+	for (auto v: mData_)
+		DataList.push_back(v);
+	mData_.clear();
+
+	sort(DataList.begin(), DataList.end(), DataCompare(primary_key_));
+
+	for (auto v: DataList)
+		mData_.push_back(v);
+}
+
 void DataTable::Insert(const std::vector< ATTRIBUTE > &attributes)
 {
 	Data* data = new Data;
@@ -112,7 +127,17 @@ void DataTable::Insert(const std::vector< ATTRIBUTE > &attributes)
 			//Value* pt = &const_cast<Value>(iter->VALUE); // 可能有bug！
 			data->setValue(iter->NAME, iter->VALUE);
 		}
-		mData_.insert(mData_.end(), data);
+		auto insert_position = mData_.end();
+		for (auto iter = mData_.begin(); iter != mData_.end(); iter ++)
+		{
+			Data* current_data = *iter;
+			if (*GetPrimaryKey(data) < *GetPrimaryKey(current_data))
+			{
+				insert_position = iter;
+				break;
+			}
+		}
+		mData_.insert(insert_position, data);
 	}
 }
 
@@ -138,6 +163,7 @@ void DataTable::Update(const ATTRIBUTE &attribute, std::vector<Data*> &data_list
 			(*iter)->setValue(attribute.NAME, attribute.VALUE);
 		}
 	}
+	this->SortData();
 }
 
 void DataTable::Select(const std::string &attribute_name, const std::vector<Data*> &data_list, std::vector<Value*> &attribute_value)
@@ -162,7 +188,7 @@ void DataTable::PrintAttributeTable()
 		cout << endl;
 	}*/
 	cout << "Field\tType\tNull\tKey\tDefault\tExtra" << endl;
-	for (auto _attr: attribute_table_)
+	for (auto _attr: sequential_attribute_table_)
 	{
 		string _attrName = _attr.first;
 		int _attrType = _attr.second;
@@ -178,7 +204,7 @@ void DataTable::PrintAttributeTable()
 		if (primary_key_ == _attrName)
 			cout << "\t" << "PRI" << "\t" << "NULL";
 		else
-			cout << "\t" << "NULL";
+			cout << "\t" << "\t" << "NULL";
 		cout << endl;
 	}
 }
@@ -265,8 +291,9 @@ bool DataTable::calcExpr(const Data* it, const std::string &clause)
 		while (!ss.eof())
 		{
 			ss >> tmp;
-			if (IS_LOGIC_OPRT(tmp))
+			if (is_logic_oprt(tmp))
 			{
+				tmp = upperized(tmp);
 				_opr = Exprs::oprTYPE[tmp];
 				break;
 			}
@@ -299,6 +326,11 @@ void DataTable::GetDataWhere(const std::string &clause, std::vector<Data*> &data
 int DataTable::GetTypeof(const std::string &attrName)
 {
 	return attribute_table_[attrName];
+}
+
+Value* DataTable::GetPrimaryKey(const Data* data)
+{
+	return data->getValue(primary_key_);
 }
 
 std::vector< std::pair<std::string, int> > DataTable::GetAttributeTable()

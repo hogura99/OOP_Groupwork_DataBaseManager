@@ -52,6 +52,8 @@ namespace Exprs
 
 }
 
-#define IS_LOGIC_OPRT(opr) ((opr) == "OR" || (opr) == "AND" || (opr) == "NOT")
+//#define IS_LOGIC_OPRT(opr) ((opr) == "OR" || (opr) == "AND" || (opr) == "NOT")
+bool is_logic_oprt(std::string opr);
+std::string upperized(std::string str);
 
 #endif

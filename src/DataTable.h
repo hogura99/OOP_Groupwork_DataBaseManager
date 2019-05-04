@@ -34,12 +34,23 @@ class DataTable
         //record the names and types of the attributes in the same sequence as initialized.
         std::vector< std::pair<std::string, int> > sequential_attribute_table_;
 
-    protected:
-        void __PopStack(std::stack<bool> &val, std::stack<int> &opr);
-        bool checkSingleClause(const Data* it, const std::vector<std::string> &_param);
-        bool calcExpr(const Data* it, const std::string &clause);
-        Value* transValue(const Data* _attr, std::string val, int dataType);
+        class DataCompare
+        {
+            std::string key_;
+        public:
+            DataCompare(std::string key): key_(key) {}
+            bool operator()(const Data* a, const Data* b)
+            {
+                return *a->getValue(key_) < *b->getValue(key_);
+            }
+        };
 
+    protected:
+        virtual void __PopStack(std::stack<bool> &val, std::stack<int> &opr);
+        virtual bool checkSingleClause(const Data* it, const std::vector<std::string> &_param);
+        virtual bool calcExpr(const Data* it, const std::string &clause);
+        virtual Value* transValue(const Data* _attr, std::string val, int dataType);
+        virtual void SortData();
 
     public:
         //@param table_name: the name of the table.
@@ -73,6 +84,8 @@ class DataTable
         void GetDataWhere(const std::string &clause, std::vector<Data*> &data_list);
         
         int GetTypeof(const std::string &attrName);
+
+        Value* GetPrimaryKey(const Data* data);
 
         std::vector< std::pair<std::string, int> > GetAttributeTable();
         
