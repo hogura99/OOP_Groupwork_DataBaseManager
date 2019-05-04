@@ -175,7 +175,7 @@ int ParamSpliter::split_delete(std::stringstream &ss, std::vector<std::string> &
 	}
 
 	ss >> str;
-	if (str != "WHERE" || ss.eof())
+	if (upperized(str) != "WHERE" || ss.eof())
 		return FORM_ERROR;
 	split_where(ss, param);
 	return DATA_DELETE;

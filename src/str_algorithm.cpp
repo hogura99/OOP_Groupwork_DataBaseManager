@@ -49,7 +49,7 @@ void ReplaceMark(const std::string &src, std::string &dst)
 			dst.push_back(c);
 			continue;
 		}
-		if (c != '(' && c != ')' && c != ',' && c != ';') // this place can be replace with a self-definition function
+		if (c != '(' && c != ')' && c != ',' && c != ';')
 			dst.push_back(c);
 		else
 			dst.push_back(' ');

@@ -139,7 +139,7 @@ class DataTable
 		virtual void PrintAttributeTable();
 
 		//check whether there are more than one data with the same primary key.
-		//use the copy constructor of Value. May cause bugs.
+		//use the copy constructor of Value.
 		virtual bool CheckPrimaryKey(const std::vector< Attribute<Value> >& attributes);
 
 		virtual bool CheckPrimaryKey(const Attribute<Value> & attribute);
@@ -298,7 +298,6 @@ void DataTable<Value>::Insert(const std::vector< Attribute<Value> > &attributes)
 	{
 		for (auto iter = attributes.begin(); iter != attributes.end(); iter++)
 		{
-			//Value* pt = &const_cast<Value>(iter->value); // 可能有bug！
 			data->setValue(iter->name, iter->value);
 		}
 		auto insert_position = mData_.end();
@@ -404,7 +403,7 @@ Value* DataTable<Value>::TransValue(const Data<Value>*_attr, std::string val, in
 template<class Value>
 bool DataTable<Value>::CheckSingleClause(const Data<Value>* attr, const std::vector<std::string> &param)
 {
-	// 目前只解决param.size()==3的情况,即Attrbute?=value，并且未对参数进行检查
+	// Only solve param.size()==3
 	Value *pt_l = NULL, *pt_r = NULL;
 	int dataType = -1;
 	if (attribute_table_.count(param[0]))
@@ -431,7 +430,7 @@ bool DataTable<Value>::CheckSingleClause(const Data<Value>* attr, const std::vec
 		case opNEQ: res = val_l != val_r; break;
 	}
 
-	std::cerr << val_l << " " << param[1] << " " << val_r << " = " << res << std::endl;
+	//std::cerr << val_l << " " << param[1] << " " << val_r << " = " << res << std::endl;
 	return res;
 }
 
@@ -486,7 +485,7 @@ bool DataTable<Value>::CalcExpr(const Data<Value>* it, const std::string &clause
 			opr.push(_opr);
 	}
 
-	while (!opr.empty()) // 这里可以考虑用一个函数指针来扩展逻辑运算符
+	while (!opr.empty())
 		PopStack(val, opr);
 	assert(!val.empty());
 	return val.top();

@@ -182,7 +182,6 @@ void DataBase<Value, DataTable, ParamSpliter>::ShowTableAll(bool PrintBaseName) 
 template<class Value, class DataTable, class ParamSpliter>
 void DataBase<Value, DataTable, ParamSpliter>::InsertData(const std::vector<std::string> &param)
 {
-	//using namespace stralgo;
 	if (mTable.count(param[0]) && param.size() % 2 == 1)
 	{
 		auto _table = mTable[ param[0] ];
@@ -278,15 +277,12 @@ void DataBase<Value, DataTable, ParamSpliter>::SelectData(const std::vector<std:
 		_table->Select(_attrName, _dataList, _attrList[0].second);
 	}
 
-	// print select data ...
-
 	this->PrintSelectData(_attrList);
 }
 
 template<class Value, class DataTable, class ParamSpliter>
 void DataBase<Value, DataTable, ParamSpliter>::UpdateData(const std::vector<std::string> &param)
 {
-	// only set one attribute
 	using namespace std;
 
 	string _tableName = param[0];
