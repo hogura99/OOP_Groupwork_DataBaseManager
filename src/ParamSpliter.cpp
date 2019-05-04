@@ -158,7 +158,7 @@ int ParamSpliter::split_select(std::stringstream &ss, std::vector<std::string> &
 	if (upperized(str) != "WHERE")
 		return FORM_ERROR;
 
-	ParamSpliter::split_where(ss, param);
+	split_where(ss, param);
 	return DATA_SELECT;
 }
 
@@ -180,7 +180,7 @@ int ParamSpliter::split_delete(std::stringstream &ss, std::vector<std::string> &
 	ss >> str;
 	if (str != "WHERE" || ss.eof())
 		return FORM_ERROR;
-	ParamSpliter::split_where(ss, param);
+	split_where(ss, param);
 	return DATA_DELETE;
 }
 
@@ -306,7 +306,7 @@ int ParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &
 		}
 	}
 	if (upperized(str) == "WHERE")
-		ParamSpliter::split_where(ss, param);
+		split_where(ss, param);
 	return DATA_UPDATE;
 }
 

@@ -1,7 +1,7 @@
 #include "DataBase.h"
 #include <assert.h>
 
-DataBase::DataBase(const std::string &DBName): __name(DBName)
+/*DataBase::DataBase(const std::string &DBName): __name(DBName)
 {
 
 }
@@ -238,4 +238,4 @@ void DataBase::DeleteData(const std::vector<std::string> &param)
 		_table->GetDataWhere("", _dataList);
 
 	_table->Remove(_dataList);
-}
+}*/

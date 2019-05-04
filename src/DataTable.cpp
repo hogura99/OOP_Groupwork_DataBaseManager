@@ -2,8 +2,8 @@
 
 #include <sstream>
 #include <assert.h>
-#define NAME first
-#define VALUE second
+//#define NAME first
+//#define VALUE second
 
 DataTable::DataTable(const std::string& table_name, std::vector< std::pair<std::string, int> >& attribute_table,
   const std::string& primary_key, const std::vector<std::string>& not_null_key)

@@ -22,12 +22,12 @@ bool readCommand(char *cmd, int maxLen, std::istream &inf)
 
 int main(int argc, char **argv) {
 
-	//freopen("input.sql", "r", stdin);
+	freopen("input.sql", "r", stdin);
 
 	const int maxCmdLen = (1 << 16) + 3;
 	static char cmd[maxCmdLen];
 
-	DataBaseManager *master = new DataBaseManager();
+	DataBaseManager<> *master = new DataBaseManager<>();
 
 	while (readCommand(cmd, maxCmdLen, std::cin))
 	{

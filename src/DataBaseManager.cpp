@@ -3,7 +3,7 @@
 
 #include "DataBaseManager.h"
 
-DataBaseManager::DataBaseManager() {
+/*DataBaseManager::DataBaseManager() {
 	mWorkBase = NULL;
 }
 
@@ -84,7 +84,7 @@ void DataBaseManager::Query(const std::string &Command) {
 
 void DataBaseManager::CreateBase(const std::string &DBName) {
 	if (!mBase.count(DBName))
-		mBase[DBName] = new DataBase(DBName);
+		mBase[DBName] = new DataBase<DataTable>(DBName);
 	else
 		throw (kERROR_BASE_EXIST);
 }
@@ -110,4 +110,4 @@ void DataBaseManager::DropBase(const std::string &DBName) {
 	} else {
 		throw (kERROR_BASE_NOT_EXIST);
 	}
-}
+}*/

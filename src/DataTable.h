@@ -12,7 +12,14 @@
 #include "Data.h"
 
 //name and the corresponding value of the attribute
-#define ATTRIBUTE std::pair<std::string, Value*>
+
+struct ATTRIBUTE
+{
+    std::string NAME;
+    Value* VALUE;
+    ATTRIBUTE() { NAME = ""; VALUE = NULL; }
+    ATTRIBUTE(std::string NAME, Value* VALUE): NAME(NAME), VALUE(VALUE) {}
+};
 
 class DataTable
 {

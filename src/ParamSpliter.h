@@ -50,19 +50,19 @@ private:
 
 public:
 	
-	static int Split(const std::string &Command, std::vector<std::string> &param);
-	static int split_use(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_show(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_drop(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_delete(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_create(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_select(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_update(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_insert(std::stringstream &ss, std::vector<std::string> &param);
-	static int split_create_table(const std::string &Command, std::vector<std::string> &param,
+	virtual int Split(const std::string &Command, std::vector<std::string> &param);
+	virtual int split_use(std::stringstream &ss, std::vector<std::string> &param);
+	virtual int split_show(std::stringstream &ss, std::vector<std::string> &param);
+	virtual int split_drop(std::stringstream &ss, std::vector<std::string> &param);
+	virtual int split_delete(std::stringstream &ss, std::vector<std::string> &param);
+	virtual int split_create(std::stringstream &ss, std::vector<std::string> &param);
+	virtual int split_select(std::stringstream &ss, std::vector<std::string> &param);
+	virtual int split_update(std::stringstream &ss, std::vector<std::string> &param);
+	virtual int split_insert(std::stringstream &ss, std::vector<std::string> &param);
+	virtual int split_create_table(const std::string &Command, std::vector<std::string> &param,
 										std::vector<std::string> &not_null, std::string &pri_key);
 
-	static void split_where(std::stringstream &ss, std::vector<std::string> &param);
+	virtual void split_where(std::stringstream &ss, std::vector<std::string> &param);
 };
 
 #endif
