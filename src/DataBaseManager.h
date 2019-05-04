@@ -9,7 +9,13 @@
 #include "DataTable.h"
 #include "ParamSpliter.h"
 
-template<class DataBase = DataBase<DataTable, ParamSpliter>, class ParamSpliter = ParamSpliter>
+/*
+ ********************************************************
+ *						definition						*
+ ********************************************************
+*/
+
+template<class Value = Value, class DataBase = DataBase<Value, DataTable<Value>, ParamSpliter>, class ParamSpliter = ParamSpliter>
 class DataBaseManager {
 
 private:
@@ -21,28 +27,48 @@ public:
 	DataBaseManager();
 	~DataBaseManager();
 
+	// Query each command.
+	// @param command: SQL command.
 	void Query(const std::string &command);
 
+	// Create a database.
+	// @param DBname: the name of database.
 	void CreateBase(const std::string &DBname);
+
+	// Delete a database.
+	// @param DBname: the name of database.
 	void DropBase(const std::string &DBname);
+
+	// Use a database.
+	// @param DBname: the name of database which you want to use.
 	void UseBase(const std::string &DBname);
+
+	// Print the names of all tables in all databases.
 	void ShowBase();
 };
 
-template<class DataBase, class ParamSpliter>
-DataBaseManager<DataBase, ParamSpliter>::DataBaseManager() {
+
+/*
+ ********************************************************
+ *					implementation						*
+ ********************************************************
+*/
+
+
+template<class Value, class DataBase, class ParamSpliter>
+DataBaseManager<Value, DataBase, ParamSpliter>::DataBaseManager() {
 	mWorkBase = NULL;
 }
 
-template<class DataBase, class ParamSpliter>
-DataBaseManager<DataBase, ParamSpliter>::~DataBaseManager() {
+template<class Value, class DataBase, class ParamSpliter>
+DataBaseManager<Value, DataBase, ParamSpliter>::~DataBaseManager() {
 	mWorkBase = NULL;
 	for (auto it: mBase)
 		delete it.second;
 }
 
-template<class DataBase, class ParamSpliter>
-void DataBaseManager<DataBase, ParamSpliter>::Query(const std::string &Command) {
+template<class Value, class DataBase, class ParamSpliter>
+void DataBaseManager<Value, DataBase, ParamSpliter>::Query(const std::string &Command) {
 	using namespace std;
 	vector<string> param;
 	string command;
@@ -111,16 +137,16 @@ void DataBaseManager<DataBase, ParamSpliter>::Query(const std::string &Command) 
 	}
 }
 
-template<class DataBase, class ParamSpliter>
-void DataBaseManager<DataBase, ParamSpliter>::CreateBase(const std::string &DBName) {
+template<class Value, class DataBase, class ParamSpliter>
+void DataBaseManager<Value, DataBase, ParamSpliter>::CreateBase(const std::string &DBName) {
 	if (!mBase.count(DBName))
 		mBase[DBName] = new DataBase(DBName);
 	else
 		throw (kERROR_BASE_EXIST);
 }
 
-template<class DataBase, class ParamSpliter>
-void DataBaseManager<DataBase, ParamSpliter>::ShowBase() {
+template<class Value, class DataBase, class ParamSpliter>
+void DataBaseManager<Value, DataBase, ParamSpliter>::ShowBase() {
 	using namespace std;
 	cout << "Database" << endl;
 	for (auto it: mBase) {
@@ -129,13 +155,13 @@ void DataBaseManager<DataBase, ParamSpliter>::ShowBase() {
 	}
 }
 
-template<class DataBase, class ParamSpliter>
-void DataBaseManager<DataBase, ParamSpliter>::UseBase(const std::string &DBName) {
+template<class Value, class DataBase, class ParamSpliter>
+void DataBaseManager<Value, DataBase, ParamSpliter>::UseBase(const std::string &DBName) {
 	mWorkBase = mBase[DBName];
 }
 
-template<class DataBase, class ParamSpliter>
-void DataBaseManager<DataBase, ParamSpliter>::DropBase(const std::string &DBName) {
+template<class Value, class DataBase, class ParamSpliter>
+void DataBaseManager<Value, DataBase, ParamSpliter>::DropBase(const std::string &DBName) {
 	auto it = mBase.find(DBName);
 	if (it != mBase.end()) {
 		delete it->second;

@@ -8,9 +8,14 @@
 
 #include "DataTable.h"
 #include "errorstream.h"
-#include "errorstream.h"
 
-template<class DataTable = DataTable, class ParamSpliter = ParamSpliter>
+/*
+ ********************************************************
+ *						definition						*
+ ********************************************************
+*/
+
+template<class Value = Value, class DataTable = DataTable<Value>, class ParamSpliter = ParamSpliter>
 class DataBase {
 
 private:
@@ -26,32 +31,72 @@ public:
 	DataBase(const std::string &DBName);
 	~DataBase();
 
+	// Create a table.
+	// @param command: create the table with this command.
 	void CreateTable(const std::string &command);
-	void DropTable(const std::string &tableName);
-	void ShowTableCol(const std::string &tableName);
-	void ShowTableAll(bool PrintTableName = true);
 
+	// Delete a table.
+	// @param tableName: the name of table.
+	void DropTable(const std::string &tableName);
+
+	// Show all attributes' names(columns) of a certain table.
+	// @param tableName: the name of table which you want to show.
+	void ShowTableCol(const std::string &tableName);
+
+	// Show all tables' name in current database.
+	// @param PrintBaseName: true if you want to print the name of current database.
+	void ShowTableAll(bool PrintBaseName = true);
+
+	// Insert data to current database.
+	// @param param:
+	//	    * param[0]: the name of the table 
+	//	    * (param[i],param[i+param.size()/2]): the attribute name and correspondent value of insert data
 	void InsertData(const std::vector<std::string> &param);
+
+	// Delete data in current database.
+	// @param param:
+	//		* param[0]: the name of the table
+	//		* param[1](if has): the where clause of delete
 	void DeleteData(const std::vector<std::string> &param);
+
+	// Update data in current database.
+	// @param param
+	//		* param[0]: the name of the table
+	//		* param[2*i+1,2*i+2]: the attribute name and correspondent setting value
+	// 		* the last element of param: the where clause of update
 	void UpdateData(const std::vector<std::string> &param);
+
+	// Select data in current database.
+	// @param param:
+	//		* param[0]: the name of the table
+	//		* param[i]: the attributes to select
+	// 		* the last element of param: the where clause of select
 	void SelectData(const std::vector<std::string> &param);
 };
 
-template<class DataTable, class ParamSpliter>
-DataBase<DataTable, ParamSpliter>::DataBase(const std::string &DBName): __name(DBName)
+
+/*
+ ********************************************************
+ *					implementation						*
+ ********************************************************
+*/
+
+
+template<class Value, class DataTable, class ParamSpliter>
+DataBase<Value, DataTable, ParamSpliter>::DataBase(const std::string &DBName): __name(DBName)
 {
 
 }
 
-template<class DataTable, class ParamSpliter>
-DataBase<DataTable, ParamSpliter>::~DataBase()
+template<class Value, class DataTable, class ParamSpliter>
+DataBase<Value, DataTable, ParamSpliter>::~DataBase()
 {
 	for (auto it: mTable)
 		delete it.second;
 }
 
-template<class DataTable, class ParamSpliter>
-Value* DataBase<DataTable, ParamSpliter>::transValue(const std::string &VStr, int type) const
+template<class Value, class DataTable, class ParamSpliter>
+Value* DataBase<Value, DataTable, ParamSpliter>::transValue(const std::string &VStr, int type) const
 {
 	Value *pt = NULL;
 	switch (type)
@@ -79,8 +124,8 @@ Value* DataBase<DataTable, ParamSpliter>::transValue(const std::string &VStr, in
 	return pt;
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::CreateTable(const std::string &command) {
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::CreateTable(const std::string &command) {
 	using namespace std;
 	vector<string> param, not_null;
 	vector<pair<string, int> > _attrType;
@@ -105,8 +150,8 @@ void DataBase<DataTable, ParamSpliter>::CreateTable(const std::string &command) 
 		throw (kERROR_TABLE_EXIST);
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::DropTable(const std::string &Name) {
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::DropTable(const std::string &Name) {
 	auto it = mTable.find(Name);
 	if (it != mTable.end()) {
 		delete it->second;
@@ -116,8 +161,8 @@ void DataBase<DataTable, ParamSpliter>::DropTable(const std::string &Name) {
 	}
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::ShowTableCol(const std::string &Name) {
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::ShowTableCol(const std::string &Name) {
 	auto it = mTable.find(Name);
 	if (it != mTable.end())
 		mTable[Name]->PrintAttributeTable();
@@ -125,23 +170,23 @@ void DataBase<DataTable, ParamSpliter>::ShowTableCol(const std::string &Name) {
 		throw (kERROR_TABLE_NOT_EXIST);
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::ShowTableAll(bool PrintTableName) { // temporarily function
-	if (PrintTableName)
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::ShowTableAll(bool PrintBaseName) { // temporarily function
+	if (PrintBaseName)
 		std::cout << "Tables_in_" << __name << std::endl;
 	for (auto it: mTable) {
 		std::cout << it.first << std::endl;
 	}
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::InsertData(const std::vector<std::string> &param)
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::InsertData(const std::vector<std::string> &param)
 {
 	//using namespace stralgo;
 	if (mTable.count(param[0]) && param.size() % 2 == 1)
 	{
 		auto _table = mTable[ param[0] ];
-		std::vector<ATTRIBUTE> _attributes;
+		std::vector<Attribute<Value> > _attributes;
 		int n = param.size() / 2;
 		for (int i = 1; i <= n; i ++)
 		{
@@ -153,7 +198,7 @@ void DataBase<DataTable, ParamSpliter>::InsertData(const std::vector<std::string
 			auto _attr_type = _table->GetTypeof(param[i]);
 			Value *pt = this->transValue(param[i + n], _attr_type);
 			if (pt != NULL)
-				_attributes.push_back( ATTRIBUTE(param[i], pt) );
+				_attributes.push_back( Attribute<Value> (param[i], pt) );
 			else		
 				throw (kERROR_INSERT_DATA_ATTRIBUTE_TYPE_MISMATCH);
 		}
@@ -168,8 +213,8 @@ void DataBase<DataTable, ParamSpliter>::InsertData(const std::vector<std::string
 	}
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::PrintSelectData(std::vector< std::pair<std::string, std::vector<Value*> > >& attrList)
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::PrintSelectData(std::vector< std::pair<std::string, std::vector<Value*> > >& attrList)
 {
 	using namespace std;
 	int n = attrList[0].second.size();
@@ -191,8 +236,8 @@ void DataBase<DataTable, ParamSpliter>::PrintSelectData(std::vector< std::pair<s
 	}
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::SelectData(const std::vector<std::string> &param)
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::SelectData(const std::vector<std::string> &param)
 {
 	using namespace std;
 	string _attrName = param[0];
@@ -206,7 +251,7 @@ void DataBase<DataTable, ParamSpliter>::SelectData(const std::vector<std::string
 		return;
 	}
 
-	vector<Data*> _dataList;
+	vector<Data<Value>*> _dataList;
 	vector< pair<string, vector<Value*> > > _attrList;
 	_attrList.clear();
 
@@ -238,48 +283,51 @@ void DataBase<DataTable, ParamSpliter>::SelectData(const std::vector<std::string
 	this->PrintSelectData(_attrList);
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::UpdateData(const std::vector<std::string> &param)
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::UpdateData(const std::vector<std::string> &param)
 {
 	// only set one attribute
 	using namespace std;
+
 	string _tableName = param[0];
-	string _attrName  = param[1];
-	string _attrVStr  = param[2];
 	DataTable *_table = mTable[_tableName];
-	if (!_table->CheckAttributeName(_attrName))
+
+	static vector<Data<Value>*> _dataList;
+	_table->GetDataWhere(param.back(), _dataList);
+
+	for (int i = 1; i + 1 < param.size(); i += 2)
 	{
-		throw kERROR_ATTRIBUTE_NOT_EXIST;
-		return;
+		string _attrName  = param[i];
+		string _attrVStr  = param[i + 1];
+		
+		if (!_table->CheckAttributeName(_attrName))
+		{
+			throw kERROR_ATTRIBUTE_NOT_EXIST;
+			return;
+		}
+
+		Value *_attrVal = this->transValue(_attrVStr, _table->GetTypeof(_attrName));
+		if (_attrVal == NULL)
+		{
+			throw kERROR_ATTRIBUTE_NOT_EXIST;
+			return;
+		}
+
+		Attribute<Value>  _attribute = Attribute<Value> (_attrName, _attrVal);
+
+		_table->Update(_attribute, _dataList);
 	}
-
-	Value *_attrVal = this->transValue(_attrVStr, _table->GetTypeof(_attrName));
-	if (_attrVal == NULL)
-	{
-		throw kERROR_ATTRIBUTE_NOT_EXIST;
-		return;
-	}
-
-	ATTRIBUTE _attribute = ATTRIBUTE(_attrName, _attrVal);
-
-	static vector<Data*> _dataList;
-	if (param.size() == 4)
-		_table->GetDataWhere(param[3], _dataList);
-	else
-		_table->GetDataWhere("", _dataList);
-
-	_table->Update(_attribute, _dataList);
 }
 
-template<class DataTable, class ParamSpliter>
-void DataBase<DataTable, ParamSpliter>::DeleteData(const std::vector<std::string> &param)
+template<class Value, class DataTable, class ParamSpliter>
+void DataBase<Value, DataTable, ParamSpliter>::DeleteData(const std::vector<std::string> &param)
 {
 	using namespace std;
 
 	string _tableName = param[0];
 	DataTable *_table = mTable[_tableName];
 
-	static vector<Data*> _dataList;
+	static vector<Data<Value>*> _dataList;
 	if (param.size() == 2)
 		_table->GetDataWhere(param[1], _dataList);
 	else

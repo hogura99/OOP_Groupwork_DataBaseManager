@@ -27,7 +27,7 @@ std::map<std::string, int> ParamSpliter::cmdType =
 	{"use", cUSE},
 };
 
-int ParamSpliter::Split(const std::string &Command, std::vector<std::string> &param/*, int CmdType*/)
+int ParamSpliter::Split(const std::string &Command, std::vector<std::string> &param)
 {
 	std::stringstream ss(Command);
 	std::string str;
@@ -92,9 +92,6 @@ int ParamSpliter::split_create(std::stringstream &ss, std::vector<std::string> &
 		return TABLE_CREATE;
 	if (upperized(str) != "DATABASE")
 		return FORM_ERROR;
-	/*ss >> str;
-	if (str != "DATABASE")
-		return FORM_ERROR;*/
 	ss >> str;
 	if (str.length() == 0)
 		return FORM_ERROR;
@@ -105,15 +102,15 @@ int ParamSpliter::split_create(std::stringstream &ss, std::vector<std::string> &
 
 void ParamSpliter::split_where(std::stringstream &ss, std::vector<std::string> &param)
 {
-	std::string expr, expr2;
-	std::string str;
+	std::string expr = "", expr2 = "";
+	std::string str = "";
 	while (!ss.eof())
 	{
 		ss >> str;
 		for (int i = 0; i < str.length(); i ++)
 		{
 			bool flag = false;
-			for (int j = std::min(3, (int)str.length() - i); j >= 1; j --)
+			for (int j = std::min(3, (int)str.length() - i); j >= 1; j --) // 判断是否为长度为3、2、1的运算符
 			{
 				if (Exprs::oprTYPE.count(str.substr(i, j)))
 				{
@@ -149,7 +146,7 @@ int ParamSpliter::split_select(std::stringstream &ss, std::vector<std::string> &
 		return FORM_ERROR;
 
 	param.push_back(str);
-	if (!(ss >> str)) // no where clause
+	if (!(ss >> str)) // 没有 where 语句
 	{
 		param.push_back("\0");
 		return DATA_SELECT;
@@ -170,10 +167,10 @@ int ParamSpliter::split_delete(std::stringstream &ss, std::vector<std::string> &
 		return FORM_ERROR;
 	ss >> str;
 	param.clear();
-	param.push_back(str); // add attribute name
-	if (ss.eof()) // no where clause
+	param.push_back(str); // 属性名
+	if (ss.eof()) // 没有 where 语句
 	{
-		param.push_back("\0");
+		param.push_back("");
 		return DATA_DELETE;
 	}
 
@@ -247,7 +244,7 @@ int ParamSpliter::split_insert(std::stringstream &ss, std::vector<std::string> &
 
 	param.clear();
 	cmd >> str;
-	param.push_back(str); // table name
+	param.push_back(str); // 表名
 
 	while (!cmd.eof())
 	{
@@ -259,12 +256,20 @@ int ParamSpliter::split_insert(std::stringstream &ss, std::vector<std::string> &
 	return DATA_INSERT;
 }
 
-int ParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &param)
+int ParamSpliter::split_update(std::stringstream &_ss, std::vector<std::string> &param)
 {
-	if (ss.eof())
+	if (_ss.eof())
 		return FORM_ERROR;
-	param.clear();
+	auto tmp = _ss.str();
+	std::string cmd;
+	stralgo::ReplaceMark(tmp, cmd);
+	std::stringstream ss(cmd);
+
 	std::string str;
+	ss >> str;
+	// assert(str == "UPDATE");
+
+	param.clear();
 	ss >> str;
 	param.push_back(str);
 	ss >> str;
@@ -277,36 +282,36 @@ int ParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &
 		ss >> str;
 		if (upperized(str) == "WHERE")
 			break;
-		if (str.find('=') == std::string::npos || str.back() == '=')
+		// 对每个“=”前后的空格分情况讨论
+		if (str.find('=') == std::string::npos || str.back() == '=') // =前有空格，=前无空格后有空格
 		{
 			if (str.back() == '=')
 				str.pop_back();
 			param.push_back(str);
 			ss >> str;
-			if (str == "=")
+			if (str == "=") // =前有空格，后有空格
 			{
 				ss >> str;
 				param.push_back(str);
 			}
-			else
+			else // =前有空格，后无空格
 			{
-				str = str.substr(1, (int) str.length() - 1);
+				str = str.substr(1, (int) str.length() - 1); // 去除字符串首尾的等号
 				param.push_back(str);
 			}
 		}
 		else
-		{
+		{ // =前后均无空格
 			size_t p = str.find('=');
 			if (p == 0 || p + 1 == str.length())
 				return FORM_ERROR;
 			str1 = str.substr(0, p);
-			str2 = str.substr(p + 1, str.length() - p);
+			str2 = str.substr(p + 1, str.length() - p); // 删去等号
 			param.push_back(str1);
 			param.push_back(str2);
 		}
 	}
-	if (upperized(str) == "WHERE")
-		split_where(ss, param);
+	split_where(ss, param);
 	return DATA_UPDATE;
 }
 
