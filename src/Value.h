@@ -39,10 +39,11 @@ const std::map<int, int> attrTypeWidth =
 };
 
 class Value{
-private:
-	virtual bool __compare(const Value *val_l, const Value *val_r, int type, int opr) const;
 protected:
-	int _typeName;
+    int _typeName;
+
+	virtual bool __compare(const Value *val_l, const Value *val_r, int type, int opr) const;
+    
 public:
 	Value() {_typeName = NONE_TYPE;}
     Value(const Value& src) {_typeName = src.getTypename();}
