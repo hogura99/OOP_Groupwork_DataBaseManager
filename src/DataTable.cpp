@@ -210,7 +210,7 @@ void DataTable::PrintAttributeTable()
 		string _attrName = _attr.first;
 		int _attrType = _attr.second;
 		cout << _attrName;
-		if (attrTypeWidth.count(_attrType))
+		if (attrTypeWidth.at(_attrType) != 0)
 			cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << attrTypeWidth.at(_attrType) << ")";
 		else
 			cout << "\t" << attrTypeInvMap.at(_attrType);
