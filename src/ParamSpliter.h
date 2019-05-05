@@ -71,7 +71,7 @@ public:
 	// Split the "DROP" clause.
 	// @param ss: the stringstream of command.
 	// @param param:
-	//		* param[0]: the name of table of database you want to drop.
+	//		* param[0]: the name of table or database you want to drop.
 	virtual int split_drop(std::stringstream &ss, std::vector<std::string> &param);
 
 	// Split the "DELETE" clause.

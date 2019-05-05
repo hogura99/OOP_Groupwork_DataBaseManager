@@ -33,18 +33,18 @@ public:
 
 	// Create a database.
 	// @param DBname: the name of database.
-	void CreateBase(const std::string &DBname);
+	virtual void CreateBase(const std::string &DBname);
 
 	// Delete a database.
 	// @param DBname: the name of database.
-	void DropBase(const std::string &DBname);
+	virtual void DropBase(const std::string &DBname);
 
 	// Use a database.
 	// @param DBname: the name of database which you want to use.
-	void UseBase(const std::string &DBname);
+	virtual void UseBase(const std::string &DBname);
 
 	// Print the names of all tables in all databases.
-	void ShowBase();
+	virtual void ShowBase();
 };
 
 
