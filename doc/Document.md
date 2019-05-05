@@ -4,6 +4,43 @@
 
 
 
+
+## 支持的功能
+
+作为一个基本的数据库，目前她支持的基本操作：
+
+* `CREATE DATABASE DBname`
+  * 创建一个名为DBname的数据库。
+* `DROP DATABASE DBname `
+  * 删除一个名为`DBname`的数据库。
+* `USE DBname `
+  * 将名为`DBname`的数据库作为当前使用的数据库。
+
+* `SHOW DATABASES `
+  * 输出现有的数据库以及其包含的所有表名。
+
+* `CREATE TABLE tableName(attrName1 Type1, attrName2 Type2, … , attrNameN TypeN NOT NULL, PRIMARY KEY(attrName1)) `
+  * 创建一个这样子的表。
+* `DROP TABLE tableName `
+  * 删除名为`tableName`的表。
+* `SHOW TABLES `
+  * 列出当前数据库的所有表的名字。
+* `SHOW columns from tableName `
+  * 输出名为`tableName`的表中的所有属性（列）。
+* `INSERT INTO [tableName(attrName1, attrName2,…, attrNameN)] VALUES(attrValue1, attrValue2,…, attrValueN)`
+  * 插入一个这样的数据。
+* `DELETE FROM tableName [WHERE whereClauses]`
+  * 从名为`tableName`的表中删除数据，其中`whereClauses`如果不填则我就只好默认你删除所有数据了。
+* `UPDATE tableName SET attrName1 = value1 [, attr2Name2 = value2, ...] [WHERE whereClauses]`
+  * 仅支持将某些属性**设置**成某些**定值**。~~实现这个函数的人太菜了，不会写表达式求值~~
+  * 如果没有where语句则默认`UPDATE`所有数据。
+* `SELECT [AttrName1, AttrName2, ...] FROM tableName [WHERE whereClauses]`
+  * 如果`[AttrList]`处填`*`则选择所有属性。~~不好意思我们没有写有限状态自动机来搞正则表达式~~
+  * 如果没有where语句则默认`SELECT`所有数据。
+* 我们并没有实现更多的其它扩展功能，但提供了参数分割器以及简单的~~没什么卵用的~~错误处理机制。
+
+
+
 ## 架构
 
 数据库应用程序按照以下的逻辑关系搭建而成：
@@ -27,6 +64,8 @@ Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者
 | ParamSpliter    | 对用户输入的指令进行处理。                |
 | errorstream     | 继承std::exception，用于输出错误信息。    |
 
+
+
 ## 运行流程
 
 ![1557038105470](C:\Users\asus\AppData\Roaming\Typora\typora-user-images\1557038105470.png)
@@ -40,6 +79,9 @@ Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者
 - 假设用户输入的指令为`SHOW colunms from oop_info`：
 
   DataBaseManager内调用ParamSpliter中的函数对该指令进行分割，发现不存在colunms关键字，于是通过errorstream向用户反馈`                Error: The form of your command is wrong. Please check your input.` 
+
+
+
 
 ## 功能拓展示例
 
@@ -138,283 +180,12 @@ DataBaseManager<newValue, DataBase<newValue, DataTable<Value>, ParamSpliter>, Pa
 
 为了保证本程序正常运行，请确保你的电脑上安装了操作系统。
 
+
+
 ## 文件说明
 
-### str_algorithm.h
+以下内容较长，**建议在使用的时候直接看目录找对应的函数调用**，_不建议直接阅读完以下所有函数_。
 
-字符串处理函数
-
-##### 函数
-
-###### stralgo::EraseSpace
-
-```cpp
-void EraseSpace(std::string &str);
-```
-
-删除换行符与空格
-
-* 参数
-
-  * str: 待处理字符串
-
-* 返回值
-
-  无
-
-###### stralgo::CompressSpace
-
-```cpp
-void CompressSpace(const std::string &src, std::string &dst); 
-```
-
-压缩空格数
-
-* 参数
-
-  * src: 原字符串
-  * dst: 压缩后字符串
-
-* 返回值
-
-  无
-
-###### stralgo::ReplaceMark
-
-```cpp
-void ReplaceMark(const std::string &src, std::string &dst);
-```
-
-将' ( '  ' ) '  ' , '  ' ; ' 字符转换为空格
-
-* 参数
-
-  * src: 原字符串
-  * dst: 转换后字符串
-
-* 返回值
-
-  无
-
-###### stralgo::str2int
-
-```cpp
-bool str2int(const std::string &str, int &val);
-```
-
-字符串转整型
-
-* 参数
-  * str: 待转换字符串
-  * val: 转换后值
-* 返回值
-  * 是否转换成功的布尔变量
-
-```cpp
-int str2int(const std::string &str);
-```
-
-字符串转整型的重载版本
-
-###### stralgo::str2double
-
-类似stralgo::str2int
-
-### ParamSpliter.h
-
-#### class ParamSpliter
-
-用于解析指令
-
-##### 成员变量
-
-`static std::map<std::string, int> cmdType`: 指令名到指令枚举的映射
-
-##### 成员函数
-
-###### ParamSpliter::Split
-
-```cpp
-virtual int Split(const std::string &Command, std::vector<std::string> &param);
-```
-
-将字符指令分割为参数字符数组，并返回Command的枚举
-
-* 参数
-  * Command: 待分割指令
-  * param: 用于储存分割后参数的数组，具体内容参见各split子函数。
-* 返回值
-  * 若成功则返回对应的指令的枚举类型，否则返回`FORM_ERROR`。
-
-###### ParamSpliter::split_use
-
-```cpp
-virtual int split_use(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割Use指令
-
-* 参数
-  * ss: 待分割指令的stringstream
-  * param: 用于储存分割后参数的数组
-    * param[0]: 需要use的数据库的名字
-* 返回值
-  - 若成功则返回`BASE_USE`，否则返回`FORM_ERROR`。
-
-###### ParamSpliter::split_show
-
-```cpp
-virtual int split_show(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割show指令
-
-- 参数
-  - ss: 待分割指令的stringstream
-  - param: 用于储存分割后参数的数组（当且仅当需要SHOW COLUMNS时才非空）
-    - param[0]: 当需要SHOW COLUMNS时，param[0]为需要SHOW的表名。
-- 返回值
-  - 如果是合法的`SHOW TABLES`命令，则返回`TABLE_SHOW_ALL`
-  - 如果是合法的`SHOW COLUMNS`命令，则返回`TABLE_SHOW_COL`
-  - 如果是合法的`SHOW DATABASES`命令，则返回`BASE_SHOW`
-  - 否则返回`FORM_ERROR`
-
-###### ParamSpliter::split_drop
-
-```cpp
-virtual int split_drop(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割drop指令
-
-- 参数
-  - ss: 待分割指令的stringstream
-  - param: 用于储存分割后参数的数组
-    - param[0]：需要drop的表或数据库的名字
-- 返回值
-  - 如果是合法的`DROP TABLE`指令，则返回`TABLE_DROP`
-  - 如果是合法的`DROP DATABASE`指令，则返回`BASE_DROP`
-  - 否则返回`FORM_ERROR`
-
-###### ParamSpliter::split_delete
-
-```cpp
-virtual int split_delete(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割delete指令
-
-- 参数
-  - ss: 待分割指令的stringstream
-  - param: 用于储存分割后参数的数组
-    - param[0]：指定的表的名字
-    - param[1]：delete语句的where语句（如果指令中没有显示给出where，则param[1]为一空字符串）
-- 返回值
-  - 如果格式正确则返回`DATA_DELETE`，否则返回`FORM_ERROR`
-
-###### ParamSpliter::split_create
-
-```cpp
-virtual int split_create(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割create指令
-
-- 参数
-  - ss: 待分割指令的stringstream
-  - param: 用于储存分割后参数的数组**（CREATE TABLE的参数在函数split_create_table中处理）**
-    - param[0]：创建的 **数据库** 的名字
-- 返回值
-  - 如果是合法的`CREATE DATABASE`指令，则返回`BASE_CREATE`
-  - 如果是`CREATE TABLE`指令，则返回`TABLE_CREATE`**（并未对指令进行分割）**
-  - 否则返回`FORM_ERROR`
-
-###### ParamSpliter::split_select
-
-```cpp
-virtual int split_select(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割select指令
-
-- 参数
-  - ss: 待分割指令的stringstream
-  - param: 用于储存分割后参数的数组
-    - param[0]：指定的表的名字
-    - param[1...]（除最后一个元素）：需要选择的属性名
-    - param的最后一个元素：select语句的where语句（如果命令中没有显式地给出where，则这是一个空字符串）
-- 返回值
-  - 如果是合法的`SELECT`指令，则返回`DATA_SELECT`，否则返回`FORM_ERROR`
-
-###### ParamSpliter::split_update
-
-```cpp
-virtual int split_update(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割update指令
-
-- 参数
-  - ss: 待分割指令的stringstream
-  - param: 用于储存分割后参数的数组
-    - param[0]：指定的表的名字
-    - (param[2i+1],param[2i+2])：两两作一个组合，前者是属性的名字，后者是对应属性要设置的值
-- 返回值
-  - 如果是合法的`UPDATE`指令，则返回`DATA_UPDATE`，否则返回`FORM_ERROR`
-
-###### ParamSpliter::split_insert
-
-```cpp
-virtual int split_insert(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割insert指令
-
-- 参数
-  - ss: 待分割指令的stringstream
-  - param: 用于储存分割后参数的数组
-    - param[0]：指定的表的名字
-    - (param[i],param[i+param.size()/2])：两两作一个组合，前者是属性的名字，后者是对应属性的值
-- 返回值
-  - 如果是合法的`INSERT`指令，则返回`DATA_INSERT`，否则返回`FORM_ERROR`
-
-###### ParamSpliter::split_create_table
-
-```cpp
-virtual int split_create_table(const std::string &Command, std::vector<std::string> &param, std::vector<std::string> &not_null, std::string &pri_key);
-```
-
-分割create table指令
-
-- 参数
-  - Commands: 待分割指令
-  - param: 用于储存分割后参数的数组
-    - param[0]：指定的表的名字
-    - (param[2i+1],param[2i+2])：两两作一个组合，前者是属性的名字，后者是对应属性的值
-  - not_null: 用于储存非空属性名的数组
-  - pri_key: 用于储存主键属性名的数组
-- 返回值
-  - 如果是合法的`CREATE TABLE`指令，则返回`TABLE_CREATE`，否则返回`FORM_ERROR`
-
-###### ParamSpliter::split_where
-
-```cpp
-virtual void split_where(std::stringstream &ss, std::vector<std::string> &param);
-```
-
-分割where指令
-
-- 参数
-
-  - ss: 待分割指令的stringstream
-  - param: 用于储存分割后参数的数组，每个param[i]有两种可能的类型：
-    - 运算符；
-    - 运算数；
-    - 其中运算符与运算数按原指令的顺序排列。
-
-- 返回值
-
-  无
 
 ### Data.h
 
@@ -604,6 +375,8 @@ friend std::ostream& operator<<(std::ostream& out, Value& b);
 是数据的储存单元，比如一个AttributeValue\<int\>可以储存一个int
 
 T为数据类型，如int, double等
+
+实际上可以支持任意的类型，只要该类型实现了`operator<`，`operator==`，扩展方式见扩展例子。
 
 ##### 成员变量
 
@@ -955,6 +728,8 @@ void SelectData(const std::vector<std::string> &param);
 
 从该数据库中指定名称的表格中获取指定数据(Data)的指定属性的属性值。
 
+~~数据库层面的Select写得比较丑不好意思hhhh~~
+
 - 参数
 
   - param
@@ -1290,6 +1065,206 @@ virtual void SortData();
 
   无
 
+
+
+### ParamSpliter.h
+
+#### class ParamSpliter
+
+用于解析指令
+
+##### 成员变量
+
+`static std::map<std::string, int> cmdType`: 指令名到指令枚举的映射
+
+##### 成员函数
+
+###### ParamSpliter::Split
+
+```cpp
+virtual int Split(const std::string &Command, std::vector<std::string> &param);
+```
+
+将字符指令分割为参数字符数组，并返回Command的枚举
+
+* 参数
+  * Command: 待分割指令
+  * param: 用于储存分割后参数的数组，具体内容参见各split子函数。
+* 返回值
+  * 若成功则返回对应的指令的枚举类型，否则返回`FORM_ERROR`。
+
+###### ParamSpliter::split_use
+
+```cpp
+virtual int split_use(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割Use指令
+
+* 参数
+  * ss: 待分割指令的stringstream
+  * param: 用于储存分割后参数的数组
+    * param[0]: 需要use的数据库的名字
+* 返回值
+  - 若成功则返回`BASE_USE`，否则返回`FORM_ERROR`。
+
+###### ParamSpliter::split_show
+
+```cpp
+virtual int split_show(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割show指令
+
+- 参数
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组（当且仅当需要SHOW COLUMNS时才非空）
+    - param[0]: 当需要SHOW COLUMNS时，param[0]为需要SHOW的表名。
+- 返回值
+  - 如果是合法的`SHOW TABLES`命令，则返回`TABLE_SHOW_ALL`
+  - 如果是合法的`SHOW COLUMNS`命令，则返回`TABLE_SHOW_COL`
+  - 如果是合法的`SHOW DATABASES`命令，则返回`BASE_SHOW`
+  - 否则返回`FORM_ERROR`
+
+###### ParamSpliter::split_drop
+
+```cpp
+virtual int split_drop(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割drop指令
+
+- 参数
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
+    - param[0]：需要drop的表或数据库的名字
+- 返回值
+  - 如果是合法的`DROP TABLE`指令，则返回`TABLE_DROP`
+  - 如果是合法的`DROP DATABASE`指令，则返回`BASE_DROP`
+  - 否则返回`FORM_ERROR`
+
+###### ParamSpliter::split_delete
+
+```cpp
+virtual int split_delete(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割delete指令
+
+- 参数
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
+    - param[0]：指定的表的名字
+    - param[1]：delete语句的where语句（如果指令中没有显示给出where，则param[1]为一空字符串）
+- 返回值
+  - 如果格式正确则返回`DATA_DELETE`，否则返回`FORM_ERROR`
+
+###### ParamSpliter::split_create
+
+```cpp
+virtual int split_create(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割create指令
+
+- 参数
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组**（CREATE TABLE的参数在函数split_create_table中处理）**
+    - param[0]：创建的 **数据库** 的名字
+- 返回值
+  - 如果是合法的`CREATE DATABASE`指令，则返回`BASE_CREATE`
+  - 如果是`CREATE TABLE`指令，则返回`TABLE_CREATE`**（并未对指令进行分割）**
+  - 否则返回`FORM_ERROR`
+
+###### ParamSpliter::split_select
+
+```cpp
+virtual int split_select(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割select指令
+
+- 参数
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
+    - param[0]：指定的表的名字
+    - param[1...]（除最后一个元素）：需要选择的属性名
+    - param的最后一个元素：select语句的where语句（如果命令中没有显式地给出where，则这是一个空字符串）
+- 返回值
+  - 如果是合法的`SELECT`指令，则返回`DATA_SELECT`，否则返回`FORM_ERROR`
+
+###### ParamSpliter::split_update
+
+```cpp
+virtual int split_update(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割update指令
+
+- 参数
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
+    - param[0]：指定的表的名字
+    - (param[2i+1],param[2i+2])：两两作一个组合，前者是属性的名字，后者是对应属性要设置的值
+- 返回值
+  - 如果是合法的`UPDATE`指令，则返回`DATA_UPDATE`，否则返回`FORM_ERROR`
+
+###### ParamSpliter::split_insert
+
+```cpp
+virtual int split_insert(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割insert指令
+
+- 参数
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
+    - param[0]：指定的表的名字
+    - (param[i],param[i+param.size()/2])：两两作一个组合，前者是属性的名字，后者是对应属性的值
+- 返回值
+  - 如果是合法的`INSERT`指令，则返回`DATA_INSERT`，否则返回`FORM_ERROR`
+
+###### ParamSpliter::split_create_table
+
+```cpp
+virtual int split_create_table(const std::string &Command, std::vector<std::string> &param, std::vector<std::string> &not_null, std::string &pri_key);
+```
+
+分割create table指令
+
+- 参数
+  - Commands: 待分割指令
+  - param: 用于储存分割后参数的数组
+    - param[0]：指定的表的名字
+    - (param[2i+1],param[2i+2])：两两作一个组合，前者是属性的名字，后者是对应属性的值
+  - not_null: 用于储存非空属性名的数组
+  - pri_key: 用于储存主键属性名的数组
+- 返回值
+  - 如果是合法的`CREATE TABLE`指令，则返回`TABLE_CREATE`，否则返回`FORM_ERROR`
+
+###### ParamSpliter::split_where
+
+```cpp
+virtual void split_where(std::stringstream &ss, std::vector<std::string> &param);
+```
+
+分割where指令
+
+- 参数
+
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组，每个param[i]有两种可能的类型：
+    - 运算符；
+    - 运算数；
+    - 其中运算符与运算数按原指令的顺序排列。
+
+- 返回值
+
+  无
+
+
+
 ### errorstream.h
 
 #### class DataBaseErrorEvent
@@ -1366,4 +1341,85 @@ virtual const char* what() const throw();
 - 返回值
 
   - 错误信息的字符串。
+
+
+### str_algorithm.h
+
+这个库提供一些简单的字符串处理函数。
+
+##### 函数
+
+###### stralgo::EraseSpace
+
+```cpp
+void EraseSpace(std::string &str);
+```
+
+删除换行符与空格
+
+* 参数
+
+  * str: 待处理字符串
+
+* 返回值
+
+  无
+
+###### stralgo::CompressSpace
+
+```cpp
+void CompressSpace(const std::string &src, std::string &dst); 
+```
+
+压缩空格数
+
+* 参数
+
+  * src: 原字符串
+  * dst: 压缩后字符串
+
+* 返回值
+
+  无
+
+###### stralgo::ReplaceMark
+
+```cpp
+void ReplaceMark(const std::string &src, std::string &dst);
+```
+
+将' ( '  ' ) '  ' , '  ' ; ' 字符转换为空格
+
+* 参数
+
+  * src: 原字符串
+  * dst: 转换后字符串
+
+* 返回值
+
+  无
+
+###### stralgo::str2int
+
+```cpp
+bool str2int(const std::string &str, int &val);
+```
+
+字符串转整型
+
+* 参数
+  * str: 待转换字符串
+  * val: 转换后值
+* 返回值
+  * 是否转换成功的布尔变量
+
+```cpp
+int str2int(const std::string &str);
+```
+
+字符串转整型的重载版本
+
+###### stralgo::str2double
+
+类似`stralgo::str2int`。
 
