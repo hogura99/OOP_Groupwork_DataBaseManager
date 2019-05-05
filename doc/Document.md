@@ -133,6 +133,7 @@ DataBaseManager<Value, newDataBase<Value, DataTable<Value>, newParamSpliter>, ne
 
 假设需要增加新的存储的数据类型，以`size_t`为例（假设其枚举类型为`SIZE_T`）。**(新的数据类型应支持<与==符号)**
 首先需要对Value类中的`getCopy(),__compare(),operator<<,transValue`作修改（以transValue为例）:
+
 ```cpp
 class newValue: public Value
 {
@@ -171,7 +172,16 @@ public:
     }
 };
 ```
+同时还要新增从“数据类型字符串名到该数据类型的枚举类”的映射，即修改`attrTypeMap`,`attrTypeInvMap`,`attrTypeWidth`这三个map中的值。修改的值的格式可以参考`Value.cpp`中对默认数据类型的初始化。比如：
+
+```cpp
+attrTypeMap["SIZE_T"] = SIZE_T;
+attrTypeInvMap[SIZE_T] = "SIZE_T";
+attrTypeWidth[SIZE_T] = 11;
+```
+
 最后在`DataBaseManager`的参数中使用新的类即可。
+
 ```cpp
 DataBaseManager<newValue, DataBase<newValue, DataTable<Value>, ParamSpliter>, ParamSpliter>* master = new DataBaseManager<newValue, DataBase<newValue, DataTable<Value>, ParamSpliter>, ParamSpliter>();
 ```
@@ -255,6 +265,10 @@ virtual int getTypename(std::string attrName) const;
 * 返回值
   * 该属性的值的数据类型(枚举)
 
+
+
+
+
 ### Value.h
 
 #### class Value
@@ -264,6 +278,9 @@ virtual int getTypename(std::string attrName) const;
 ##### 成员变量
 
 *  `_typeName`: 储存该Value储存的数据类型(枚举)
+*  `std::map<std::string, int> attrTypeMap`: 存储从数据类型的字符串名字到数据类型的映射
+*  `std::map<int, std::string> attrTypeInvMap`: 存储从数据类型到数据类型名字的映射
+*  `std::map<int, int> attrTypeWidth`: 我也不知道这个存的应该是什么，总之是从数据类型到“show columns时数据类型后面接的括号里的数字，如果不输出数字则为0”
 
 ##### 成员函数
 
@@ -366,6 +383,10 @@ bool operator<=(const Value& b) const;
 friend std::ostream& operator<<(std::ostream& out, Value& b);
 ```
 
+
+
+
+
 ### AttributeValue.h
 
 #### class AttributeValue\<T>
@@ -461,6 +482,10 @@ T getValue() const;
 ###### AttributeValue::operator<=
 
 `bool operator<=(const AttributeValue<T>& b) const;`
+
+
+
+
 
 ### DataBaseManager.h
 
@@ -740,6 +765,10 @@ void SelectData(const std::vector<std::string> &param);
 - 返回值
 
   无
+
+
+
+
 
 ### DataTable.h
 
@@ -1341,6 +1370,58 @@ virtual const char* what() const throw();
 - 返回值
 
   - 错误信息的字符串。
+
+### expression.h
+
+这个库原本是用来做表达式的。
+
+由于简化了问题，因此所需要考虑的表达式只有逻辑运算。
+
+##### 常量
+
+###### 枚举类 OPERATORS
+
+存储了逻辑运算符的枚举类。
+
+###### Exprs::oprTYPE
+
+存储了从逻辑运算符的字符串到其枚举类的映射。
+注意在这里等值判断是用单等号，即“=”的。
+
+##### 函数
+
+###### is_logic_oprt
+
+```cpp
+bool is_logic_oprt(std::string opr)
+```
+
+判断字符串`opr`是否为逻辑运算符。
+
+* 参数
+
+  * str：待判断字符串。
+
+* 返回值
+
+  * 如果是则逻辑运算符"AND","OR","NOT"，则返回true。
+
+###### upperized
+
+```cpp
+std::string upperized(std::string str);
+```
+
+将字符串str中的小写字母全部换成大写字母。
+
+* 参数
+
+  * str：待处理字符串。
+
+* 返回值
+
+  * 返回处理完后的字符串。
+
 
 
 ### str_algorithm.h
