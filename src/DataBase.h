@@ -18,11 +18,12 @@
 template<class Value = Value, class DataTable = DataTable<Value>, class ParamSpliter = ParamSpliter>
 class DataBase {
 
-private:
+protected:
+
 	std::map<std::string, DataTable*> mTable;
+
 	std::string __name;
 
-protected:
 	virtual Value* transValue(const std::string &VStr, int type) const;
 
 	virtual void PrintSelectData(std::vector< std::pair<std::string, std::vector<Value*> > >& _attrList);
@@ -45,7 +46,7 @@ public:
 
 	// Show all tables' name in current database.
 	// @param PrintBaseName: true if you want to print the name of current database.
-	void ShowTableAll(bool PrintBaseName = true);
+	void ShowTableAll(bool PrintBaseName);
 
 	// Insert data to current database.
 	// @param param:
@@ -98,29 +99,7 @@ DataBase<Value, DataTable, ParamSpliter>::~DataBase()
 template<class Value, class DataTable, class ParamSpliter>
 Value* DataBase<Value, DataTable, ParamSpliter>::transValue(const std::string &VStr, int type) const
 {
-	Value *pt = NULL;
-	switch (type)
-	{
-		case INT :
-		{
-			int val = 0;
-			if (stralgo::str2int(VStr, val))
-				pt = new AttributeValue<int>(val);
-			break;
-		}
-		case DOUBLE :
-		{
-			double val = 0;
-			if (stralgo::str2double(VStr, val))
-				pt = new AttributeValue<double>(val);
-			break;
-		}
-		case STRING :
-		{
-			pt = new AttributeValue<std::string>(VStr);
-			break;
-		}
-	}
+	Value *pt = Value().transValue(VStr, type);
 	return pt;
 }
 

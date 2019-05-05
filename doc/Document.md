@@ -41,6 +41,99 @@ Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者
 
   DataBaseManager内调用ParamSpliter中的函数对该指令进行分割，发现不存在colunms关键字，于是通过errorstream向用户反馈`                Error: The form of your command is wrong. Please check your input.` 
 
+## 功能拓展示例
+
+### 例1. 增强UPDATE语句的功能
+
+假设需要支持`UPDATE table1 SET attribute1 = attribute + value1 `这样的求值式SET。
+首先需要更换参数分割的方式，改变split_update函数。
+```cpp
+class newParamSpliter: public ParamSpliter
+{
+public:
+  int split_update(std::stringstream &ss, std::vector<std::string> &param) override;
+};
+
+int newParamSpliter::split_update(std::stringstream &ss, std::vector<std::string> &param)
+{
+  // Your new implementation
+  return DATA_UPDATE;
+}
+```
+实现完新的split_update后，需要在DataBase中实现新的`UpdateData`。因SET的特性，一定是将某个属性设为某个定值，所以理论上无需在DataTable实现新的`update`。
+```cpp
+template<class Value, class DataTable, class ParamSpliter>
+class newDataBase: public DataBase
+{
+public:
+  newDataBase(std::string name): DataBase<Value,DataTable,ParamSpliter>(name) {}
+  void UpdateData(const std::vector<std::string> &param)
+  {
+    // Your new implementation
+    // ......
+    // Calculate which attribute to update, find the selected data list.
+    for (int i = 0; i < update_attributes.size(); i ++) // only a sample code
+    {
+      mTable[ param[0] ]->Update(update_attributes[i], selected_data_list);
+    }
+  }
+};
+
+```
+最后只需在`DataBaseManager`的参数中使用这些新的类即可：
+```cpp
+DataBaseManager<Value, newDataBase<Value, DataTable<Value>, newParamSpliter>, newParamSpliter>* master = new DataBaseManager<Value, newDataBase<Value, DataTable<Value>, newParamSpliter>, newParamSpliter>();
+```
+这样在master处理命令时即会调用新的update方式。
+
+
+### 例2. 增加支持的数据类型
+
+假设需要增加新的存储的数据类型，以`size_t`为例（假设其枚举类型为`SIZE_T`）。**(新的数据类型应支持<与==符号)**
+首先需要对Value类中的`getCopy(),__compare(),operator<<,transValue`作修改（以transValue为例）:
+```cpp
+class newValue: public Value
+{
+public:
+  newValue* transValue(std::string StrVal, int dataType)
+  {
+    newValue* pt = NULL;
+    switch (dataType)
+    {
+      case SIZE_T :
+      {
+        size_t val = 0;
+        if (str2size_t(StrVal, val))
+          pt = new AttributeValue<size_t>(val);
+        break;
+      }
+      default: {
+        pt = Value::transValue(StrVal, dataType);
+        break;
+      }
+    }
+    return pt;
+  }
+};
+```
+接着要增加`AttributeValue`中支持的数据类型。
+```cpp
+template<class T>
+class newAttr: public AttributeValue<T>, public: newValue
+{
+public:
+  newAttr(T attrValue):Value(), AttributeValue<T>(attrValue) {
+      if(typeid(size_t) == typeid(T)){
+        _typeName = SIZE_T;
+      }
+    }
+};
+```
+最后在`DataBaseManager`的参数中使用新的类即可。
+```cpp
+DataBaseManager<newValue, DataBase<newValue, DataTable<Value>, ParamSpliter>, ParamSpliter>* master = new DataBaseManager<newValue, DataBase<newValue, DataTable<Value>, ParamSpliter>, ParamSpliter>();
+```
+
 ## 运行环境
 
 
@@ -55,7 +148,9 @@ Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者
 
 ###### stralgo::EraseSpace
 
-`void EraseSpace(std::string &str);`
+```cpp
+void EraseSpace(std::string &str);
+```
 
 删除换行符与空格
 
@@ -69,7 +164,9 @@ Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者
 
 ###### stralgo::CompressSpace
 
-`void CompressSpace(const std::string &src, std::string &dst);`
+```cpp
+void CompressSpace(const std::string &src, std::string &dst); 
+```
 
 压缩空格数
 

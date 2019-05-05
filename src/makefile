@@ -2,7 +2,7 @@ all: DataBaseManager.o DataBase.o ParamSpliter.o main.o Value.o AttributeValue.o
 	g++ expression.o str_algorithm.o ParamSpliter.o Value.o AttributeValue.o main.o -o main -std=c++14
 
 local: DataBaseManager.o DataBase.o ParamSpliter.o main.o Value.o AttributeValue.o DataTable.o Data.o str_algorithm.o expression.o
-	g++ expression.o str_algorithm.o DataBaseManager.o DataBase.o DataTable.o ParamSpliter.o Value.o AttributeValue.o Data.o main.o -o debug/main -std=c++14 -g
+	g++ expression.o str_algorithm.o ParamSpliter.o Value.o AttributeValue.o main.o -o debug/main -std=c++14
 
 main.o: main.cpp
 	g++ -c main.cpp -o main.o -std=c++14 -g
@@ -36,6 +36,10 @@ expression.o: expression.h expression.cpp
 
 gdb:
 	gdb debug/main
+
+tst: all
+	g++ -c test.cpp -o test.o -std=c++14 -g
+	g++ expression.o str_algorithm.o ParamSpliter.o Value.o AttributeValue.o test.o -o test -std=c++14
 
 clean:
 	rm *.o

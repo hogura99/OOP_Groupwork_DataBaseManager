@@ -102,7 +102,7 @@ void DataBaseManager<Value, DataBase, ParamSpliter>::Query(const std::string &Co
 			break;
 		}
 		case TABLE_SHOW_ALL: {
-			mWorkBase->ShowTableAll();
+			mWorkBase->ShowTableAll(true);
 			break;
 		}
 		case TABLE_SHOW_COL: {

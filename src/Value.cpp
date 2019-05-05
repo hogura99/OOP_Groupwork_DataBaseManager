@@ -1,4 +1,5 @@
 #include "Value.h"
+#include "str_algorithm.h"
 #include "AttributeValue.h"
 
 #include <assert.h>
@@ -8,6 +9,34 @@
 		case opLE: res = (*pt_l)< (*pt_r); break;			\
 		case opEQ: res = (*pt_l)==(*pt_r); break;			\
 	}														\
+}
+
+Value* Value::transValue(std::string StrVal, int dataType)
+{
+	Value *pt = NULL;
+	switch (dataType)
+	{
+		case INT :
+		{
+			int val = 0;
+			if (stralgo::str2int(StrVal, val))
+				pt = new AttributeValue<int>(val);
+			break;
+		}
+		case DOUBLE :
+		{
+			double val = 0;
+			if (stralgo::str2double(StrVal, val))
+				pt = new AttributeValue<double>(val);
+			break;
+		}
+		case STRING :
+		{
+			pt = new AttributeValue<std::string>(StrVal);
+			break;
+		}
+	}
+	return pt;
 }
 
 bool Value::__compare(const Value *val_l, const Value *val_r, int type, int opr) const {
@@ -39,11 +68,9 @@ bool Value::__compare(const Value *val_l, const Value *val_r, int type, int opr)
 			else {
 				assert(false);
 			}
-			//SWITCH_OPRT(pt_l, pt_r, opr);
 			break;
 		}
 	}
-	//assert(false);
 	return res;
 }
 

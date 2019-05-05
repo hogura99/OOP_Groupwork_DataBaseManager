@@ -51,6 +51,7 @@ public:
     virtual ~Value(){/* std::cerr << "delete Value -->   " << this << std::endl; */}
     virtual Value* setValue(){return NULL;}
     virtual Value* getCopy();
+    virtual Value* transValue(std::string StrVal, int dataType);
     int getTypename() const;
 
     bool operator==(const Value& b) const;

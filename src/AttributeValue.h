@@ -15,8 +15,9 @@
 
 
 template<class T>
-class AttributeValue : public Value{
-	T _attrValue;
+class AttributeValue : public Value {
+	protected:
+		T _attrValue;
 	public:
 		AttributeValue(T attrValue):Value(), _attrValue(attrValue){
 			if(typeid(int) == typeid(T)){

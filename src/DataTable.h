@@ -33,7 +33,7 @@ struct Attribute
 template<class Value = Value>
 class DataTable
 {
-	private:
+	protected:
 		
 		//the Data in the DataTable
 		std::list<Data<Value>* > mData_;
@@ -390,13 +390,7 @@ Value* DataTable<Value>::TransValue(const Data<Value>*_attr, std::string val, in
 	if (attribute_table_.count(val))
 		return _attr->getValue(val);
 	else
-		switch (_dataType)
-		{
-			case INT: res = new AttributeValue<int>(stralgo::str2int(val)); break;
-			case DOUBLE: res = new AttributeValue<double>(stralgo::str2double(val)); break;
-			case STRING: res = new AttributeValue<std::string>(val); break;
-			default: res = NULL; break;
-		}
+		res = Value().transValue(val, _dataType);
 	return res;
 }
 
