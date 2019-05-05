@@ -51,7 +51,7 @@
 
 Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者可以实现其他的数据类型或指令分割规则并运用在程序中。同时，各个类中的主要功能函数都是virtual类型，开发者也可以通过继承的方式对这一部分的函数进行重写。
 
-![类之间的关系](D:\Programming\OOPProject\大作业\绘图1.jpg)
+![类之间的关系](图片1.jpg)
 
 | 类名            | 主要组成部分/作用                         |
 | --------------- | ----------------------------------------- |
@@ -68,7 +68,7 @@ Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者
 
 ## 运行流程
 
-![1557038105470](C:\Users\asus\AppData\Roaming\Typora\typora-user-images\1557038105470.png)
+![运行流程](图片2.png)
 
 下面举例说明：
 
@@ -85,7 +85,7 @@ Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者
 
 ## 功能拓展示例
 
-### 例1. 增强UPDATE语句的功能
+### 例1. 拓展UPDATE语句的功能
 
 假设需要支持`UPDATE table1 SET attribute1 = attribute + value1 `这样的求值式SET。
 首先需要更换参数分割的方式，改变split_update函数。
