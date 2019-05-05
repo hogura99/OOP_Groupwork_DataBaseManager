@@ -17,27 +17,6 @@ enum attrType
     STRING
 };
 
-const std::map<std::string, int> attrTypeMap =
-{
-	{"INT", INT},
-	{"DOUBLE", DOUBLE},
-	{"CHAR", STRING},
-};
-
-const std::map<int, std::string> attrTypeInvMap = 
-{
-    {INT, "int"},
-    {DOUBLE, "double"},
-    {STRING, "char"},
-};
-
-const std::map<int, int> attrTypeWidth = 
-{
-    {INT, 11},
-    {DOUBLE, 0},
-    {STRING, 1},
-};
-
 class Value{
 protected:
     int _typeName;
@@ -45,6 +24,10 @@ protected:
 	virtual bool __compare(const Value *val_l, const Value *val_r, int type, int opr) const;
     
 public:
+    static std::map<std::string, int> attrTypeMap;
+    static std::map<int, std::string> attrTypeInvMap;
+    static std::map<int, int> attrTypeWidth;
+
 	Value() {_typeName = NONE_TYPE;}
     Value(const Value& src) {_typeName = src.getTypename();}
     

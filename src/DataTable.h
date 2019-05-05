@@ -367,10 +367,10 @@ void DataTable<Value>::PrintAttributeTable()
 		string _attrName = _attr.first;
 		int _attrType = _attr.second;
 		cout << _attrName;
-		if (attrTypeWidth.at(_attrType) != 0)
-			cout << "\t" << attrTypeInvMap.at(_attrType) << "(" << attrTypeWidth.at(_attrType) << ")";
+		if (Value::attrTypeWidth.at(_attrType) != 0)
+			cout << "\t" << Value::attrTypeInvMap.at(_attrType) << "(" << Value::attrTypeWidth.at(_attrType) << ")";
 		else
-			cout << "\t" << attrTypeInvMap.at(_attrType);
+			cout << "\t" << Value::attrTypeInvMap.at(_attrType);
 		if (not_null_key_[_attrName])
 			cout << "\t" << "NO";
 		else
@@ -432,7 +432,7 @@ template<class Value>
 void DataTable<Value>::PopStack(std::stack<bool> &val, std::stack<int> &opr)
 {
 	bool se = val.top(); val.pop();
-	assert(!val.empty());
+	//assert(!val.empty());
 	bool fi = val.top(); val.pop();
 	int _opr = opr.top(); opr.pop();
 	switch (_opr)
@@ -481,7 +481,7 @@ bool DataTable<Value>::CalcExpr(const Data<Value>* it, const std::string &clause
 
 	while (!opr.empty())
 		PopStack(val, opr);
-	assert(!val.empty());
+	//assert(!val.empty());
 	return val.top();
 }
 

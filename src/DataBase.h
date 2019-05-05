@@ -110,15 +110,15 @@ void DataBase<Value, DataTable, ParamSpliter>::CreateTable(const std::string &co
 	vector<pair<string, int> > _attrType;
 	string pri_key = "\0";
 	auto res = ParamSpliter().split_create_table(command, param, not_null, pri_key);
-	assert(res == TABLE_CREATE); // !!!
+	//assert(res == TABLE_CREATE);
 
 	for (int i = 1; i < param.size(); i += 2)
 	{
 		pair<string, int> _attr;
 		_attr.first = param[i];
 		param[i + 1] = upperized(param[i + 1]);
-		if (attrTypeMap.count(param[i + 1]))
-			_attr.second = attrTypeMap.at(param[i + 1]);
+		if (Value::attrTypeMap.count(param[i + 1]))
+			_attr.second = Value::attrTypeMap.at(param[i + 1]);
 		else
 			throw kERROR_TYPE_NOT_SUPPORT;
 		_attrType.push_back(_attr);

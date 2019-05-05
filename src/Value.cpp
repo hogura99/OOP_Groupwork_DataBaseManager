@@ -4,6 +4,27 @@
 
 #include <assert.h>
 
+std::map<std::string, int> Value::attrTypeMap =
+{
+	{"INT", INT},
+	{"DOUBLE", DOUBLE},
+	{"CHAR", STRING},
+};
+
+std::map<int, std::string> Value::attrTypeInvMap = 
+{
+    {INT, "int"},
+    {DOUBLE, "double"},
+    {STRING, "char"},
+};
+
+std::map<int, int> Value::attrTypeWidth = 
+{
+    {INT, 11},
+    {DOUBLE, 0},
+    {STRING, 1},
+};
+
 #define SWITCH_OPRT(pt_l, pt_r, opr) {						\
 	switch (opr) {											\
 		case opLE: res = (*pt_l)< (*pt_r); break;			\
@@ -36,6 +57,7 @@ Value* Value::transValue(std::string StrVal, int dataType)
 			break;
 		}
 	}
+
 	return pt;
 }
 
@@ -45,29 +67,24 @@ bool Value::__compare(const Value *val_l, const Value *val_r, int type, int opr)
 	bool res = false;
 	switch (type) {
 		case INT: {
-			//assert(dynamic_cast<AttributeValue<int>*>(val_l) != NULL && dynamic_cast<AttributeValue<int>*>(val_r) != NULL);
 			AttributeValue<int> *pt_l = dynamic_cast<AttributeValue<int>*>(_val_l);
 			AttributeValue<int> *pt_r = dynamic_cast<AttributeValue<int>*>(_val_r);
-			assert(pt_l != NULL && pt_r != NULL);
+			//assert(pt_l != NULL && pt_r != NULL);
 			SWITCH_OPRT(pt_l, pt_r, opr);
 			break;
 		}
 		case DOUBLE: {
 			const AttributeValue<double> *pt_l = dynamic_cast<AttributeValue<double>*>(_val_l);
 			const AttributeValue<double> *pt_r = dynamic_cast<AttributeValue<double>*>(_val_r);
-			assert(pt_l != NULL && pt_r != NULL);
+			//assert(pt_l != NULL && pt_r != NULL);
 			SWITCH_OPRT(pt_l, pt_r, opr);
 			break;
 		}
 		case STRING: {
 			const AttributeValue<std::string> *pt_l = dynamic_cast<AttributeValue<std::string>*>(_val_l);
 			const AttributeValue<std::string> *pt_r = dynamic_cast<AttributeValue<std::string>*>(_val_r);
-			assert(pt_l != NULL && pt_r != NULL);
-			if (opr == opEQ)
-				res = pt_l->operator==(*pt_r);
-			else {
-				assert(false);
-			}
+			//assert(pt_l != NULL && pt_r != NULL);
+			SWITCH_OPRT(pt_l, pt_r, opr);
 			break;
 		}
 	}
