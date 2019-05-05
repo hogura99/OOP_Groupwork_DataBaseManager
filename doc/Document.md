@@ -136,7 +136,7 @@ DataBaseManager<newValue, DataBase<newValue, DataTable<Value>, ParamSpliter>, Pa
 
 ## 运行环境
 
-
+为了保证本程序正常运行，请确保你的电脑上安装了操作系统。
 
 ## 文件说明
 
@@ -148,15 +148,13 @@ DataBaseManager<newValue, DataBase<newValue, DataTable<Value>, ParamSpliter>, Pa
 
 ###### stralgo::EraseSpace
 
-```cpp
-void EraseSpace(std::string &str);
-```
+`void EraseSpace(std::string &str);`
 
 删除换行符与空格
 
 * 参数
 
-  * std::string &str: 待处理字符串
+  * str: 待处理字符串
 
 * 返回值
 
@@ -164,16 +162,14 @@ void EraseSpace(std::string &str);
 
 ###### stralgo::CompressSpace
 
-```cpp
-void CompressSpace(const std::string &src, std::string &dst); 
-```
+`void CompressSpace(const std::string &src, std::string &dst); `
 
 压缩空格数
 
 * 参数
 
-  * const std::string &src: 原字符串
-  * std::string &dst: 压缩后字符串
+  * src: 原字符串
+  * dst: 压缩后字符串
 
 * 返回值
 
@@ -183,12 +179,12 @@ void CompressSpace(const std::string &src, std::string &dst);
 
 `void ReplaceMark(const std::string &src, std::string &dst);`
 
-将'(', ')', ',', ';'字符转换为空格
+将' ( '  ' ) '  ' , '  ' ; ' 字符转换为空格
 
 * 参数
 
-  * const std::string &src: 原字符串
-  * std::string &dst: 转换后字符串
+  * src: 原字符串
+  * dst: 转换后字符串
 
 * 返回值
 
@@ -201,8 +197,8 @@ void CompressSpace(const std::string &src, std::string &dst);
 字符串转整型
 
 * 参数
-  * const std::string &str: 待转换字符串
-  * int &val: 转换后值
+  * str: 待转换字符串
+  * val: 转换后值
 * 返回值
   * 是否转换成功的布尔变量
 
@@ -233,8 +229,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 将字符指令分割为参数字符数组，并返回Command的枚举
 
 * 参数
-  * const std::string &Command: 待分割指令
-  * std::vector\<std::string>: 用于储存分割后参数的数组，具体内容参见各split子函数。
+  * Command: 待分割指令
+  * param: 用于储存分割后参数的数组，具体内容参见各split子函数。
 * 返回值
   * 若成功则返回对应的指令的枚举类型，否则返回`FORM_ERROR`。
 
@@ -245,8 +241,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割Use指令
 
 * 参数
-  * std::stringstream &ss: 待分割指令的stringstream
-  * std::vector\<std::string> &param: 用于储存分割后参数的数组
+  * ss: 待分割指令的stringstream
+  * param: 用于储存分割后参数的数组
     * param[0]: 需要use的数据库的名字
 * 返回值
   - 若成功则返回`BASE_USE`，否则返回`FORM_ERROR`。
@@ -258,8 +254,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割show指令
 
 - 参数
-  - std::stringstream &ss: 待分割指令的stringstream
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组（当且仅当需要SHOW COLUMNS时才非空）
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组（当且仅当需要SHOW COLUMNS时才非空）
     - param[0]: 当需要SHOW COLUMNS时，param[0]为需要SHOW的表名。
 - 返回值
   - 如果是合法的`SHOW TABLES`命令，则返回`TABLE_SHOW_ALL`
@@ -274,8 +270,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割drop指令
 
 - 参数
-  - std::stringstream &ss: 待分割指令的stringstream
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
     - param[0]：需要drop的表或数据库的名字
 - 返回值
   - 如果是合法的`DROP TABLE`指令，则返回`TABLE_DROP`
@@ -289,8 +285,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割delete指令
 
 - 参数
-  - std::stringstream &ss: 待分割指令的stringstream
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
     - param[0]：指定的表的名字
     - param[1]：delete语句的where语句（如果指令中没有显示给出where，则param[1]为一空字符串）
 - 返回值
@@ -303,8 +299,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割create指令
 
 - 参数
-  - std::stringstream &ss: 待分割指令的stringstream
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组**（CREATE TABLE的参数在函数split_create_table中处理）**
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组**（CREATE TABLE的参数在函数split_create_table中处理）**
     - param[0]：创建的 **数据库** 的名字
 - 返回值
   - 如果是合法的`CREATE DATABASE`指令，则返回`BASE_CREATE`
@@ -318,8 +314,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割select指令
 
 - 参数
-  - std::stringstream &ss: 待分割指令的stringstream
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
     - param[0]：指定的表的名字
     - param[1...]（除最后一个元素）：需要选择的属性名
     - param的最后一个元素：select语句的where语句（如果命令中没有显式地给出where，则这是一个空字符串）
@@ -333,8 +329,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割update指令
 
 - 参数
-  - std::stringstream &ss: 待分割指令的stringstream
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
     - param[0]：指定的表的名字
     - (param[2i+1],param[2i+2])：两两作一个组合，前者是属性的名字，后者是对应属性要设置的值
 - 返回值
@@ -347,8 +343,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割insert指令
 
 - 参数
-  - std::stringstream &ss: 待分割指令的stringstream
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组
     - param[0]：指定的表的名字
     - (param[i],param[i+param.size()/2])：两两作一个组合，前者是属性的名字，后者是对应属性的值
 - 返回值
@@ -361,12 +357,12 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 分割create table指令
 
 - 参数
-  - const std::string &Commands: 待分割指令
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组
+  - Commands: 待分割指令
+  - param: 用于储存分割后参数的数组
     - param[0]：指定的表的名字
     - (param[2i+1],param[2i+2])：两两作一个组合，前者是属性的名字，后者是对应属性的值
-  - std::vector\<std::string> &not_nul: 用于储存非空属性名的数组
-  - std::vector\<std::string> &pri_key: 用于储存主键属性名的数组
+  - not_null: 用于储存非空属性名的数组
+  - pri_key: 用于储存主键属性名的数组
 - 返回值
   - 如果是合法的`CREATE TABLE`指令，则返回`TABLE_CREATE`，否则返回`FORM_ERROR`
 
@@ -378,8 +374,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 
 - 参数
 
-  - std::stringstream &ss: 待分割指令的stringstream
-  - std::vector\<std::string> &param: 用于储存分割后参数的数组，每个param[i]有两种可能的类型：
+  - ss: 待分割指令的stringstream
+  - param: 用于储存分割后参数的数组，每个param[i]有两种可能的类型：
     - 运算符；
     - 运算数；
     - 其中运算符与运算数按原指令的顺序排列。
@@ -419,7 +415,7 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 用于取得一个属性的值(指针)
 
 * 参数
-  * std::string attrName: 待查找属性名
+  * attrName: 待查找属性名
 * 返回值
   * 该属性名对应值(指针)，如果未找到则为NULL
 
@@ -430,8 +426,8 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 用于设定一个属性的值(指针)
 
 * 参数
-  * std::string attrName: 待设定属性名
-  * Value* src: 待设定属性值(指针)
+  * attrName: 待设定属性名
+  * src: 待设定属性值(指针)
 * 返回值
   * 成功则返回设定后该值的指针，失败则返回NULL
 
@@ -442,7 +438,7 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 用于取得一个属性的值的数据类型
 
 * 参数
-  * std::string attrName: 待查找属性名
+  * attrName: 待查找属性名
 * 返回值
   * 该属性的值的数据类型(枚举)
 
@@ -454,7 +450,7 @@ static std::map<std::string, int> cmdType: 指令名到指令枚举的映射
 
 ##### 成员变量
 
-* int _typeName: 储存该Value储存的数据类型(枚举)
+*  _typeName: 储存该Value储存的数据类型(枚举)
 
 ##### 成员函数
 
@@ -543,7 +539,7 @@ T为数据类型，如int, double等
 
 ##### 成员变量
 
-* T _attrValue: 储存数据
+*  _attrValue: 储存数据
 
 ##### 成员函数
 
@@ -554,7 +550,7 @@ T为数据类型，如int, double等
 构造函数
 
 * 参数
-  * T attrValue: 待储存的值
+  * attrValue: 待储存的值
 
 `AttributeValue(const AttributeValue& src);`
 
@@ -573,7 +569,7 @@ T为数据类型，如int, double等
 用于设定一个AttributeValue储存的值
 
 * 参数
-  * T attrValue: 待储存的值
+  * attrValue: 待储存的值
 * 返回值
   * 设定成功则返回该AttributeValue\<T\>的指针，失败则返回NULL
 
@@ -660,7 +656,7 @@ T为数据类型，如int, double等
 
 * 参数
 
-  * const std::string &DBname: 数据库名
+  * DBname: 数据库名
 
 * 返回值
 
@@ -674,7 +670,7 @@ T为数据类型，如int, double等
 
 * 参数
 
-  * const std::string &DBname: 数据库名
+  * DBname: 数据库名
 
 * 返回值
 
@@ -688,7 +684,7 @@ T为数据类型，如int, double等
 
 * 参数
 
-  - const std::string &DBname: 数据库名
+  - DBname: 数据库名
 
 * 返回值
 
