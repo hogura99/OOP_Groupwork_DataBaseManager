@@ -148,9 +148,7 @@ DataBaseManager<newValue, DataBase<newValue, DataTable<Value>, ParamSpliter>, Pa
 
 ###### stralgo::EraseSpace
 
-```cpp
-void EraseSpace(std::string &str);
-```
+`void EraseSpace(std::string &str);`
 
 删除换行符与空格
 
@@ -164,9 +162,7 @@ void EraseSpace(std::string &str);
 
 ###### stralgo::CompressSpace
 
-```cpp
-void CompressSpace(const std::string &src, std::string &dst); 
-```
+`void CompressSpace(const std::string &src, std::string &dst); `
 
 压缩空格数
 
