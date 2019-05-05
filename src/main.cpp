@@ -36,7 +36,8 @@ int main(int argc, char **argv) {
 		}
 		catch (DataBaseErrorEvent &error) {
 			if (error.getType() != ERROR_NONE)
-				std::cerr << error.what() << std::endl;
+				//std::cerr << error.what() << std::endl;
+				;
 			error = ERROR_NONE;
 		}
 	}

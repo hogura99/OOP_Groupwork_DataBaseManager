@@ -39,7 +39,7 @@
   * 如果没有where语句则默认`SELECT`所有数据。
 * 我们并没有实现更多的其它扩展功能，但提供了参数分割器以及简单的~~没什么卵用的~~错误处理机制。
 
-
+<div STYLE="page-break-after: always;"></div>
 
 ## 架构
 
@@ -64,7 +64,23 @@ Value和ParamSpliter通过模板参数的形式作用于类中，因此开发者
 | ParamSpliter    | 对用户输入的指令进行处理。                |
 | errorstream     | 继承std::exception，用于输出错误信息。    |
 
+<div STYLE="page-break-after: always;"></div>
 
+## 依赖关系
+
+以下是本工程的代码文件之间的依赖关系图（其中箭头所指向的文件被箭头起点的文件包含）：
+
+![依赖关系图1](图片3.png)
+
+<div STYLE="page-break-after: always;"></div>
+
+以下是本工程与c++库文件的依赖关系：
+
+![标准库依赖关系](图片4.png)
+
+
+
+<div STYLE="page-break-after: always;"></div>
 
 ## 运行流程
 

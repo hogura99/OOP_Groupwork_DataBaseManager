@@ -35,7 +35,7 @@ int ParamSpliter::Split(const std::string &Command, std::vector<std::string> &pa
 	if (!cmdType.count(str))
 		return FORM_ERROR;
 	int res = BASE_DEFAULT;
-	std::cerr << ">>> " << str << std::endl;
+	//std::cerr << ">>> " << str << std::endl;
 	switch (cmdType[str])
 	{
 		case cCREATE:

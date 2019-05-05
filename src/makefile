@@ -4,19 +4,19 @@ all: DataBaseManager.o DataBase.o ParamSpliter.o main.o Value.o AttributeValue.o
 local: DataBaseManager.o DataBase.o ParamSpliter.o main.o Value.o AttributeValue.o DataTable.o Data.o str_algorithm.o expression.o
 	g++ expression.o str_algorithm.o ParamSpliter.o Value.o AttributeValue.o main.o -o debug/main -std=c++14
 
-main.o: main.cpp
+main.o: main.cpp DataBaseManager.h DataTable.h DataBase.h Value.h
 	g++ -c main.cpp -o main.o -std=c++14 -g
 
-DataBaseManager.o: DataBaseManager.h errorstream.h DataBase.h DataTable.h ParamSpliter.h
+DataBaseManager.o: DataBaseManager.h errorstream.h DataBase.h DataTable.h ParamSpliter.h Value.h
 	g++ -c DataBaseManager.h -o DataBaseManager.o -std=c++14 -g
 
-DataBase.o: DataBase.h DataTable.h errorstream.h
+DataBase.o: DataBase.h DataTable.h errorstream.h Value.h
 	g++ -c DataBase.h -o DataBase.o -std=c++14 -g
 
-DataTable.o: DataTable.h ParamSpliter.h expression.h ParamSpliter.h errorstream.h Value.h Data.h
+DataTable.o: DataTable.h ParamSpliter.h expression.h ParamSpliter.h errorstream.h Value.h Data.h Value.h
 	g++ -c DataTable.h -o DataTable.o -std=c++14 -g
 
-Data.o: Data.h AttributeValue.h
+Data.o: Data.h AttributeValue.h Value.h
 	g++ -c Data.h -o Data.o -std=c++14 -g
 
 ParamSpliter.o: ParamSpliter.cpp ParamSpliter.h str_algorithm.h expression.h errorstream.h
