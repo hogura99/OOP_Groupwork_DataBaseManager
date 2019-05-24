@@ -1,10 +1,11 @@
 #include <iostream>
 #include <string>
 #include <ctime>
+
 #include "database.h"
 #include "entry.h"
 #include "datastream.h"
-#include "parser.h"
+#include "parserext.h"
 #include "token.h"
 
 /**
@@ -19,7 +20,7 @@ int main()
     while (getline(std::cin, cmd, ';'))
     {
         cmd += ';';
-        Parser parser(cmd);
+        ParserExt parser(cmd);
         try
         {
             auto parseResult = parser.parseStatement();
