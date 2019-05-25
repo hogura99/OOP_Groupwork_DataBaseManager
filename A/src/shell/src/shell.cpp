@@ -7,6 +7,7 @@
 #include "datastream.h"
 #include "parserext.h"
 #include "token.h"
+#include "server.h"
 
 /**
  * Database shell program.
@@ -17,10 +18,23 @@ int main()
 {
     Database db;
     std::string cmd;
-    while (getline(std::cin, cmd, ';'))
+    static char recvBuf[Server::MAXBUF];
+    int InitServerStatus = Server::initServer("127.0.0.1");
+    if (InitServerStatus != 0)
     {
+        std::cerr << "init server failed" << std::endl;
+        return InitServerStatus;
+    }
+    while (true)
+    {
+        memset(recvBuf, 0, sizeof recvBuf);
+        Server::SOCKET client = Server::connectClient();
+        int ConnectStatus = Server::recvMsgFromClient(client, recvBuf, Server::MAXBUF);
+
+        cmd = recvBuf;
         cmd += ';';
-        ParserExt parser(cmd);
+
+        Parser parser(cmd);
         try
         {
             auto parseResult = parser.parseStatement();
@@ -110,6 +124,10 @@ int main()
         {
             std::cout << e.what() << std::endl;
         }
+
+        Server::disconnectClient(client);
     }
+
+    Server::closeServer();
     return 0;
 }
