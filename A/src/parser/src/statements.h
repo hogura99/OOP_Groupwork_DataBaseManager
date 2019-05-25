@@ -31,7 +31,8 @@ class StatementBase
         SELECT,
         INSERT,
         UPDATE,
-        DELETE
+        DELETE,
+        INTO_OUTFILE,
     };
     StatementBase(const std::string &id, StatementType type) : _id(id), _type(type) {}
     virtual const std::string &id() const { return _id; }
@@ -180,7 +181,36 @@ class StatementSelect : public StatementBase
     std::vector<std::string> _columns; // can contain '*'
     Expr _where;
 };
+/**
+* ext StatementSelect into
+*/
+class StatementSelectInto : public StatementBase
+{
+public:
+    StatementSelectInto(const std::string id ,const std::string file_name, const std::vector<std::string> columns, const Expr &where)
+            : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name) {}
 
+    const std::vector<std::string> &getColumns() const { return _columns; }
+    const std::string &getFilename() const {return _file_name;}
+    const Expr &getWhere() const { return _where; }
+    virtual void print() const override
+    {
+        StatementBase::print();
+        std::cout << "Columns:" << _columns << std::endl
+                  << "where clause:" << _where << std::endl;
+    }
+    friend std::ostream &operator<<(std::ostream &out, const StatementSelectInto &s)
+    {
+        return out << (StatementBase)s << std::endl
+                   << "Columns:" << s._columns << std::endl
+                   << "where clause:" << s._where << std::endl;
+    }
+
+protected:
+    std::vector<std::string> _columns; // can contain '*'
+    std::string _file_name;
+    Expr _where;
+};
 /**
 * Update statement. Consists of id, keys, values and a where expression.
 */

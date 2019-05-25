@@ -18,4 +18,6 @@ std::map<StatementBase::StatementType, std::string> StatementBase::typeStringMap
     {StatementBase::SELECT, "select"},
     {StatementBase::INSERT, "insert"},
     {StatementBase::UPDATE, "update"},
-    {StatementBase::DELETE, "delete"}};
+    {StatementBase::DELETE, "delete"},
+    {StatementBase::INTO_OUTFILE, "into outfile"},
+};
