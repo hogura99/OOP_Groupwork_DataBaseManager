@@ -31,7 +31,8 @@ class StatementBase
         SELECT,
         INSERT,
         UPDATE,
-        DELETE
+        DELETE,
+        LOAD
     };
     StatementBase(const std::string &id, StatementType type) : _id(id), _type(type) {}
     virtual const std::string &id() const { return _id; }
@@ -208,6 +209,18 @@ class StatementUpdate : public StatementBase
     std::vector<std::string> _keys;
     std::vector<Variant> _values;
     Expr _where;
+};
+
+class StatementLoad : public StatementBase
+{
+  public:
+    StatementLoad(std::string tableName, std::vector< std::map<std::string, Variant> > entries) 
+    : _entries(entries), StatementBase(tableName, LOAD) {}
+    const std::vector< std::map<std::string, Variant> > entries() { return _entries; }
+
+  protected:
+    
+    std::vector< std::map<std::string, Variant> > _entries;
 };
 
 /**
