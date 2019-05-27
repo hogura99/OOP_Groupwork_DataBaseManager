@@ -73,11 +73,11 @@ class QueryResultSelectInto : public QueryResultBase
 {
 public:
     explicit QueryResultSelectInto(std::vector<std::string> keyNames, std::vector<Entry> entries)
-            : QueryResultBase(SELECT), _keyNames(std::move(keyNames)), _entries(std::move(entries)) {}
+            : QueryResultBase(SELECT), _keyNames(std::move(keyNames)), _entries(std::move(entries)) {_file_name = NULL;}
 
     virtual void print() const override
     {
-        std::ofstream file_stream;
+        std::ofstream file_stream(_file_name);
         if (_entries.empty())
             return;
 
@@ -89,10 +89,11 @@ public:
     }
     const std::vector<std::string> &keyNames() const { return _keyNames; }
     const std::vector<Entry> &entries() const { return _entries; }
-
+    void setFileName(const std::string file_name){_file_name = file_name;}
 protected:
     std::vector<std::string> _keyNames;
     std::vector<Entry> _entries;
+    std::string _file_name;
 };
 
 class QueryResultShowDatabases : public QueryResultBase
