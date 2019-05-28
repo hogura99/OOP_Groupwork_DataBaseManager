@@ -2,7 +2,7 @@
 #include <string>
 #include <ctime>
 
-#include "database.h"
+#include "databaseExt.h"
 #include "entry.h"
 #include "datastream.h"
 #include "parserext.h"
@@ -16,7 +16,7 @@
  */
 int main()
 {
-    Database db;
+    DatabaseExt db;
     std::string cmd;
     static char recvBuf[Server::MAXBUF];
     int InitServerStatus = Server::initServer("127.0.0.1");
@@ -97,6 +97,11 @@ int main()
                 else
                     db.selectFrom(s->id(), s->getColumns(), s->getWhere()).result()->print();
                 break;
+            }
+            case StatementBase::LOAD:
+            {
+                auto s = dynamic_cast<StatementLoad *>(statement);
+                db.load(s->id(), s->entries());
             }
             default:
                 break;

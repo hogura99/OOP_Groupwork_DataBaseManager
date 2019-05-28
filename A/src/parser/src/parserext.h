@@ -9,4 +9,7 @@ public:
     virtual ~ParserExt() = default;
 
     Statement parseSelect() ;
+    Statement parseLoad() ;
+    void parseValueListFromFile(std::vector<std::vector<Variant> > values);
+    
 };
