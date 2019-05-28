@@ -29,7 +29,8 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"null", Token::NULL_SQL},
     {"and", Token::AND},
     {"or", Token::OR},
-    {"set", Token::SET}};
+    {"set", Token::SET},
+	{"outfile", Token::OUTFILE}};
 
 std::map<char, Token::Type> Lexer::singleOp{
     {'+', Token::PLUS},

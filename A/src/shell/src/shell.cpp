@@ -39,7 +39,7 @@ int main()
         {
             auto parseResult = parser.parseStatement();
             if (!parseResult.content())
-                return 0;
+                break;
             auto statement = parseResult.content();
             switch (statement->type())
             {
