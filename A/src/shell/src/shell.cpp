@@ -2,11 +2,12 @@
 #include <string>
 #include <ctime>
 
-#include "database.h"
+#include "databaseExt.h"
 #include "entry.h"
 #include "datastream.h"
 #include "parserext.h"
 #include "token.h"
+#include "server.h"
 
 /**
  * Database shell program.
@@ -15,17 +16,30 @@
  */
 int main()
 {
-    Database db;
+    DatabaseExt db;
     std::string cmd;
-    while (getline(std::cin, cmd, ';'))
+    static char recvBuf[Server::MAXBUF];
+    int InitServerStatus = Server::initServer("127.0.0.1");
+    if (InitServerStatus != 0)
     {
+        std::cerr << "init server failed" << std::endl;
+        return InitServerStatus;
+    }
+    while (true)
+    {
+        memset(recvBuf, 0, sizeof recvBuf);
+        Server::SOCKET client = Server::connectClient();
+        int ConnectStatus = Server::recvMsgFromClient(client, recvBuf, Server::MAXBUF);
+
+        cmd = recvBuf;
         cmd += ';';
-        ParserExt parser(cmd);
+
+        Parser parser(cmd);
         try
         {
             auto parseResult = parser.parseStatement();
             if (!parseResult.content())
-                return 0;
+                break;
             auto statement = parseResult.content();
             switch (statement->type())
             {
@@ -84,6 +98,11 @@ int main()
                     db.selectFrom(s->id(), s->getColumns(), s->getWhere()).result()->print();
                 break;
             }
+            case StatementBase::LOAD:
+            {
+                auto s = dynamic_cast<StatementLoad *>(statement);
+                db.load(s->id(), s->entries());
+            }
             default:
                 break;
             }
@@ -110,6 +129,10 @@ int main()
         {
             std::cout << e.what() << std::endl;
         }
+
+        Server::disconnectClient(client);
     }
+
+    Server::closeServer();
     return 0;
 }

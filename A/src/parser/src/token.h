@@ -82,6 +82,9 @@ class Token
         COMMA,
         SEMICOLON,
         END,
+        LOAD,
+        DATA,
+        INFILE,
         OUTFILE,
     };
     Token(Type type = NONE, const Variant &data = Variant());
