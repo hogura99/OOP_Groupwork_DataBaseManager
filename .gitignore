@@ -1,0 +1,6 @@
+*.sql
+*.out
+*.o
+*.exe
+/doc/*
+/src/*
