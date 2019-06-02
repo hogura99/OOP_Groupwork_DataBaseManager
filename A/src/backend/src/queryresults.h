@@ -72,28 +72,62 @@ class QueryResultSelect : public QueryResultBase
 class QueryResultSelectInto : public QueryResultBase
 {
 public:
-    explicit QueryResultSelectInto(std::vector<std::string> keyNames, std::vector<Entry> entries)
-            : QueryResultBase(SELECT), _keyNames(std::move(keyNames)), _entries(std::move(entries)) {_file_name = NULL;}
+    explicit QueryResultSelectInto(std::vector<std::string> keyNames,
+                                   std::vector<Entry> entries,
+                                   const std::string *file_name)
+            : QueryResultBase(SELECT), _keyNames(std::move(keyNames)), _entries(std::move(entries))
+            {
+                this->setFileName(file_name);
+            }
+
+    explicit QueryResultSelectInto(const QueryResultSelect &queryResult,
+                                   const std::string *file_name)
+            : QueryResultSelectInto(queryResult.keyNames(), queryResult.entries(), file_name) {}
+
+    ~QueryResultSelectInto()
+    {
+        delete _file_name;
+        decltype(_entries)().swap(_entries);
+        decltype(_keyNames)().swap(_keyNames);
+    }
 
     virtual void print() const override
     {
-        std::ofstream file_stream(_file_name);
         if (_entries.empty())
             return;
+        if (_file_name == nullptr)
+        {
+            for (auto &k : _keyNames)
+                std::cout << k << '\t';
+            std::cout << std::endl;
+            for (auto &r : _entries)
+                std::cout << r << std::endl;
+        }
+        else
+        {
+            std::ofstream file_stream(*_file_name);
 
-        for (auto &k : _keyNames)
-            file_stream << k << '\t';
-        file_stream << std::endl;
-        for (auto &r : _entries)
-            file_stream << r << std::endl;
+            for (auto &k : _keyNames)
+                file_stream << k << '\t';
+            file_stream << std::endl;
+            for (auto &r : _entries)
+                file_stream << r << std::endl;
+        }
     }
     const std::vector<std::string> &keyNames() const { return _keyNames; }
     const std::vector<Entry> &entries() const { return _entries; }
-    void setFileName(const std::string file_name){_file_name = file_name;}
+    void setFileName(const std::string *file_name)
+    {
+        if (file_name != nullptr)
+            _file_name = new std::string(*file_name);
+        else
+            _file_name = nullptr;
+    }
+    std::string* getFileName() const { return _file_name; }
 protected:
     std::vector<std::string> _keyNames;
     std::vector<Entry> _entries;
-    std::string _file_name;
+    std::string* _file_name;
 };
 
 class QueryResultShowDatabases : public QueryResultBase

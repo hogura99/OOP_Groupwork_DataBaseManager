@@ -5,9 +5,9 @@
 class DatabaseExt: public Database
 {
 public:
-    DatabaseExt();
+    DatabaseExt(): Database() {}
     virtual ~DatabaseExt() = default;
-    QueryResult selectAllFromInto(const std::string &tableName, const Expr &expr, const std::string* file_name);
-    QueryResult selectFromInto(const std::string &tableName, const std::vector<std::string> &fieldNames, const Expr &expr, const std::string* file_name);
+    QueryResult selectAllFrom(const std::string &tableName, const Expr &expr, const std::string* file_name);
+    QueryResult selectFrom(const std::string &tableName, const std::vector<std::string> &fieldNames, const Expr &expr, const std::string* file_name);
     void load(const std::string &tableName, const std::vector< std::map<std::string, Variant> > &entries);
 };

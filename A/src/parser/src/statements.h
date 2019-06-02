@@ -192,8 +192,14 @@ public:
             : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name) {}
 
     const std::vector<std::string> &getColumns() const { return _columns; }
-    const std::string &getFilename() const {return _file_name;}
     const Expr &getWhere() const { return _where; }
+    const std::string* getFilename() const
+    {
+        if (_file_name == "")
+            return nullptr;
+        else
+            return &_file_name;
+    }
     virtual void print() const override
     {
         StatementBase::print();

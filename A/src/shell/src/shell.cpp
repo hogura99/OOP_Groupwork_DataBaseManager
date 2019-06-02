@@ -9,6 +9,8 @@
 #include "token.h"
 #include "server.h"
 
+//#define SERVER_ON
+
 /**
  * Database shell program.
  * This program accepts SQL commands from keyboard, calls parser to parse the commands into SQL statements,
@@ -27,11 +29,15 @@ int main()
     }
     while (true)
     {
+#ifdef SERVER_ON
         memset(recvBuf, 0, sizeof recvBuf);
         Server::SOCKET client = Server::connectClient();
         int ConnectStatus = Server::recvMsgFromClient(client, recvBuf, Server::MAXBUF);
-
         cmd = recvBuf;
+#else
+        if (!std::getline(std::cin, cmd, ';'))
+            break;
+#endif
         cmd += ';';
 
         Parser parser(cmd);
@@ -91,11 +97,11 @@ int main()
             }
             case StatementBase::SELECT:
             {
-                auto s = dynamic_cast<StatementSelect *>(statement);
+                auto s = dynamic_cast<StatementSelectInto *>(statement);
                 if (s->getColumns().front() == "*")
-                    db.selectAllFrom(s->id(), s->getWhere()).result()->print();
+                    db.selectAllFrom(s->id(), s->getWhere(), s->getFilename()).result()->print();
                 else
-                    db.selectFrom(s->id(), s->getColumns(), s->getWhere()).result()->print();
+                    db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename()).result()->print();
                 break;
             }
             case StatementBase::LOAD:
@@ -130,7 +136,9 @@ int main()
             std::cout << e.what() << std::endl;
         }
 
+#ifdef SERVER_ON
         Server::disconnectClient(client);
+#endif
     }
 
     Server::closeServer();
