@@ -68,6 +68,16 @@ namespace Server
 
 #elif linux
 
+    static int initServer(char *ip_address, int port = 1234)
+    {
+        return 0;
+    }
+
+    static void closeServer()
+    {
+
+    }
+
 #endif
 
 }

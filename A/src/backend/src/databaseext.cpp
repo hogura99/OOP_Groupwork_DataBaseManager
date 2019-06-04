@@ -7,6 +7,8 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
     keyNames.pop_back();
     std::reverse(keyNames.begin(), keyNames.end()); // delete the first '*' of keynames
 
+    // TODO: change the key names
+
     std::vector<std::string> _keyNames;
     std::vector<std::string> _cntNames;
     std::vector<size_t> _cntPos;
@@ -25,7 +27,9 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
     return QueryResult(queryResult);
 }
 
-QueryResult DatabaseExt::selectFrom(const std::string &tableName, const std::vector<std::string> &keyNames, const Expr &expr, const std::string* file_name)
+QueryResult DatabaseExt::selectFrom(const std::string &tableName,
+                                    const std::vector<std::string> &keyNames, const Expr &expr, const std::string* file_name,
+                                    const std::vector<std::string> &groupByKey, std::string *orderByKey)
 {
     std::vector<std::string> _keyNames;
     std::vector<std::string> _cntNames;
@@ -104,6 +108,43 @@ void DatabaseExt::countEntries(const std::vector<std::string> &keyNames,
             for (int k = 0; k < entries.size(); k ++)
                 resultEntries[k].push_back(entries[k][j]);
         }
+}
+
+void DatabaseExt::makeGroupBy(const std::vector<std::string> &groupByKey, const std::vector<std::string> &keyNames,
+                              const Group &entries, std::vector<Group> &groups)
+{
+    auto _groupByKey = groupByKey;
+    std::sort(_groupByKey.begin(), _groupByKey.end());
+    std::vector<int> rankOfKey(groupByKey.size());
+    for (int i = 0; i < keyNames.size(); i ++)
+    {
+        auto rank = std::lower_bound(_groupByKey.begin(), _groupByKey.end(), keyNames[i]) - _groupByKey.begin();
+        if (rank < _groupByKey.size())
+            rankOfKey[rank] = i;
+    }
+
+    // TODO: check the count(*) statements.
+    auto _compare = [=] (const Entry &entry1, const Entry &entry2)
+    {
+        for (int i : rankOfKey)
+            if (entry1[i] != entry2[i])
+                return false;
+        return true;
+    };
+
+    for (auto entry: entries)
+    {
+        bool flag = false;
+        for (auto &group: groups)
+            if (_compare(entry, group.front()))
+            {
+                group.push_back(entry);
+                flag = true;
+                break;
+            }
+        if (!flag)
+            groups.push_back({entry});
+    }
 }
 
 void DatabaseExt::load(const std::string &tableName, const std::vector< std::map<std::string, Variant> > &entries)
