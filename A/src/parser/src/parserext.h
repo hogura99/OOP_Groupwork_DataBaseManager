@@ -11,5 +11,5 @@ public:
     Statement parseSelect() ;
     Statement parseLoad() ;
     void parseValueListFromFile(std::vector<std::vector<Variant> > values);
-    
+    std::vector<Variant> parseValueListInFile();
 };
