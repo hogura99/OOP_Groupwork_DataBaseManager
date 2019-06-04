@@ -9,7 +9,7 @@ Statement ParserExt::parseSelect()
     std::vector<std::string> columns = parseSelectList();
     std::string file_name = "";
     std::string table_id = "";
-    std::vector<std::string> group_by_column = {};
+    std::vector<std::string> group_by_column;
     Expr where;
 
     while (_token.type() != Token::WHERE || _token.type() != Token::SEMICOLON){
@@ -50,7 +50,6 @@ Statement ParserExt::parseSelect()
             case Token::ORDER:{
                 consume(Token::ORDER);
                 consume(Token::BY);
-                columns.insert(columns.end(), parseColumnList().begin(), parseColumnList().end());
                 break;
             }
         }

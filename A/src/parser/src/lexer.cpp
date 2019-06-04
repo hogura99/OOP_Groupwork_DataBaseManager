@@ -35,6 +35,8 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"order", Token::ORDER},
     {"by", Token::BY},
     {"count", Token::COUNT},
+    {"infile", Token::INFILE},
+    {"load", Token::LOAD},
 };
 
 std::map<char, Token::Type> Lexer::singleOp{
