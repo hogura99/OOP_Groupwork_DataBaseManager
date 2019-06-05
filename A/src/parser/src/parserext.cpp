@@ -4,6 +4,17 @@
 #include <algorithm>
 #include <fstream>
 
+Statement ParserExt::parseStatement()
+{
+    switch (_token.type())
+    {
+        case Token::LOAD:
+            return parseLoad();
+        default:
+            return Parser::parseStatement();
+    }
+}
+
 Statement ParserExt::parseSelect()
 {
     consume(Token::SELECT);

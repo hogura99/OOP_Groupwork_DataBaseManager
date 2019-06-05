@@ -3,7 +3,7 @@
 #ifdef WIN32
 #include <io.h>
 #include <direct.h>
-#elif unix
+#else unix
 #include <unistd.h>
 #include <dirent.h>
 #endif
