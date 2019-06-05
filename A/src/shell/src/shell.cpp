@@ -99,9 +99,9 @@ int main()
             {
                 auto s = dynamic_cast<StatementSelectInto *>(statement);
                 if (s->getColumns().front() == "*")
-                    db.selectAllFrom(s->id(), s->getWhere(), s->getFilename()).result()->print();
+                    db.selectAllFrom(s->id(), s->getWhere(), s->getFilename() ,s->getGroupByColumn()).result()->print();
                 else
-                    db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename()).result()->print();
+                    db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn()).result()->print();
                 break;
             }
             case StatementBase::LOAD:

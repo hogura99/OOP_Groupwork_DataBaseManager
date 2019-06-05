@@ -213,7 +213,7 @@ public:
                    << "Columns:" << s._columns << std::endl
                    << "where clause:" << s._where << std::endl;
     }
-
+    const std::vector<std::string>& getGroupByColumn() const { return _group_by_column;}
 protected:
     std::vector<std::string> _columns; // can contain '*'
     std::string _file_name;
