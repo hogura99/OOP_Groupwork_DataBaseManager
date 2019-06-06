@@ -36,7 +36,15 @@ std::map<Token::Type, std::string> Token::name{
     {Token::COMMA, "COMMA"},
     {Token::SEMICOLON, "SEMICOLON"},
     {Token::END, "END"},
-    {Token::NONE, "NONE"}};
+    {Token::NONE, "NONE"},
+    {Token::INFILE, "INFILE"},
+    {Token::OUTFILE, "OUTFILE"},
+    {Token::GROUP, "GROUP"},
+    {Token::BY, "BY"},
+    {Token::ORDER, "ORDER"},
+    {Token::COUNT, "COUNT"},
+    {Token::LOAD, "LOAD"},
+};
 
 Token::Token(Type type, const Variant &data)
 {

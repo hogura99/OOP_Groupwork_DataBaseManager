@@ -33,7 +33,8 @@ class StatementBase
         UPDATE,
         DELETE,
         INTO_OUTFILE,
-        LOAD
+        LOAD,
+        COUNT
     };
     StatementBase(const std::string &id, StatementType type) : _id(id), _type(type) {}
     virtual const std::string &id() const { return _id; }
@@ -183,13 +184,13 @@ class StatementSelect : public StatementBase
     Expr _where;
 };
 /**
-* ext StatementSelect into
+* ext StatementSelect new
 */
 class StatementSelectInto : public StatementBase
 {
 public:
-    StatementSelectInto(const std::string id ,const std::string file_name, const std::vector<std::string> columns, const Expr &where)
-            : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name) {}
+    StatementSelectInto(const std::string& id ,const std::string& file_name, const std::vector<std::string>& group_by_column, const std::vector<std::string> columns, const Expr &where)
+            : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column) {}
 
     const std::vector<std::string> &getColumns() const { return _columns; }
     const Expr &getWhere() const { return _where; }
@@ -212,10 +213,11 @@ public:
                    << "Columns:" << s._columns << std::endl
                    << "where clause:" << s._where << std::endl;
     }
-
+    const std::vector<std::string>& getGroupByColumn() const { return _group_by_column;}
 protected:
     std::vector<std::string> _columns; // can contain '*'
     std::string _file_name;
+    std::vector<std::string> _group_by_column;
     Expr _where;
 };
 /**

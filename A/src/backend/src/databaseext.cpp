@@ -1,6 +1,6 @@
 #include "databaseext.h"
 
-QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::vector<std::string> &fieldNames, const Expr &expr, const std::string* file_name)
+QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::vector<std::string> &fieldNames, const Expr &expr, const std::string* file_name, const std::vector<std::string>& group_by_column)
 {
     std::vector<std::string> keyNames = fieldNames;
     std::reverse(keyNames.begin(), keyNames.end());

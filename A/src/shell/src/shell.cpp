@@ -98,6 +98,10 @@ int main()
             case StatementBase::SELECT:
             {
                 auto s = dynamic_cast<StatementSelectInto *>(statement);
+                if (s->getColumns().front() == "*")
+                    db.selectAllFrom(s->id(), s->getWhere(), s->getFilename() ,s->getGroupByColumn()).result()->print();
+                else
+                    db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn()).result()->print();
                 // TODO ADD COUNT AND GROUP KEYS LISTS
                 /*if (s->getColumns().front() == "*")
                     db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename()).result()->print();

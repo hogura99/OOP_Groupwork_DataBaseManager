@@ -7,20 +7,53 @@ Statement ParserExt::parseSelect()
 {
     consume(Token::SELECT);
     std::vector<std::string> columns = parseSelectList();
-    std::string file_name;
-
-    if(_token.type() == Token::INTO)
-    {
-        consume(Token::INTO);
-        consume(Token::OUTFILE);
-        file_name = _token.toId();
-        consume(Token::OPERAND);
-    }
-
-    consume(Token::FROM);
-    std::string table_id = _token.toId();
-    consume(Token::ID);
+    std::string file_name = "";
+    std::string table_id = "";
+    std::vector<std::string> group_by_column;
     Expr where;
+
+    while (_token.type() != Token::WHERE || _token.type() != Token::SEMICOLON){
+        switch (_token.type())
+        {
+            case Token::COUNT:{
+                std::string count_data = "";
+                count_data = _token.toId();
+                for(char& ch : count_data)
+                    if (ch <= 90 && ch >= 65)
+                        ch += 32;
+                    else if (ch == '(')
+                        ch = ' ';
+                    else if (ch == ')')
+                        ch = 0;
+                count_data = "\\\\" + count_data;
+                consume(Token::COUNT);
+                columns.push_back(count_data);
+                break;
+            }
+            case Token::INTO:
+                consume(Token::INTO);
+                consume(Token::OUTFILE);
+                file_name = _token.toId();
+                consume(Token::OPERAND);
+                break;
+            case Token::FROM:
+                consume(Token::FROM);
+                table_id = _token.toId();
+                consume(Token::ID);
+                break;
+            case Token::GROUP: {
+                consume(Token::GROUP);
+                consume(Token::BY);
+                group_by_column.insert(group_by_column.end(), parseColumnList().begin(), parseColumnList().end());
+                break;
+            }
+            case Token::ORDER:{
+                consume(Token::ORDER);
+                consume(Token::BY);
+                break;
+            }
+        }
+    }
 
     switch (_token.type())
     {
@@ -35,9 +68,9 @@ Statement ParserExt::parseSelect()
         default:
             break;
     }
-
     consume(Token::SEMICOLON);
-    return Statement(new StatementSelectInto(table_id, file_name, columns, where));
+
+    return Statement(new StatementSelectInto(table_id, file_name, group_by_column, columns, where));
 }
 
 Statement ParserExt::parseLoad()
