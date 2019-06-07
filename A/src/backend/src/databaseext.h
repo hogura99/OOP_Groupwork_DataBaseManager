@@ -1,6 +1,7 @@
 #pragma once
 
 #include "database.h"
+#include "column.h"
 
 typedef std::vector<Entry> Group;
 
@@ -10,11 +11,12 @@ public:
     DatabaseExt(): Database() {}
     virtual ~DatabaseExt() = default;
 
-    QueryResult selectAllFrom(const std::string &tableName,
-                              const std::vector<std::string> &fieldNames, const Expr &expr, const std::string* file_name);
+    QueryResult selectAllFrom(const std::string &tableName, const std::vector<Column> &columns,
+                              const Expr &expr, const std::string* file_name,
+                              const std::vector<std::string>& groupByColumn);
     QueryResult selectFrom(const std::string &tableName,
-                           const std::vector<std::string> &fieldNames, const Expr &expr, const std::string* file_name,
-                           const std::vector<std::string> &groupByKey, std::string *orderByKey);
+                           const std::vector<std::string> &keyNames, const Expr &expr, const std::string* file_name,
+                           const std::vector<std::string> &groupByColumn, std::string *orderByKey);
 
     void getCountNames(const std::vector<std::string> &keyNames,
                       std::vector<std::string> &_keyNames,
@@ -26,7 +28,13 @@ public:
                       const std::vector<Entry> &entries,
                       std::vector<Entry> &resultEntries);
 
-    void makeGroupBy(const std::vector<std::string> &groupByKey, const std::vector<std::string> &keyNames,
+    void gatherEntries(const std::vector<Column> &columns,
+                       const std::vector<std::string> &keyNames,
+                       const std::vector<Entry> &entries,
+                       Entry &resultEntries);
+
+    void makeGroupBy(const std::vector<std::string> &groupByKey,
+                     const std::vector<std::string> &keyNames,
                      const Group &entries, std::vector<Group> &groups);
 
     void load(const std::string &tableName, const std::vector< std::map<std::string, Variant> > &entries);

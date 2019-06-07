@@ -3,74 +3,205 @@
 #include "../../backend/include/stack.h"
 #include <algorithm>
 
-Statement ParserExt::parseSelect()
+Statement ParserExt::parseStatement()
 {
-    consume(Token::SELECT);
-    std::vector<std::string> columns = parseSelectList();
-    std::string file_name = "";
-    std::string table_id = "";
-    std::vector<std::string> group_by_column;
-    Expr where;
+    switch (_token.type())
+    {
+        case Token::SELECT:
+            return parseSelect();
+        default:
+            return Parser::parseStatement();
+    }
+}
 
-    while (_token.type() != Token::WHERE || _token.type() != Token::SEMICOLON){
+std::vector<std::string> ParserExt::parseColumnList()
+{
+    std::vector<std::string> columns;
+
+    auto consumeKeys = [&](Token _token)
+    {
         switch (_token.type())
         {
-            case Token::COUNT:{
+            case Token::COUNT:
+            {
+                consume(Token::COUNT);
+                consume(Token::L_PAREN);
                 std::string count_data = "";
-                count_data = _token.toId();
-                for(char& ch : count_data)
-                    if (ch <= 90 && ch >= 65)
-                        ch += 32;
+                if (_token.type() == Token::MUL)
+                {
+                    count_data = "*";
+                    consume(Token::MUL);
+                }
+                else
+                {
+                    count_data = _token.toId();
+                    consume(Token::ID);
+                }
+                for (char& ch : count_data)
+                    if (ch <= 'Z' && ch >= 'A')
+                        ch += 'z' - 'A';
                     else if (ch == '(')
                         ch = ' ';
                     else if (ch == ')')
                         ch = 0;
-                count_data = "\\\\" + count_data;
-                consume(Token::COUNT);
+                count_data = "\\COUNT " + count_data;
+                consume(Token::R_PAREN);
                 columns.push_back(count_data);
                 break;
             }
-            case Token::INTO:
-                consume(Token::INTO);
-                consume(Token::OUTFILE);
-                file_name = _token.toId();
-                consume(Token::OPERAND);
-                break;
-            case Token::FROM:
-                consume(Token::FROM);
-                table_id = _token.toId();
+            case Token::ID:
+            {
+                columns.push_back(_token.toId());
                 consume(Token::ID);
                 break;
-            case Token::GROUP: {
-                consume(Token::GROUP);
-                consume(Token::BY);
-                group_by_column.insert(group_by_column.end(), parseColumnList().begin(), parseColumnList().end());
+            }
+        }
+    };
+
+    {
+        switch (_token.type())
+        {
+            case Token::COUNT:
+            {
+                consume(Token::COUNT);
+                consume(Token::L_PAREN);
+                std::string count_data = "";
+                if (_token.type() == Token::MUL)
+                {
+                    count_data = "*";
+                    consume(Token::MUL);
+                }
+                else
+                {
+                    count_data = _token.toId();
+                    consume(Token::ID);
+                }
+                for (char& ch : count_data)
+                    if (ch <= 'Z' && ch >= 'A')
+                        ch += 'z' - 'A';
+                    else if (ch == '(')
+                        ch = ' ';
+                    else if (ch == ')')
+                        ch = 0;
+                count_data = "\\COUNT " + count_data;
+                consume(Token::R_PAREN);
+                columns.push_back(count_data);
                 break;
             }
-            case Token::ORDER:{
-                consume(Token::ORDER);
-                consume(Token::BY);
+            case Token::ID:
+            {
+                columns.push_back(_token.toId());
+                consume(Token::ID);
                 break;
             }
         }
     }
 
+    while (_token.type() == Token::COMMA)
+    {
+        consume(Token::COMMA);
+        {
+            switch (_token.type())
+            {
+                case Token::COUNT:
+                {
+                    consume(Token::COUNT);
+                    consume(Token::L_PAREN);
+                    std::string count_data = "";
+                    if (_token.type() == Token::MUL)
+                    {
+                        count_data = "*";
+                        consume(Token::MUL);
+                    }
+                    else
+                    {
+                        count_data = _token.toId();
+                        consume(Token::ID);
+                    }
+                    for (char& ch : count_data)
+                        if (ch <= 'Z' && ch >= 'A')
+                            ch += 'z' - 'A';
+                    count_data = "\\COUNT " + count_data;
+                    consume(Token::R_PAREN);
+                    columns.push_back(count_data);
+                    break;
+                }
+                case Token::ID:
+                {
+                    columns.push_back(_token.toId());
+                    consume(Token::ID);
+                    break;
+                }
+            }
+        }
+    }
+
+    return columns;
+}
+
+std::vector<std::string> ParserExt::parseSelectList()
+{
+    std::vector<std::string> columns;
     switch (_token.type())
     {
-        case Token::WHERE:
-            consume(Token::WHERE);
-            where = parseWhereClause();
+        case Token::MUL:
+            columns.emplace_back("*");
+            consume(Token::MUL);
             break;
 
-        case Token::SEMICOLON:
+        case Token::ID: case Token::COUNT:
+            columns = parseColumnList();
             break;
 
         default:
-            break;
+            throw ParserError("Syntax error");
     }
+    return columns;
+}
+
+Statement ParserExt::parseSelect() {
+    consume(Token::SELECT);
+    std::vector<std::string> columns = parseSelectList();
+    std::string file_name = "";
+    std::string table_id = "";
+    std::vector<std::string> groupByColumn, orderByColumn;
+    Expr where;
+
+    if (_token.type() == Token::INTO)
+    {
+        consume(Token::INTO);
+        consume(Token::OUTFILE);
+        file_name = _token.toId();
+        consume(Token::OPERAND);
+    }
+
+    consume(Token::FROM);
+    table_id = _token.toId();
+    consume(Token::ID);
+
+    if (_token.type() == Token::WHERE)
+    {
+       consume(Token::WHERE);
+       where = parseWhereClause();
+    }
+
+    if (_token.type() == Token::GROUP)
+    {
+        consume(Token::GROUP);
+        consume(Token::BY);
+        groupByColumn = parseColumnList();
+    }
+
+    if (_token.type() == Token::ORDER)
+    {
+        consume(Token::ORDER);
+        consume(Token::BY);
+        orderByColumn = parseColumnList();
+    }
+
     consume(Token::SEMICOLON);
 
-    return Statement(new StatementSelectInto(table_id, file_name, group_by_column, columns, where));
+    return Statement(new StatementSelectInto(table_id, file_name, groupByColumn, columns, where));
 }
 
 Statement ParserExt::parseLoad()

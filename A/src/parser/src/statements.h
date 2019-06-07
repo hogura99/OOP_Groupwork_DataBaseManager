@@ -190,7 +190,10 @@ class StatementSelectInto : public StatementBase
 {
 public:
     StatementSelectInto(const std::string& id ,const std::string& file_name, const std::vector<std::string>& group_by_column, const std::vector<std::string> columns, const Expr &where)
-            : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column) {}
+            : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column)
+            {
+
+            }
 
     const std::vector<std::string> &getColumns() const { return _columns; }
     const Expr &getWhere() const { return _where; }
@@ -213,12 +216,24 @@ public:
                    << "Columns:" << s._columns << std::endl
                    << "where clause:" << s._where << std::endl;
     }
-    const std::vector<std::string>& getGroupByColumn() const { return _group_by_column;}
+    const std::vector<std::string>& getGroupByColumn() const { return _group_by_column; }
+
+    bool isSelectAll() const
+    {
+        if (_columns.front() == "*")
+            return true;
+        // TODO: change the column names of StatementSelectInto.
+        for (auto column: _columns)
+            if (column[0] != '\\')
+                return false;
+        return true;
+    }
 protected:
     std::vector<std::string> _columns; // can contain '*'
     std::string _file_name;
     std::vector<std::string> _group_by_column;
     Expr _where;
+    bool _select_all;
 };
 /**
 * Update statement. Consists of id, keys, values and a where expression.
