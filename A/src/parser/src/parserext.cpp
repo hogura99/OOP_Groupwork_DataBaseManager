@@ -87,7 +87,8 @@ void ParserExt::parseValueListFromFile(std::vector<std::vector<Variant> > values
     std::ifstream infile;
     infile.open(_token.toId());
     if (!infile.is_open())
-        throw ParserError("File not found.");   //这里的报错信息先随便写了一个
+        throw ParserError(_token.toId());
+        //throw ParserError("File not found.");   //这里的报错信息先随便写了一个
     while(!infile.eof())
     {
         std::string data;

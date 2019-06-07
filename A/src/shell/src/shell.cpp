@@ -42,7 +42,7 @@ int main()
 #endif
         cmd += ';';
 
-        Parser parser(cmd);
+        ParserExt parser(cmd);
         try
         {
             auto parseResult = parser.parseStatement();

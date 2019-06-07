@@ -3,7 +3,8 @@
 #ifdef WIN32
 #include <io.h>
 #include <direct.h>
-#else unix
+#else
+#define unix 1
 #include <unistd.h>
 #include <dirent.h>
 #endif

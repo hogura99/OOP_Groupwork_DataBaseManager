@@ -124,11 +124,30 @@ Token Lexer::next()
         else if (_peek == '"' || _peek == '\'')
         {
             char quote = _peek;
+            std::string content = "";
             advance();
             char c = advance();
+            content = content + c;
+            char tmp = advance();
+            if (tmp == quote)
+                return Token(Token::OPERAND, Variant(c));
+            else
+                content = content + tmp;
+            while (!isEnd())
+            {
+                c = advance();
+                if (c == quote)
+                {
+                    return Token(Token::ID, Variant(content));
+                }
+                content = content + c;
+
+            }
+            /*
             if (advance() != quote)
                 throw LexerError("Bad char");
             return Token(Token::OPERAND, Variant(c));
+            */
         }
         // white space
         else if (isspace(_peek))
