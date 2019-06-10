@@ -235,5 +235,8 @@ Statement ParserExt::parseLoad()
 
 void ParserExt::parseValueListFromFile(std::vector<std::vector<Variant> > values)
 {
-
+    std::ifstream infile;
+    infile.open("output_file");
+    if (!infile.is_open())
+        throw ParserError("file not found");
 }

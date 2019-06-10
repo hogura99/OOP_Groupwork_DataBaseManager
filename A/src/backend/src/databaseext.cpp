@@ -207,6 +207,12 @@ void DatabaseExt::makeGroupBy(const std::vector<std::string> &groupByKey,
 
 void DatabaseExt::load(const std::string &tableName, const std::vector< std::map<std::string, Variant> > &entries)
 {
+    std::ifstream infile;
+    infile.open("output_file");
+    if (!infile.is_open())
+    {
+        throw DatabaseError("open file failed");
+    }
     assertDatabaseSelected();
     assertTableExist(tableName);
 
