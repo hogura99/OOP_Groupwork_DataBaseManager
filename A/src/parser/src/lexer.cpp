@@ -30,13 +30,15 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"and", Token::AND},
     {"or", Token::OR},
     {"set", Token::SET},
-	{"outfile", Token::OUTFILE},
+	  {"outfile", Token::OUTFILE},
+    {"load", Token::LOAD},
+    {"infile", Token::INFILE},
+    {"data", Token::DATA},
     {"group", Token::GROUP},
     {"order", Token::ORDER},
     {"by", Token::BY},
     {"count", Token::COUNT},
     {"infile", Token::INFILE},
-    {"load", Token::LOAD},
 };
 
 std::map<char, Token::Type> Lexer::singleOp{
@@ -127,11 +129,30 @@ Token Lexer::next()
         else if (_peek == '"' || _peek == '\'')
         {
             char quote = _peek;
+            std::string content = "";
             advance();
             char c = advance();
+            content = content + c;
+            char tmp = advance();
+            if (tmp == quote)
+                return Token(Token::OPERAND, Variant(c));
+            else
+                content = content + tmp;
+            while (!isEnd())
+            {
+                c = advance();
+                if (c == quote)
+                {
+                    return Token(Token::ID, Variant(content));
+                }
+                content = content + c;
+
+            }
+            /*
             if (advance() != quote)
                 throw LexerError("Bad char");
             return Token(Token::OPERAND, Variant(c));
+            */
         }
         // white space
         else if (isspace(_peek))

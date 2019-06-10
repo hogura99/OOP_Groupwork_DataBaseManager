@@ -20,6 +20,7 @@ int main()
 {
     DatabaseExt db;
     std::string cmd;
+    /*
     static char recvBuf[Server::MAXBUF];
     int InitServerStatus = Server::initServer("127.0.0.1");
     if (InitServerStatus != 0)
@@ -27,6 +28,7 @@ int main()
         std::cerr << "init server failed" << std::endl;
         return InitServerStatus;
     }
+    */
     while (true)
     {
 #ifdef SERVER_ON
@@ -142,6 +144,6 @@ int main()
 #endif
     }
 
-    Server::closeServer();
+    //Server::closeServer();
     return 0;
 }
