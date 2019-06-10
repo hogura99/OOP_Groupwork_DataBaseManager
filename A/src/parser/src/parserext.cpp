@@ -3,6 +3,7 @@
 #include "../../backend/include/stack.h"
 #include <algorithm>
 #include <fstream>
+#include "fileio.h"
 
 Statement ParserExt::parseStatement()
 {
@@ -240,10 +241,13 @@ Statement ParserExt::parseLoad()
 void ParserExt::parseValueListFromFile(std::vector<std::vector<Variant> > values)
 {
     std::ifstream infile;
-    infile.open(_token.toId());
+    std::string fileName = _token.toId();
+    if (!isFile(fileName)) // not absolute directory
+        fileName = getCwd() + "/../" + fileName;
+    infile.clear();
+    infile.open(fileName);
     if (!infile.is_open())
-        throw ParserError(_token.toId());
-        //throw ParserError("File not found.");   //这里的报错信息先随便写了一个
+        throw ParserError("File " + _token.toId() + " not found.");   //这里的报错信息先随便写了一个
     while(!infile.eof())
     {
         std::string data;

@@ -145,5 +145,6 @@ int main()
     }
 
     //Server::closeServer();
+    system("pause");
     return 0;
 }

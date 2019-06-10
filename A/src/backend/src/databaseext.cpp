@@ -34,7 +34,9 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
         }
         else
         {
-            _resultEntries.emplace_back(_group);
+            //_resultEntries.push_back(_group);
+            for (auto member: _group)
+                _resultEntries.push_back(member);
         }
     }
 
