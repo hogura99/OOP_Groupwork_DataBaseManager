@@ -2,11 +2,14 @@
 #include "../../backend/src/field.h"
 #include "../../backend/include/stack.h"
 #include <algorithm>
+#include <fstream>
 
 Statement ParserExt::parseStatement()
 {
     switch (_token.type())
     {
+        case Token::LOAD:
+            return parseLoad();
         case Token::SELECT:
             return parseSelect();
         default:
@@ -215,6 +218,7 @@ Statement ParserExt::parseLoad()
     consume(Token::INTO);
     consume(Token::TABLE);
     std::string tableName = _token.toId();
+    consume(Token::ID);
     consume(Token::L_PAREN);
     std::vector<std::string> columns = parseColumnList();
     consume(Token::R_PAREN);
@@ -236,7 +240,27 @@ Statement ParserExt::parseLoad()
 void ParserExt::parseValueListFromFile(std::vector<std::vector<Variant> > values)
 {
     std::ifstream infile;
-    infile.open("output_file");
+    infile.open(_token.toId());
     if (!infile.is_open())
-        throw ParserError("file not found");
+        throw ParserError(_token.toId());
+        //throw ParserError("File not found.");   //这里的报错信息先随便写了一个
+    while(!infile.eof())
+    {
+        std::string data;
+        getline(infile, data);
+        ParserExt parserInFile(data);
+        std::vector<Variant> value = parserInFile.parseValueListInFile();
+        values.emplace_back(value);
+    }
+}
+
+std::vector<Variant> ParserExt::parseValueListInFile()
+{
+    std::vector<Variant> value;
+    
+    while (!isEnd())
+    {
+        value.emplace_back(_token.toOperand());
+        consume(Token::OPERAND);
+    }
 }

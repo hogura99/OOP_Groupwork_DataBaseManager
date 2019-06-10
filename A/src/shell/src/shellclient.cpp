@@ -7,6 +7,7 @@
 
 int main()
 {
+    /*
     Client::initClient("127.0.0.1");
     std::string cmd;
     static char sendBuf[Client::MAXBUF];
@@ -27,5 +28,6 @@ int main()
         std::cout << recvBuf << std::endl;
         Client::stopConversation();
     }
+    */
     return 0;
 }
