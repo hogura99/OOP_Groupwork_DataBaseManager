@@ -30,10 +30,15 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"and", Token::AND},
     {"or", Token::OR},
     {"set", Token::SET},
-	{"outfile", Token::OUTFILE},
+	  {"outfile", Token::OUTFILE},
     {"load", Token::LOAD},
     {"infile", Token::INFILE},
-    {"data", Token::DATA}
+    {"data", Token::DATA},
+    {"group", Token::GROUP},
+    {"order", Token::ORDER},
+    {"by", Token::BY},
+    {"count", Token::COUNT},
+    {"infile", Token::INFILE},
 };
 
 std::map<char, Token::Type> Lexer::singleOp{

@@ -74,15 +74,17 @@ class QueryResultSelectInto : public QueryResultBase
 public:
     explicit QueryResultSelectInto(std::vector<std::string> keyNames,
                                    std::vector<Entry> entries,
-                                   const std::string *file_name)
-            : QueryResultBase(SELECT), _keyNames(std::move(keyNames)), _entries(std::move(entries))
+                                   const std::string *file_name,
+                                   const std::vector<std::string>& group_by_column)
+            : QueryResultBase(SELECT), _keyNames(std::move(keyNames)), _entries(std::move(entries)), _group_by_column(group_by_column)
             {
                 this->setFileName(file_name);
             }
 
     explicit QueryResultSelectInto(const QueryResultSelect &queryResult,
-                                   const std::string *file_name)
-            : QueryResultSelectInto(queryResult.keyNames(), queryResult.entries(), file_name) {}
+                                   const std::string *file_name,
+                                   const std::vector<std::string>& group_by_column)
+            : QueryResultSelectInto(queryResult.keyNames(), queryResult.entries(), file_name, group_by_column) {}
 
     ~QueryResultSelectInto()
     {
@@ -124,10 +126,12 @@ public:
             _file_name = nullptr;
     }
     std::string* getFileName() const { return _file_name; }
+    const std::vector<std::string>& getGroupByColumn() const { return _group_by_column;}
 protected:
     std::vector<std::string> _keyNames;
     std::vector<Entry> _entries;
     std::string* _file_name;
+    std::vector<std::string> _group_by_column;
 };
 
 class QueryResultShowDatabases : public QueryResultBase
