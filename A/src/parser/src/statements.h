@@ -193,7 +193,7 @@ public:
     StatementSelectInto(const std::string& id ,const std::string& file_name, const std::vector<Column>& group_by_column, const std::vector<Column>& order_by_column,const std::vector<Column>& columns, const Expr &where)
             : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column), _order_by_column(order_by_column)
             {
-
+                _select_all = isSelectAll();
             }
 
     const std::vector<Column> &getColumns() const { return _columns; }
@@ -222,14 +222,12 @@ public:
 
     bool isSelectAll() const
     {
-        if (_columns.front().columnName == "*")
+        if (_columns.front().type == Token::COUNT && _columns.front().columnName == "*" && _columns.size() == 1)//only (* && Count)
             return true;
-        // TODO: change the column names of StatementSelectInto.
-
         for (auto column: _columns)
-            if (column.columnName[0] != '\\')
-                return false;
-        return true;
+            if (column.type == Token::ID && column.columnName == "*")//contain (ID && *)
+                return true;
+        return false;
     }
 protected:
     std::vector<Column> _columns; // can contain '*'
