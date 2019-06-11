@@ -2,7 +2,8 @@
 
 QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::vector<Column> &columns,
                                        const Expr &expr, const std::string* file_name,
-                                       const std::vector<std::string>& groupByColumn)
+                                       const std::vector<std::string>& groupByColumn,
+                                       const std::vector<std::string>& orderByColumn)
 {
     /*std::vector<std::string> keyNames = fieldNames;
     std::reverse(keyNames.begin(), keyNames.end());
@@ -39,14 +40,14 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
     }
 
     delete selectResult;
-    auto queryResult = new QueryResultSelectInto(_keyNames, _resultEntries, file_name, groupByColumn);
+    auto queryResult = new QueryResultSelectInto(_keyNames, _resultEntries, file_name, groupByColumn, orderByColumn);
 
     return QueryResult(queryResult);
 }
 
 QueryResult DatabaseExt::selectFrom(const std::string &tableName,
                                     const std::vector<std::string> &keyNames, const Expr &expr, const std::string* file_name,
-                                    const std::vector<std::string> &groupByColumn, std::string *orderByKey)
+                                    const std::vector<std::string> &groupByColumn, const std::vector<std::string>& orderByColumn, std::string *orderByKey)
 {
     std::vector<std::string> _keyNames;
     std::vector<std::string> _cntNames;
@@ -61,7 +62,7 @@ QueryResult DatabaseExt::selectFrom(const std::string &tableName,
     countEntries(_keyNames, _cntNames, _cntPos, _entries, _resultEntries);
 
     delete selectResult;
-    auto queryResult = new QueryResultSelectInto(keyNames, _resultEntries, file_name, groupByColumn);
+    auto queryResult = new QueryResultSelectInto(keyNames, _resultEntries, file_name, groupByColumn, orderByColumn);
 
     return QueryResult(queryResult);
 }

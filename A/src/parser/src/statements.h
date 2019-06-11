@@ -7,6 +7,7 @@
 #include <map>
 #include "../../backend/src/print.h"
 #include "../../backend/src/field.h"
+#include "../../backend/src/column.h"
 
 /**
 * @brief A basic container for all kinds of statements.  
@@ -189,13 +190,13 @@ class StatementSelect : public StatementBase
 class StatementSelectInto : public StatementBase
 {
 public:
-    StatementSelectInto(const std::string& id ,const std::string& file_name, const std::vector<std::string>& group_by_column, const std::vector<std::string> columns, const Expr &where)
-            : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column)
+    StatementSelectInto(const std::string& id ,const std::string& file_name, const std::vector<Column>& group_by_column, const std::vector<Column>& order_by_column,const std::vector<Column>& columns, const Expr &where)
+            : StatementBase(id, SELECT), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column), _order_by_column(order_by_column)
             {
 
             }
 
-    const std::vector<std::string> &getColumns() const { return _columns; }
+    const std::vector<Column> &getColumns() const { return _columns; }
     const Expr &getWhere() const { return _where; }
     const std::string* getFilename() const
     {
@@ -216,22 +217,24 @@ public:
                    << "Columns:" << s._columns << std::endl
                    << "where clause:" << s._where << std::endl;
     }
-    const std::vector<std::string>& getGroupByColumn() const { return _group_by_column; }
+    const std::vector<Column>& getGroupByColumn() const { return _group_by_column; }
+    const std::vector<Column>& getOrderByColumn() const { return _order_by_column; }
 
     bool isSelectAll() const
     {
-        if (_columns.front() == "*")
+        if (_columns.front().columnName == "*")
             return true;
         // TODO: change the column names of StatementSelectInto.
+
         for (auto column: _columns)
-            if (column[0] != '\\')
+            if (column.columnName[0] != '\\')
                 return false;
         return true;
     }
 protected:
-    std::vector<std::string> _columns; // can contain '*'
+    std::vector<Column> _columns; // can contain '*'
     std::string _file_name;
-    std::vector<std::string> _group_by_column;
+    std::vector<Column> _group_by_column, _order_by_column;
     Expr _where;
     bool _select_all;
 };

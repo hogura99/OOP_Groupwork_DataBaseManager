@@ -8,8 +8,8 @@ public:
     ParserExt(const std::string &cmd): Parser(cmd) {}
     virtual ~ParserExt() = default;
 
-    std::vector<std::string> parseColumnList();
-    std::vector<std::string> parseSelectList();
+    std::vector<Column> parseColumnList();
+    std::vector<Column> parseSelectList();
 
     Statement parseSelect();
     Statement parseLoad() ;
