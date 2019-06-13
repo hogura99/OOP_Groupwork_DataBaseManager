@@ -13,10 +13,11 @@ public:
 
     QueryResult selectAllFrom(const std::string &tableName, const std::vector<Column> &columns,
                               const Expr &expr, const std::string* file_name,
-                              const std::vector<std::string>& groupByColumn);
+                              const std::vector<std::string>& groupByColumn,
+                              const std::vector<std::string>& orderByColumn);
     QueryResult selectFrom(const std::string &tableName,
                            const std::vector<std::string> &keyNames, const Expr &expr, const std::string* file_name,
-                           const std::vector<std::string> &groupByColumn, std::string *orderByKey);
+                           const std::vector<std::string> &groupByColumn, const std::vector<std::string>& orderByColumn, std::string *orderByKey);
 
     void getCountNames(const std::vector<std::string> &keyNames,
                       std::vector<std::string> &_keyNames,
