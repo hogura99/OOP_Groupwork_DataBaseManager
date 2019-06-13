@@ -2,10 +2,13 @@
 
 QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::vector<Column> &columns,
                                        const Expr &expr, const std::string* fileName,
-                                       const std::vector<std::string>& groupByColumn,
+                                       const std::vector<Column>& groupByColumn,
                                        const std::vector<Column>& orderByColumns)
 {
-    auto selectResult = dynamic_cast<QueryResultSelect*>(Database::selectAllFrom(tableName, expr).result());
+    auto selectResultBase = Database::selectAllFrom(tableName, expr);
+    auto selectResult = dynamic_cast<QueryResultSelect*>(selectResultBase.result());
+
+    assert(selectResult != nullptr);
 
     std::vector<std::string> _keyNames = selectResult->keyNames();
     std::vector<Entry> _entries = selectResult->entries();
@@ -29,15 +32,18 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
     }
     orderEntriesBy(_resultEntries, columns, orderByColumns);
 
-    delete selectResult;
-    auto queryResult = new QueryResultSelectInto(_keyNames, _resultEntries, fileName, groupByColumn);
+    std::vector<std::string> _columns;
+    for (auto column: columns)
+        _columns.push_back(trans2Str(column));
+
+    auto queryResult = new QueryResultSelectInto(_columns, _resultEntries, fileName, groupByColumn, orderByColumns);
 
     return QueryResult(queryResult);
 }
 
 QueryResult DatabaseExt::selectFrom(const std::string &tableName,
-                                    const std::vector<std::string> &keyNames, const Expr &expr, const std::string* file_name,
-                                    const std::vector<std::string> &groupByColumn, std::string *orderByKey)
+                                    const std::vector<std::string> &keyNames, const Expr &expr, const std::string* fileName,
+                                    const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn)
 {
     std::vector<std::string> _keyNames;
     std::vector<std::string> _cntNames;
@@ -52,7 +58,7 @@ QueryResult DatabaseExt::selectFrom(const std::string &tableName,
     countEntries(_keyNames, _cntNames, _cntPos, _entries, _resultEntries);
 
     delete selectResult;
-    auto queryResult = new QueryResultSelectInto(keyNames, _resultEntries, file_name, groupByColumn);
+    auto queryResult = new QueryResultSelectInto(keyNames, _resultEntries, fileName, groupByColumn, orderByColumn);
 
     return QueryResult(queryResult);
 }
@@ -76,15 +82,19 @@ void DatabaseExt::gatherEntries(const std::vector<Column> &columns,
                 int countRes = 0;
                 int pos = -1;
                 for (int i = 0; i < keyNames.size(); i++)
-                    if (keyNames[i] == column.columnName)
+                    if (keyNames[i] == column.name)
                     {
                         pos = i;
                         break;
                     }
                 if (pos != -1)
+                {
                     for (auto value: entries[pos])
                         if (value.type() != Variant::NONE)
-                            countRes ++;
+                            countRes++;
+                }
+                else if (column.name == "*")
+                    countRes = entries.size();
                 resultEntries.push_back(countRes);
                 break;
             }
@@ -157,20 +167,18 @@ void DatabaseExt::countEntries(const std::vector<std::string> &keyNames,
         }
 }
 
-void DatabaseExt::makeGroupBy(const std::vector<std::string> &groupByKey,
+void DatabaseExt::makeGroupBy(const std::vector<Column> &groupByKey,
                               const std::vector<std::string> &keyNames,
                               const Group &entries, std::vector<Group> &groups)
 {
     auto _groupByKey = groupByKey;
     std::sort(_groupByKey.begin(), _groupByKey.end());
-    std::vector<int> rankOfKey(groupByKey.size());
+    std::vector<int> rankOfKey(groupByKey.size(), -1);
     for (int i = 0; i < keyNames.size(); i ++)
     {
-        auto rank = std::lower_bound(_groupByKey.begin(), _groupByKey.end(), keyNames[i]) - _groupByKey.begin();
+        auto rank = std::lower_bound(_groupByKey.begin(), _groupByKey.end(), Column("", keyNames[i], Token::NONE)) - _groupByKey.begin();
         if (rank < _groupByKey.size())
             rankOfKey[rank] = i;
-        else
-            rankOfKey[rank] = -1;
     }
 
     // TODO: check the count(*) statements.

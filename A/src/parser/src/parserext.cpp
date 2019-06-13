@@ -18,9 +18,9 @@ Statement ParserExt::parseStatement()
     }
 }
 
-std::vector<std::string> ParserExt::parseColumnList()
+std::vector<Column> ParserExt::parseColumnList()
 {
-    std::vector<std::string> columns;
+    std::vector<Column> columns;
 
     auto consumeKeys = [&](Token _token)
     {
@@ -48,14 +48,13 @@ std::vector<std::string> ParserExt::parseColumnList()
                         ch = ' ';
                     else if (ch == ')')
                         ch = 0;
-                count_data = "\\COUNT " + count_data;
                 consume(Token::R_PAREN);
-                columns.push_back(count_data);
+                columns.push_back(Column{"", count_data, Token::COUNT});
                 break;
             }
             case Token::ID:
             {
-                columns.push_back(_token.toId());
+                columns.push_back(Column{"", _token.toId(), Token::ID});
                 consume(Token::ID);
                 break;
             }
@@ -87,14 +86,13 @@ std::vector<std::string> ParserExt::parseColumnList()
                         ch = ' ';
                     else if (ch == ')')
                         ch = 0;
-                count_data = "\\COUNT " + count_data;
                 consume(Token::R_PAREN);
-                columns.push_back(count_data);
+                columns.push_back(Column{"", count_data, Token::COUNT});
                 break;
             }
             case Token::ID:
             {
-                columns.push_back(_token.toId());
+                columns.push_back(Column{"", _token.toId(), Token::ID});
                 consume(Token::ID);
                 break;
             }
@@ -125,14 +123,13 @@ std::vector<std::string> ParserExt::parseColumnList()
                     for (char& ch : count_data)
                         if (ch <= 'Z' && ch >= 'A')
                             ch += 'z' - 'A';
-                    count_data = "\\COUNT " + count_data;
                     consume(Token::R_PAREN);
-                    columns.push_back(count_data);
+                    columns.push_back(Column{"", count_data, Token::COUNT});
                     break;
                 }
                 case Token::ID:
                 {
-                    columns.push_back(_token.toId());
+                    columns.push_back(Column{"", _token.toId(), Token::ID});
                     consume(Token::ID);
                     break;
                 }
@@ -143,13 +140,14 @@ std::vector<std::string> ParserExt::parseColumnList()
     return columns;
 }
 
-std::vector<std::string> ParserExt::parseSelectList()
+std::vector<Column> ParserExt::parseSelectList()
 {
-    std::vector<std::string> columns;
+    std::vector<Column> columns;
     switch (_token.type())
     {
         case Token::MUL:
-            columns.emplace_back("*");
+            //TODO: make sure if it's MUL or other
+            columns.emplace_back(Column{"", "*", Token::MUL});
             consume(Token::MUL);
             break;
 
@@ -165,22 +163,22 @@ std::vector<std::string> ParserExt::parseSelectList()
 
 Statement ParserExt::parseSelect() {
     consume(Token::SELECT);
-    std::vector<std::string> columns = parseSelectList();
-    std::string file_name = "";
-    std::string table_id = "";
-    std::vector<std::string> groupByColumn, orderByColumn;
+    std::vector<Column> columns = parseSelectList();
+    std::string fileName = "";
+    std::string tableId = "";
+    std::vector<Column> orderByColumn, groupByColumn;
     Expr where;
 
     if (_token.type() == Token::INTO)
     {
         consume(Token::INTO);
         consume(Token::OUTFILE);
-        file_name = _token.toId();
+        fileName = _token.toId();
         consume(Token::OPERAND);
     }
 
     consume(Token::FROM);
-    table_id = _token.toId();
+    tableId = _token.toId();
     consume(Token::ID);
 
     if (_token.type() == Token::WHERE)
@@ -205,7 +203,7 @@ Statement ParserExt::parseSelect() {
 
     consume(Token::SEMICOLON);
 
-    return Statement(new StatementSelectInto(table_id, file_name, groupByColumn, columns, where));
+    return Statement(new StatementSelectInto(tableId, fileName, groupByColumn, orderByColumn, columns, where));
 }
 
 Statement ParserExt::parseLoad()
@@ -221,7 +219,7 @@ Statement ParserExt::parseLoad()
     std::string tableName = _token.toId();
     consume(Token::ID);
     consume(Token::L_PAREN);
-    std::vector<std::string> columns = parseColumnList();
+    std::vector<Column> columns = parseColumnList();
     consume(Token::R_PAREN);
     consume(Token::SEMICOLON);
 
@@ -233,7 +231,7 @@ Statement ParserExt::parseLoad()
     {
         std::map<std::string, Variant> entry;
         for (size_t j = 0; j < columns.size(); j++)
-            entry[columns[j]] = values[i][j];
+            entry[columns[j].name] = values[i][j];
     }
     return Statement(new StatementLoad(tableName, entries));
 }

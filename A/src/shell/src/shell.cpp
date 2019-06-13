@@ -100,10 +100,11 @@ int main()
             case StatementBase::SELECT:
             {
                 auto s = dynamic_cast<StatementSelectInto *>(statement);
-                if (s->getColumns().front() == "*")
-                    db.selectAllFrom(s->id(), {}, s->getWhere(), s->getFilename(), s->getGroupByColumn(), {}).result()->print();
+                if (s->isSelectAll())
+                    db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
                 else
-                    db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), {}).result()->print();
+                    ;
+                    //db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn(), {}).result()->print();
                 // TODO: add count, group by, order by lists.
                 break;
             }

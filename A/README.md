@@ -193,7 +193,7 @@ This project is licensed under the Apache License - see the [LICENSE](LICENSE) f
 驼峰命名法，首字母**小写**。例如
 
 ```cpp
-std::string tableName;
+std::string table;
 SqlParser sqlParser;
 
 struct Point

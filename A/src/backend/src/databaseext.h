@@ -13,11 +13,11 @@ public:
 
     QueryResult selectAllFrom(const std::string &tableName, const std::vector<Column> &columns,
                               const Expr &expr, const std::string* fileName,
-                              const std::vector<std::string>& groupByColumns,
+                              const std::vector<Column>& groupByColumns,
                               const std::vector<Column> &orderByColumns);
     QueryResult selectFrom(const std::string &tableName,
                            const std::vector<std::string> &keyNames, const Expr &expr, const std::string* file_name,
-                           const std::vector<std::string> &groupByColumn, std::string *orderByKey);
+                           const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn);
 
     void getCountNames(const std::vector<std::string> &keyNames,
                       std::vector<std::string> &_keyNames,
@@ -35,7 +35,7 @@ public:
                        Entry &resultEntries);
     void orderEntriesBy(std::vector<Entry> &entries, const std::vector<Column> &columns, const std::vector<Column> &orderByColumns);
 
-    void makeGroupBy(const std::vector<std::string> &groupByKey,
+    void makeGroupBy(const std::vector<Column> &groupByKey,
                      const std::vector<std::string> &keyNames,
                      const Group &entries, std::vector<Group> &groups);
 

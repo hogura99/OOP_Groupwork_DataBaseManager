@@ -5,32 +5,39 @@
 
 #include "token.h"
 
-struct Column
-{
-    std::string tableName;
-    std::string columnName;
-    Token::Type type;
-
-    bool operator==(const Column &x) const
-    {
-        return tableName == x.tableName && columnName == x.columnName && type == x.type;
-    }
-};
-
-/*
 class Column
 {
 public:
-    Column(const std::string &tableName, const std::string &columnName, const Token::Type &type):
-           _tableName(tableName), _columnName(columnName), _type(type) {}
-    virtual ~Column() {}
+    std::string table;
+    std::string name;
+    Token::Type type;
 
-    Token::Type getType() const ;
-    std::string getTableName() const ;
-    std::string getColumnName() const ;
+    Column(std::string table, std::string name, Token::Type type):
+        table(table), name(name), type(type) {}
+    Column(): table(""), name(""), type(Token::NONE) {}
 
-private:
-    std::string _tableName;
-    std::string _columnName;
-    Token::Type _type;
-};*/
+    bool operator==(const Column &x) const
+    {
+        return table == x.table && name == x.name && type == x.type;
+    }
+
+    bool operator<(const Column &x) const
+    {
+        return table == x.table ? name < x.name : table < x.table;
+    }
+
+    friend std::string trans2Str(Column x)
+    {
+        std::string s;
+        if (Token::name.count(x.type))
+            s += Token::name[x.type] + "(";
+
+        if (x.table != "")
+            s += x.table + ".";
+        s += x.name;
+
+        if (Token::name.count(x.type))
+            s += ")";
+        return s;
+    }
+};
