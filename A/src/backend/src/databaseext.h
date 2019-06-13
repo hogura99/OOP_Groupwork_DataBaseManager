@@ -12,8 +12,9 @@ public:
     virtual ~DatabaseExt() = default;
 
     QueryResult selectAllFrom(const std::string &tableName, const std::vector<Column> &columns,
-                              const Expr &expr, const std::string* file_name,
-                              const std::vector<std::string>& groupByColumn);
+                              const Expr &expr, const std::string* fileName,
+                              const std::vector<std::string>& groupByColumns,
+                              const std::vector<Column> &orderByColumns);
     QueryResult selectFrom(const std::string &tableName,
                            const std::vector<std::string> &keyNames, const Expr &expr, const std::string* file_name,
                            const std::vector<std::string> &groupByColumn, std::string *orderByKey);
@@ -32,6 +33,7 @@ public:
                        const std::vector<std::string> &keyNames,
                        const std::vector<Entry> &entries,
                        Entry &resultEntries);
+    void orderEntriesBy(std::vector<Entry> &entries, const std::vector<Column> &columns, const std::vector<Column> &orderByColumns);
 
     void makeGroupBy(const std::vector<std::string> &groupByKey,
                      const std::vector<std::string> &keyNames,

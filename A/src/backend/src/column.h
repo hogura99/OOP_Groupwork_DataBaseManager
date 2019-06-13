@@ -10,6 +10,11 @@ struct Column
     std::string tableName;
     std::string columnName;
     Token::Type type;
+
+    bool operator==(const Column &x) const
+    {
+        return tableName == x.tableName && columnName == x.columnName && type == x.type;
+    }
 };
 
 /*

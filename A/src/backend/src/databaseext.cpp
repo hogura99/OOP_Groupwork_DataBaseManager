@@ -1,28 +1,17 @@
 #include "databaseext.h"
 
 QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::vector<Column> &columns,
-                                       const Expr &expr, const std::string* file_name,
-                                       const std::vector<std::string>& groupByColumn)
+                                       const Expr &expr, const std::string* fileName,
+                                       const std::vector<std::string>& groupByColumn,
+                                       const std::vector<Column>& orderByColumns)
 {
-    /*std::vector<std::string> keyNames = fieldNames;
-    std::reverse(keyNames.begin(), keyNames.end());
-    keyNames.pop_back();
-    std::reverse(keyNames.begin(), keyNames.end()); // delete the first '*' of keynames
-*/
-    // TODO: change the key names
-
-    /*std::vector<std::string> _keyNames;
-    std::vector<std::string> _cntNames;
-    std::vector<size_t> _cntPos;
-
-    getCountNames(keyNames, _keyNames, _cntNames, _cntPos);*/
-
     auto selectResult = dynamic_cast<QueryResultSelect*>(Database::selectAllFrom(tableName, expr).result());
 
     std::vector<std::string> _keyNames = selectResult->keyNames();
     std::vector<Entry> _entries = selectResult->entries();
     std::vector<Entry> _resultEntries;
     std::vector<Group> _groups;
+
     makeGroupBy(groupByColumn, _keyNames, _entries, _groups);
     for (auto _group: _groups)
     {
@@ -34,14 +23,14 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
         }
         else
         {
-            //_resultEntries.push_back(_group);
             for (auto member: _group)
                 _resultEntries.push_back(member);
         }
     }
+    orderEntriesBy(_resultEntries, columns, orderByColumns);
 
     delete selectResult;
-    auto queryResult = new QueryResultSelectInto(_keyNames, _resultEntries, file_name, groupByColumn);
+    auto queryResult = new QueryResultSelectInto(_keyNames, _resultEntries, fileName, groupByColumn);
 
     return QueryResult(queryResult);
 }
@@ -87,7 +76,8 @@ void DatabaseExt::gatherEntries(const std::vector<Column> &columns,
                 int countRes = 0;
                 int pos = -1;
                 for (int i = 0; i < keyNames.size(); i++)
-                    if (keyNames[i] == column.columnName) {
+                    if (keyNames[i] == column.columnName)
+                    {
                         pos = i;
                         break;
                     }
@@ -205,6 +195,41 @@ void DatabaseExt::makeGroupBy(const std::vector<std::string> &groupByKey,
         if (!flag)
             groups.push_back({entry});
     }
+}
+
+void DatabaseExt::orderEntriesBy(std::vector<Entry> &entries,
+                                 const std::vector<Column> &columns,
+                                 const std::vector<Column> &orderByColumns)
+{
+    if (orderByColumns.empty())
+        return;
+
+    std::vector<int> orderByPosition(orderByColumns.size());
+    for (int i = 0; i < orderByColumns.size(); i ++)
+    {
+        int k = -1;
+        for (int j = 0; j < columns.size(); j ++)
+            if (columns[j] == orderByColumns[i])
+            {
+                k = j;
+                break;
+            }
+        if (k == -1)
+            throw DatabaseError("order by error");
+        orderByPosition[i] = k;
+    }
+
+    auto _less_compare = [=, &orderByPosition](const Entry &a, const Entry &b)
+    {
+        for (int pos: orderByPosition)
+            if (a[pos] < b[pos])
+                return true;
+            else if (a[pos] > b[pos])
+                return false;
+        return false;
+    };
+
+    sort(entries.begin(), entries.end(), _less_compare);
 }
 
 void DatabaseExt::load(const std::string &tableName, const std::vector< std::map<std::string, Variant> > &entries)
