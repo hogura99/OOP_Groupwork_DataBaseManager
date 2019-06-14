@@ -45,6 +45,9 @@ bool Database::dropDatabase(const std::string &dbName)
         if (removeFile(_dataDir + dbName + "/" + fname) == 0)
             return false;
     }
+
+    assert(isDir(_dataDir + dbName));
+
     return removeDir(_dataDir + dbName);
 }
 
