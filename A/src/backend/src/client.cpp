@@ -1,5 +1,7 @@
 #include "client.h"
 
+#include <cstring>
+
 #ifdef WIN32
 
 #include <winsock2.h>
@@ -40,11 +42,14 @@ void Client::sendMsgToServer(const std::string &msg)
     strcat(sendMsg, msg.c_str());
 
     send(_socket, sendMsg, MAX_BUF, NULL);
+
+    memset(sendMsg, 0, strlen(sendMsg) * sizeof(char));
 }
 
 void Client::recvMsgFromServer(std::string &msg)
 {
     static char recvMsg[MAX_BUF];
+    memset(recvMsg, 0, strlen(recvMsg) * sizeof(char));
     recv(_socket, recvMsg, MAX_BUF * sizeof(char), NULL);
     msg = recvMsg;
 }
@@ -56,12 +61,21 @@ void Client::stopConversation()
 
 #else
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <stdio.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/shm.h>
+
 void Client::setServer(char *serverIpAddress, int port)
 {
     _serverIpAddr = serverIpAddress;
     _serverPort = port;
-    WSADATA wsaData;
-    WSAStartup(MAKEWORD(2, 2), &wsaData);
 }
 
 void Client::buildClient()
@@ -77,31 +91,30 @@ void Client::createConversation()
     sockAddr.sin_family = PF_INET;
     sockAddr.sin_addr.s_addr = inet_addr(_serverIpAddr.c_str());
     sockAddr.sin_port = htons(_serverPort);
-    int res = connect(_socket, (SOCKADDR*)&sockAddr, sizeof (SOCKADDR));
-
+    int res = connect(_socket, (sockaddr*)&sockAddr, sizeof (sockaddr));
+    if (res != 0)
+        throw ClientError("Create conversation error code: " + std::to_string(res));
 }
 
 void Client::sendMsgToServer(const std::string &msg)
 {
-    static char sendMsg[MAX_BUF];
-
     if (msg.length() > MAX_BUF)
         throw ClientError("Client sending too many messages.");
-    strcat(sendMsg, msg.c_str());
 
-    send(_socket, sendMsg, MAX_BUF, NULL);
+    send(_socket, msg.c_str(), msg.length() * sizeof(char), NULL);
 }
 
 void Client::recvMsgFromServer(std::string &msg)
 {
     static char recvMsg[MAX_BUF];
+    memset(recvMsg, 0, strlen(recvMsg) * sizeof(char));
     recv(_socket, recvMsg, MAX_BUF * sizeof(char), NULL);
     msg = recvMsg;
 }
 
 void Client::stopConversation()
 {
-    closesocket(_socket);
+    close(_socket);
 }
 
 #endif
