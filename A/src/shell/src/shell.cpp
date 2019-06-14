@@ -103,8 +103,7 @@ int main()
                 if (s->isSelectAll())
                     db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
                 else
-                    ;
-                    //db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn(), {}).result()->print();
+                    db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
                 // TODO: add count, group by, order by lists.
                 break;
             }

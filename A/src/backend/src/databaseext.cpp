@@ -16,20 +16,7 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
     std::vector<Group> _groups;
 
     makeGroupBy(groupByColumn, _keyNames, _entries, _groups);
-    for (auto _group: _groups)
-    {
-        Entry _resultEntry;
-        if (!columns.empty())
-        {
-            gatherEntries(columns, _keyNames, _group, _resultEntry);
-            _resultEntries.push_back(_resultEntry);
-        }
-        else
-        {
-            for (auto member: _group)
-                _resultEntries.push_back(member);
-        }
-    }
+    gatherEntriesInGroup(columns, _keyNames, _groups, _resultEntries);
     orderEntriesBy(_resultEntries, columns, orderByColumns);
 
     std::vector<std::string> _columns;
@@ -42,25 +29,52 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
 }
 
 QueryResult DatabaseExt::selectFrom(const std::string &tableName,
-                                    const std::vector<std::string> &keyNames, const Expr &expr, const std::string* fileName,
+                                    const std::vector<Column> &columns, const Expr &expr, const std::string* fileName,
                                     const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn)
 {
     std::vector<std::string> _keyNames;
-    std::vector<std::string> _cntNames;
-    std::vector<size_t> _cntPos;
 
-    getCountNames(keyNames, _keyNames, _cntNames, _cntPos);
+    for (auto column: columns)
+        if (column.type == Token::ID)
+            _keyNames.push_back(column.name);
 
-    auto selectResult = dynamic_cast<QueryResultSelect*>(Database::selectFrom(tableName, _keyNames, expr).result());
+    auto selectResultBase = Database::selectFrom(tableName, _keyNames, expr);
+    auto selectResult = dynamic_cast<QueryResultSelect*>(selectResultBase.result());
 
     std::vector<Entry> _entries = selectResult->entries();
-    std::vector<Entry> _resultEntries(_entries.size());
-    countEntries(_keyNames, _cntNames, _cntPos, _entries, _resultEntries);
+    std::vector<Entry> _resultEntries;
+    std::vector<Group> _groups;
 
-    delete selectResult;
-    auto queryResult = new QueryResultSelectInto(keyNames, _resultEntries, fileName, groupByColumn, orderByColumn);
+    makeGroupBy(groupByColumn, _keyNames, _entries, _groups);
+    gatherEntriesInGroup(columns, _keyNames, _groups, _resultEntries);
+    orderEntriesBy(_resultEntries, columns, orderByColumn);
+
+    std::vector<std::string> _columns;
+    for (auto column: columns)
+        _columns.push_back(trans2Str(column));
+
+    auto queryResult = new QueryResultSelectInto(_columns, _resultEntries, fileName, groupByColumn, orderByColumn);
 
     return QueryResult(queryResult);
+}
+
+void DatabaseExt::gatherEntriesInGroup(const std::vector<Column> &columns, const std::vector<std::string> &keyNames,
+                                       const std::vector<Group> &groups, std::vector<Entry> &resultEntries)
+{
+    for (auto _group: groups)
+    {
+        Entry _resultEntry;
+        if (!columns.empty())
+        {
+            gatherEntries(columns, keyNames, _group, _resultEntry);
+            resultEntries.push_back(_resultEntry);
+        }
+        else
+        {
+            for (auto member: _group)
+                resultEntries.push_back(member);
+        }
+    }
 }
 
 void DatabaseExt::gatherEntries(const std::vector<Column> &columns,
@@ -106,7 +120,7 @@ void DatabaseExt::gatherEntries(const std::vector<Column> &columns,
     }
 }
 
-void DatabaseExt::getCountNames(const std::vector<std::string> &keyNames,
+/*void DatabaseExt::getCountNames(const std::vector<std::string> &keyNames,
                    std::vector<std::string> &_keyNames,
                    std::vector<std::string> &_cntNames,
                    std::vector<size_t> &_cntPos)
@@ -165,7 +179,7 @@ void DatabaseExt::countEntries(const std::vector<std::string> &keyNames,
             for (int k = 0; k < entries.size(); k ++)
                 resultEntries[k].push_back(entries[k][j]);
         }
-}
+}*/
 
 void DatabaseExt::makeGroupBy(const std::vector<Column> &groupByKey,
                               const std::vector<std::string> &keyNames,

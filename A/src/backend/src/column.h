@@ -29,14 +29,14 @@ public:
     friend std::string trans2Str(Column x)
     {
         std::string s;
-        if (Token::name.count(x.type))
+        if (Token::name.count(x.type) && x.type != Token::ID)
             s += Token::name[x.type] + "(";
 
         if (x.table != "")
             s += x.table + ".";
         s += x.name;
 
-        if (Token::name.count(x.type))
+        if (Token::name.count(x.type) && x.type != Token::ID)
             s += ")";
         return s;
     }
