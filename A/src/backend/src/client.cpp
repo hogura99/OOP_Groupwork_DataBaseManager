@@ -27,7 +27,8 @@ void Client::createConversation()
     sockAddr.sin_addr.s_addr = inet_addr(_serverIpAddr.c_str());
     sockAddr.sin_port = htons(_serverPort);
     int res = connect(_socket, (SOCKADDR*)&sockAddr, sizeof (SOCKADDR));
-
+    if (res != 0)
+        throw ClientError("Connecting server error code: " + std::to_string(res));
 }
 
 void Client::sendMsgToServer(const std::string &msg)

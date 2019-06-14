@@ -22,7 +22,7 @@ int main()
     std::string cmd;
 #ifdef SERVER_ON
     Server server;
-    server.init("127.0.0.1");
+    server.init("183.172.163.124", 1234);
 #endif
     while (true)
     {
