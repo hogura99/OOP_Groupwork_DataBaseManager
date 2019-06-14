@@ -22,7 +22,7 @@ std::vector<Column> ParserExt::parseColumnList()
 {
     std::vector<Column> columns;
 
-    auto consumeKeys = [&](Token _token)
+    auto consumeKeys = [&](Token &_token)
     {
         switch (_token.type())
         {
@@ -61,80 +61,12 @@ std::vector<Column> ParserExt::parseColumnList()
         }
     };
 
-    {
-        switch (_token.type())
-        {
-            case Token::COUNT:
-            {
-                consume(Token::COUNT);
-                consume(Token::L_PAREN);
-                std::string count_data = "";
-                if (_token.type() == Token::MUL)
-                {
-                    count_data = "*";
-                    consume(Token::MUL);
-                }
-                else
-                {
-                    count_data = _token.toId();
-                    consume(Token::ID);
-                }
-                for (char& ch : count_data)
-                    if (ch <= 'Z' && ch >= 'A')
-                        ch += 'z' - 'A';
-                    else if (ch == '(')
-                        ch = ' ';
-                    else if (ch == ')')
-                        ch = 0;
-                consume(Token::R_PAREN);
-                columns.push_back(Column{"", count_data, Token::COUNT});
-                break;
-            }
-            case Token::ID:
-            {
-                columns.push_back(Column{"", _token.toId(), Token::ID});
-                consume(Token::ID);
-                break;
-            }
-        }
-    }
+    consumeKeys(_token);
 
     while (_token.type() == Token::COMMA)
     {
         consume(Token::COMMA);
-        {
-            switch (_token.type())
-            {
-                case Token::COUNT:
-                {
-                    consume(Token::COUNT);
-                    consume(Token::L_PAREN);
-                    std::string count_data = "";
-                    if (_token.type() == Token::MUL)
-                    {
-                        count_data = "*";
-                        consume(Token::MUL);
-                    }
-                    else
-                    {
-                        count_data = _token.toId();
-                        consume(Token::ID);
-                    }
-                    for (char& ch : count_data)
-                        if (ch <= 'Z' && ch >= 'A')
-                            ch += 'z' - 'A';
-                    consume(Token::R_PAREN);
-                    columns.push_back(Column{"", count_data, Token::COUNT});
-                    break;
-                }
-                case Token::ID:
-                {
-                    columns.push_back(Column{"", _token.toId(), Token::ID});
-                    consume(Token::ID);
-                    break;
-                }
-            }
-        }
+        consumeKeys(_token);
     }
 
     return columns;

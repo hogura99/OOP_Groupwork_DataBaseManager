@@ -9,7 +9,7 @@
 #include "token.h"
 #include "server.h"
 
-#define SERVER_ON
+//#define SERVER_ON
 
 /**
  * Database shell program.
@@ -56,7 +56,7 @@ int main()
             case StatementBase::DROP_DATABASE:
             {
                 auto res = db.dropDatabase(statement->id());
-                std::cout << res << std::endl;
+                //std::cout << res << std::endl;
                 break;
             }
             case StatementBase::DROP_TABLE:
