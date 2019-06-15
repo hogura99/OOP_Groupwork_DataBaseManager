@@ -217,8 +217,10 @@ Statement Parser::parseInsert()
 
     std::map<std::string, Variant> entry;
 
+    // ERROR: modified here !!!
     for (size_t i = 0; i < values.size(); i++)
-        entry[columns[i]] = values[i];
+        if (values[i].type() != Variant::NONE)
+            entry[columns[i]] = values[i];
 
     consume(Token::R_PAREN);
     consume(Token::SEMICOLON);
@@ -228,14 +230,32 @@ Statement Parser::parseInsert()
 std::vector<Variant> Parser::parseValueList()
 {
     std::vector<Variant> values;
-    values.emplace_back(_token.toOperand());
-    consume(Token::OPERAND);
+    // ERROR: modified here !!!
+    if (_token.type() == Token::NULL_SQL)
+    {
+        values.emplace_back(Variant());
+        consume(Token::NULL_SQL);
+    }
+    else
+    {
+        values.emplace_back(_token.toOperand());
+        consume(Token::OPERAND);
+    }
 
     while (_token.type() != Token::R_PAREN)
     {
         consume(Token::COMMA);
-        values.emplace_back(_token.toOperand());
-        consume(Token::OPERAND);
+        // ERROR: modified here !!!
+        if (_token.type() == Token::NULL_SQL)
+        {
+            values.emplace_back(Variant());
+            consume(Token::NULL_SQL);
+        }
+        else
+        {
+            values.emplace_back(_token.toOperand());
+            consume(Token::OPERAND);
+        }
     }
 
     return values;
@@ -290,7 +310,7 @@ Expr Parser::parseWhereClause()
     Stack<Expr> vals;       // a stack of operands
     Stack<Token::Type> ops; // a stack of operators
 
-    for (; !isEnd(); advance())
+    for (; !isEnd() && _token.type() != Token::GROUP && _token.type() != Token::ORDER; advance()) // !!! original code:   !isEnd()
     {
         if (_token.type() == Token::L_PAREN)
         {

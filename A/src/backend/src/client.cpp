@@ -2,6 +2,20 @@
 
 #include <cstring>
 
+void Client::sendMsgToServer(const std::string &msg)
+{
+    createConversation();
+    _sendMsgToServer(msg);
+    stopConversation();
+}
+
+void Client::recvMsgFromServer(std::string &msg)
+{
+    createConversation();
+    _recvMsgFromServer(msg);
+    stopConversation();
+}
+
 #ifdef WIN32
 
 #include <winsock2.h>
@@ -33,7 +47,7 @@ void Client::createConversation()
         throw ClientError("Connecting server error code: " + std::to_string(res));
 }
 
-void Client::sendMsgToServer(const std::string &msg)
+void Client::_sendMsgToServer(const std::string &msg)
 {
     static char sendMsg[MAX_BUF];
 
@@ -46,7 +60,7 @@ void Client::sendMsgToServer(const std::string &msg)
     memset(sendMsg, 0, strlen(sendMsg) * sizeof(char));
 }
 
-void Client::recvMsgFromServer(std::string &msg)
+void Client::_recvMsgFromServer(std::string &msg)
 {
     static char recvMsg[MAX_BUF];
     memset(recvMsg, 0, strlen(recvMsg) * sizeof(char));
@@ -96,7 +110,7 @@ void Client::createConversation()
         throw ClientError("Create conversation error code: " + std::to_string(res));
 }
 
-void Client::sendMsgToServer(const std::string &msg)
+void Client::_sendMsgToServer(const std::string &msg)
 {
     if (msg.length() > MAX_BUF)
         throw ClientError("Client sending too many messages.");
@@ -104,7 +118,7 @@ void Client::sendMsgToServer(const std::string &msg)
     send(_socket, msg.c_str(), msg.length() * sizeof(char), NULL);
 }
 
-void Client::recvMsgFromServer(std::string &msg)
+void Client::_recvMsgFromServer(std::string &msg)
 {
     static char recvMsg[MAX_BUF];
     memset(recvMsg, 0, strlen(recvMsg) * sizeof(char));

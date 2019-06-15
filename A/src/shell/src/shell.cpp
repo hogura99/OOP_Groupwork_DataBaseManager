@@ -27,8 +27,13 @@ int main()
     while (true)
     {
 #ifdef SERVER_ON
-        std::string client = server.connectClient();
-        server.recvMsgFrom(client, cmd);
+        //std::string client = server.connectClient();
+        //server.recvMsgFrom(client, cmd);
+        server.recvMsg(cmd);
+
+        auto streamBufCout = std::cout.rdbuf();
+        std::stringstream strstream;
+        std::cout.rdbuf(strstream.rdbuf());
 #else
         if (!std::getline(std::cin, cmd, ';'))
             break;
@@ -135,7 +140,11 @@ int main()
         }
 
 #ifdef SERVER_ON
-        server.disconnectClient(client);
+        std::string result = strstream.str();
+        std::cerr << "Command:[ " << cmd << " ]\n"
+                  << "Result :[ " << result << " ]" << std::endl;
+        server.sendMsg(result);
+        std::cout.rdbuf(streamBufCout);
 #endif
     }
 

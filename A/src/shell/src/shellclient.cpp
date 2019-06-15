@@ -4,6 +4,7 @@
 #include <cstdio>
 
 #include "client.h"
+#include "clientexcept.h"
 
 int main()
 {
@@ -13,11 +14,16 @@ int main()
     std::string recvMsg;
     while (std::getline(std::cin, cmd, ';'))
     {
-        client.createConversation();
-        client.sendMsgToServer(cmd);
-        client.recvMsgFromServer(recvMsg);
-        std::cout << recvMsg << std::endl;
-        client.stopConversation();
+        try
+        {
+            client.sendMsgToServer(cmd);
+            client.recvMsgFromServer(recvMsg);
+            std::cout << recvMsg << std::endl;
+        }
+        catch (const ClientError &err)
+        {
+            std::cout << err.what() << std::endl;
+        }
     }
     return 0;
 }
