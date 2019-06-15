@@ -29,8 +29,9 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"null", Token::NULL_SQL},
     {"and", Token::AND},
     {"or", Token::OR},
+    {"xor", Token::XOR},
     {"set", Token::SET},
-	  {"outfile", Token::OUTFILE},
+    {"outfile", Token::OUTFILE},
     {"load", Token::LOAD},
     {"infile", Token::INFILE},
     {"data", Token::DATA},
@@ -39,6 +40,8 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"by", Token::BY},
     {"count", Token::COUNT},
     {"infile", Token::INFILE},
+    {"like", Token::LIKE},
+    {"as", Token::AS},
 };
 
 std::map<char, Token::Type> Lexer::singleOp{
@@ -46,6 +49,7 @@ std::map<char, Token::Type> Lexer::singleOp{
     {'-', Token::MINUS},
     {'*', Token::MUL},
     {'/', Token::DIV},
+    {'%', Token::MOD},
     {'(', Token::L_PAREN},
     {')', Token::R_PAREN},
     {',', Token::COMMA},

@@ -215,3 +215,26 @@ Variant Variant::operator/(const Variant &v) const
         throw std::runtime_error("Operator - failed");
     }
 }
+//<<<<<<<<<<<<<<<<<<<<<
+Variant Variant::operator%(const Variant &v) const
+{
+    auto retType = commonType(_type, v._type);
+    auto a = convertTo(retType);
+    auto b = v.convertTo(retType);
+    switch (a.type())
+    {
+        case INT:
+            if(!b.toInt())
+                return ;
+            return a.toInt() % b.toInt();
+        case DOUBLE:
+            throw std::runtime_error("ERROR: Use % on double");
+        case CHAR:
+            throw std::runtime_error("ERROR: Use % on char");
+        case BOOL:
+            throw std::runtime_error("ERROR: Use % on bool");
+        default:
+            throw std::runtime_error("Operator % failed");
+    }
+}
+//>>>>>>>>>>>>>>>>>>>

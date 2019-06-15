@@ -75,8 +75,10 @@ class Token
         MINUS,
         MUL,
         DIV,
+        MOD,
         AND,
         OR,
+        XOR,
         L_PAREN,
         R_PAREN,
         COMMA,
@@ -90,6 +92,8 @@ class Token
         GROUP,
         BY,
         ORDER,
+        LIKE,
+        AS,
     };
     Token(Type type = NONE, const Variant &data = Variant());
     Token(const Token &other) : _type(other._type), _data(other._data) {}
