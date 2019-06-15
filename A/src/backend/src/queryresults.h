@@ -113,7 +113,10 @@ public:
         }
         else
         {
-            std::ofstream file_stream(*_file_name);
+            std::string file_name = *_file_name;
+            if (file_name[0] != '/' && file_name[0] != '\\') // not absolute path
+                file_name = "../../" + *_file_name; // go back to the main directory
+            std::ofstream file_stream(file_name);
 
             for (auto &k : _keyNames)
                 file_stream << k << '\t';

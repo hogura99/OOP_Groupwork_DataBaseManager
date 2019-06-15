@@ -44,6 +44,10 @@ std::map<Token::Type, std::string> Token::name{
     {Token::ORDER, "ORDER"},
     {Token::COUNT, "COUNT"},
     {Token::LOAD, "LOAD"},
+    {Token::MAX, "MAX"},
+    {Token::MIN, "MIN"},
+    {Token::SUM, "SUM"},
+    {Token::AVG, "AVG"},
 };
 
 Token::Token(Type type, const Variant &data)

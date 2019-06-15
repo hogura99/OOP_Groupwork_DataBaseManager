@@ -13,7 +13,7 @@ public:
 
     static const int MAX_BUF = 65536;
 
-    void setServer(char *serverIpAddress, int port = 1234);
+    void setServer(char *serverIpAddress = "127.0.0.1", int port = 1234);
     void buildClient();
 
     void sendMsgToServer(const std::string &msg);
@@ -23,6 +23,9 @@ public:
     void stopConversation();
 
 private:
+    void _sendMsgToServer(const std::string &msg);
+    void _recvMsgFromServer(std::string &msg);
+
     std::string _serverIpAddr;
     int _serverPort;
 

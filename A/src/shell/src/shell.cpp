@@ -22,13 +22,18 @@ int main()
     std::string cmd;
 #ifdef SERVER_ON
     Server server;
-    server.init("183.172.163.124", 1234);
+    server.init("127.0.0.1", 1234);
 #endif
     while (true)
     {
 #ifdef SERVER_ON
-        std::string client = server.connectClient();
-        server.recvMsgFrom(client, cmd);
+        //std::string client = server.connectClient();
+        //server.recvMsgFrom(client, cmd);
+        server.recvMsg(cmd);
+
+        auto streamBufCout = std::cout.rdbuf();
+        std::stringstream strstream;
+        std::cout.rdbuf(strstream.rdbuf());
 #else
         if (!std::getline(std::cin, cmd, ';'))
             break;
@@ -135,7 +140,11 @@ int main()
         }
 
 #ifdef SERVER_ON
-        server.disconnectClient(client);
+        std::string result = strstream.str();
+        std::cerr << "Command:[ " << cmd << " ]\n"
+                  << "Result :[ " << result << " ]" << std::endl;
+        server.sendMsg(result);
+        std::cout.rdbuf(streamBufCout);
 #endif
     }
 

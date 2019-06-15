@@ -1,5 +1,19 @@
 #include "server.h"
 
+void Server::recvMsg(std::string &msg)
+{
+    auto client = connectClient();
+    recvMsgFrom(client, msg);
+    disconnectClient(client);
+}
+
+void Server::sendMsg(const std::string &msg)
+{
+    auto client = connectClient();
+    sendMsgTo(client, msg);
+    disconnectClient(client);
+}
+
 #ifdef WIN32
 
 #include <winsock2.h>
@@ -51,8 +65,6 @@ void Server::recvMsgFrom(const std::string &client, std::string &msg)
     static char recvMsg[MAX_BUF];
 
     int res = recv(clientSock, recvMsg, sizeof recvMsg, NULL);
-    //if (res != 0)
-    //    throw ServerError("receiving message error code " + std::to_string(res));
 
     msg = recvMsg;
 }

@@ -30,7 +30,7 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"and", Token::AND},
     {"or", Token::OR},
     {"set", Token::SET},
-	  {"outfile", Token::OUTFILE},
+    {"outfile", Token::OUTFILE},
     {"load", Token::LOAD},
     {"infile", Token::INFILE},
     {"data", Token::DATA},
@@ -39,6 +39,10 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"by", Token::BY},
     {"count", Token::COUNT},
     {"infile", Token::INFILE},
+    {"min", Token::MIN},
+    {"max", Token::MAX},
+    {"sum", Token::SUM},
+    {"avg", Token::AVG},
 };
 
 std::map<char, Token::Type> Lexer::singleOp{
@@ -126,7 +130,7 @@ Token Lexer::next()
                 return Token(Token::ID, std::string(_buffer));
         }
         // char
-        else if (_peek == '"' || _peek == '\'')
+        else if (_peek == '"' || _peek == '\'') // CHANGE: modified here !!!
         {
             char quote = _peek;
             std::string content = "";
