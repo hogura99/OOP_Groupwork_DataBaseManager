@@ -94,11 +94,21 @@ Variant Expr::eval(const std::map<std::string, Variant> &varMap) const
         case Token::ID:
             return varMap.at(_token.toId());
         case Token::AND:
+            if (_left->eval(varMap).type() == Variant::NONE || _right->eval(varMap).type() == Variant::NONE)
+                return Variant();
             return _left->eval(varMap).toBool() && _right->eval(varMap).toBool();
         case Token::OR:
+            if (_left->eval(varMap).type() == Variant::NONE || _right->eval(varMap).type() == Variant::NONE)
+                return Variant();
             return _left->eval(varMap).toBool() || _right->eval(varMap).toBool();
         case Token::NOT:
+            if (_right->eval(varMap).type() == Variant::NONE)
+                return Variant();
             return !_right->eval(varMap).toBool();
+        case Token::XOR:
+            if (_left->eval(varMap).type() == Variant::NONE || _right->eval(varMap).type() == Variant::NONE)
+                return Variant();
+            return _left->eval(varMap).toBool() xor _right->eval(varMap).toBool();
         case Token::GT:
             return _left->eval(varMap) > _right->eval(varMap);
         case Token::LT:
@@ -119,12 +129,12 @@ Variant Expr::eval(const std::map<std::string, Variant> &varMap) const
             return _left->eval(varMap) * _right->eval(varMap);
         case Token::DIV:
             return _left->eval(varMap) / _right->eval(varMap);
-        //<<<<<<<<<<<<<<<< origin version
         case Token::MOD:
             return _left->eval(varMap) % _right->eval(varMap);
-        case Token::XOR:
-            return _left->eval(varMap).toBool() xor _right->eval(varMap).toBool();
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+            //TODO : Add LIKE here.
+        //case Token::LIKE:
+        //    return sqlLike(_left->eval(varMap).toStdString(), _right->eval(varMap).toStdString());
         default:
             throw std::runtime_error("Expr eval fail");
 

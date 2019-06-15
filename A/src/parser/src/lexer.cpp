@@ -57,7 +57,8 @@ std::map<char, Token::Type> Lexer::singleOp{
     {'(', Token::L_PAREN},
     {')', Token::R_PAREN},
     {',', Token::COMMA},
-    {';', Token::SEMICOLON}};
+    {';', Token::SEMICOLON},
+};
 
 std::map<std::string, Token::Type> Lexer::ops{
     {"!", Token::NOT},
@@ -72,14 +73,17 @@ std::map<std::string, Token::Type> Lexer::ops{
     {"-", Token::MINUS},
     {"*", Token::MUL},
     {"/", Token::DIV},
+    {"%", Token::MOD},
     {"(", Token::L_PAREN},
     {")", Token::R_PAREN},
     {",", Token::COMMA},
-    {";", Token::SEMICOLON}};
+    {";", Token::SEMICOLON},
+    {"like", Token::LIKE},
+};
 
 bool Lexer::isOp(char ch) const
 {
-    return ch == '!' || ch == '<' || ch == '>' || ch == '=' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')' || ch == ',' || ch == ';';
+    return ch == '!' || ch == '<' || ch == '>' || ch == '=' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')' || ch == ',' || ch == ';' || ch == '%';
 }
 
 Token Lexer::next()

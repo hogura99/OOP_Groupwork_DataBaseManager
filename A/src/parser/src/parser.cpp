@@ -17,6 +17,7 @@ std::map<Token::Type, int> Parser::opPrioMap{
     {Token::GEQ, 5},
     {Token::GT, 5},
     {Token::LT, 5},
+    {Token::LIKE, 5},
 
     {Token::NOT, 3},
 
