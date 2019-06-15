@@ -9,7 +9,7 @@
 #include "token.h"
 #include "server.h"
 
-//#define SERVER_ON
+#define SERVER_ON
 
 /**
  * Database shell program.
@@ -22,7 +22,7 @@ int main()
     std::string cmd;
 #ifdef SERVER_ON
     Server server;
-    server.init("183.172.163.124", 1234);
+    server.init("127.0.0.1", 1234);
 #endif
     while (true)
     {

@@ -98,6 +98,7 @@ Statement ParserExt::parseSelect() {
     std::vector<Column> columns = parseSelectList();
     std::string fileName = "";
     std::string tableId = "";
+    std::vector<std::string> tableIds;
     std::vector<Column> orderByColumn, groupByColumn;
     Expr where;
 
@@ -112,6 +113,12 @@ Statement ParserExt::parseSelect() {
     consume(Token::FROM);
     tableId = _token.toId();
     consume(Token::ID);
+    while (_token.type() == Token::COMMA)
+    {
+        consume(Token::COMMA);
+        tableId = _token.toId();
+        consume(Token::ID);
+    }
 
     if (_token.type() == Token::WHERE)
     {
