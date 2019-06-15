@@ -1,60 +1,33 @@
 #pragma once
 
-namespace Client
-{
-
-#include <iostream>
 #include <cstdlib>
 #include <cstdio>
+#include <string>
 
-#ifdef WIN32
+#include "clientexcept.h"
 
-#include "winsock2.h"
+class Client
+{
+public:
+    typedef unsigned int SOCKET;
 
-    const int MAXBUF = 65536;
+    static const int MAX_BUF = 65536;
 
-    sockaddr_in sockAddr;
-    SOCKET clientSock;
+    void setServer(char *serverIpAddress = "127.0.0.1", int port = 1234);
+    void buildClient();
 
-    static void initClient(char *server_ip_address, int port = 1234)
-    {
-        WSADATA wsaData;
-        WSAStartup(MAKEWORD(2, 2), &wsaData);
+    void sendMsgToServer(const std::string &msg);
+    void recvMsgFromServer(std::string &msg);
 
-        memset(&sockAddr, 0, sizeof(sockAddr));
-        sockAddr.sin_family = PF_INET;
-        sockAddr.sin_addr.s_addr = inet_addr(server_ip_address);
-        sockAddr.sin_port = htons(port);
-    }
+    void createConversation();
+    void stopConversation();
 
-    static void createClient()
-    {
-        clientSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    }
+private:
+    void _sendMsgToServer(const std::string &msg);
+    void _recvMsgFromServer(std::string &msg);
 
-    static int createConversation()
-    {
-        createClient();
-        int res = connect(clientSock, (SOCKADDR*)&sockAddr, sizeof (SOCKADDR));
-        return res;
-    }
+    std::string _serverIpAddr;
+    int _serverPort;
 
-    static void sendMsgToServer(char *msg)
-    {
-        send(clientSock, msg, MAXBUF, NULL);
-    }
-
-    static void recvMsgFromServer(char *msg)
-    {
-        send(clientSock, msg, MAXBUF, NULL);
-    }
-
-    static void stopConversation()
-    {
-        closesocket(clientSock);
-    }
-
-#elif linux
-
-#endif
-}
+    SOCKET _socket;
+};

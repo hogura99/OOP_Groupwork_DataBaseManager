@@ -20,22 +20,20 @@ int main()
 {
     DatabaseExt db;
     std::string cmd;
-    /*
-    static char recvBuf[Server::MAXBUF];
-    int InitServerStatus = Server::initServer("127.0.0.1");
-    if (InitServerStatus != 0)
-    {
-        std::cerr << "init server failed" << std::endl;
-        return InitServerStatus;
-    }
-    */
+#ifdef SERVER_ON
+    Server server;
+    server.init("127.0.0.1", 1234);
+#endif
     while (true)
     {
 #ifdef SERVER_ON
-        memset(recvBuf, 0, sizeof recvBuf);
-        Server::SOCKET client = Server::connectClient();
-        int ConnectStatus = Server::recvMsgFromClient(client, recvBuf, Server::MAXBUF);
-        cmd = recvBuf;
+        //std::string client = server.connectClient();
+        //server.recvMsgFrom(client, cmd);
+        server.recvMsg(cmd);
+
+        auto streamBufCout = std::cout.rdbuf();
+        std::stringstream strstream;
+        std::cout.rdbuf(strstream.rdbuf());
 #else
         if (!std::getline(std::cin, cmd, ';'))
             break;
@@ -61,8 +59,11 @@ int main()
                 db.showTables().result()->print();
                 break;
             case StatementBase::DROP_DATABASE:
-                db.dropDatabase(statement->id());
+            {
+                auto res = db.dropDatabase(statement->id());
+                //std::cout << res << std::endl;
                 break;
+            }
             case StatementBase::DROP_TABLE:
                 db.dropTable(statement->id());
                 break;
@@ -104,7 +105,6 @@ int main()
                     db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
                 else
                     db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
-                // TODO: add count, group by, order by lists.
                 break;
             }
             case StatementBase::LOAD:
@@ -140,11 +140,16 @@ int main()
         }
 
 #ifdef SERVER_ON
-        Server::disconnectClient(client);
+        std::string result = strstream.str();
+        std::cerr << "Command:[ " << cmd << " ]\n"
+                  << "Result :[ " << result << " ]" << std::endl;
+        server.sendMsg(result);
+        std::cout.rdbuf(streamBufCout);
 #endif
     }
 
-    //Server::closeServer();
-    system("pause");
+#ifdef SERVER_ON
+    server.close();
+#endif
     return 0;
 }

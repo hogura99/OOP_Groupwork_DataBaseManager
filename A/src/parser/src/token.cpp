@@ -48,6 +48,10 @@ std::map<Token::Type, std::string> Token::name{
     {Token::LOAD, "LOAD"},
     {Token::LIKE, "LIKE"},
     {Token::AS, "AS"},
+    {Token::MAX, "MAX"},
+    {Token::MIN, "MIN"},
+    {Token::SUM, "SUM"},
+    {Token::AVG, "AVG"},
 };
 
 Token::Token(Type type, const Variant &data)

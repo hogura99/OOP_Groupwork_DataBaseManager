@@ -227,12 +227,14 @@ public:
 
     bool isSelectAll() const
     {
-        if (_columns.front().type == Token::COUNT && _columns.front().name == "*" && _columns.size() == 1)//only (* && Count)
-            return true;
+        /*if (_columns.front().type == Token::COUNT && _columns.front().name == "*" && _columns.size() == 1)//only (* && Count)
+            return true;*/
         for (auto column: _columns)
             if (column.type == Token::ID && column.name == "*")//contain (ID && *)
                 return true;
-        return false;
+            else if (column.type == Token::ID)
+                return false;
+        return true;
     }
 protected:
     std::vector<Column> _columns; // can contain '*'

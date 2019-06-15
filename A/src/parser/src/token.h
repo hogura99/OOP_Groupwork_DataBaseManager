@@ -94,6 +94,10 @@ class Token
         ORDER,
         LIKE,
         AS,
+        MIN,
+        MAX,
+        SUM,
+        AVG,
     };
     Token(Type type = NONE, const Variant &data = Variant());
     Token(const Token &other) : _type(other._type), _data(other._data) {}

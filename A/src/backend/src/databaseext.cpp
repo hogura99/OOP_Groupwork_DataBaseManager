@@ -15,13 +15,34 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
     std::vector<Entry> _resultEntries;
     std::vector<Group> _groups;
 
-    makeGroupBy(groupByColumn, _keyNames, _entries, _groups);
-    gatherEntriesInGroup(columns, _keyNames, _groups, _resultEntries);
+    bool isGatherSelect = false;
+    for (auto column: columns)
+        if (column.type != Token::ID && column.type != Token::MUL)
+        {
+            isGatherSelect = true;
+            break;
+        }
+
+    if (!isGatherSelect && groupByColumn.empty())
+    {
+        std::vector<Column> _groupByColumn;
+        for (auto keyName: _keyNames)
+            _groupByColumn.push_back(Column("", keyName, Token::ID));
+        makeGroupBy(_groupByColumn, _keyNames, _entries, _groups);
+    }
+    else
+    {
+        makeGroupBy(groupByColumn, _keyNames, _entries, _groups);
+    }
+    gatherEntriesInGroup(columns, _keyNames, _groups, _resultEntries, isGatherSelect);
     orderEntriesBy(_resultEntries, columns, orderByColumns);
 
     std::vector<std::string> _columns;
-    for (auto column: columns)
-        _columns.push_back(trans2Str(column));
+    if (isGatherSelect)
+        for (auto column: columns)
+            _columns.push_back(trans2Str(column));
+    else
+        _columns = _keyNames;
 
     auto queryResult = new QueryResultSelectInto(_columns, _resultEntries, fileName, groupByColumn, orderByColumns);
 
@@ -35,7 +56,7 @@ QueryResult DatabaseExt::selectFrom(const std::string &tableName,
     std::vector<std::string> _keyNames;
 
     for (auto column: columns)
-        if (column.type == Token::ID)
+        if (column.type != Token::MUL)
             _keyNames.push_back(column.name);
 
     auto selectResultBase = Database::selectFrom(tableName, _keyNames, expr);
@@ -45,8 +66,26 @@ QueryResult DatabaseExt::selectFrom(const std::string &tableName,
     std::vector<Entry> _resultEntries;
     std::vector<Group> _groups;
 
-    makeGroupBy(groupByColumn, _keyNames, _entries, _groups);
-    gatherEntriesInGroup(columns, _keyNames, _groups, _resultEntries);
+    bool isGatherSelect = false;
+    for (auto column: columns)
+        if (column.type != Token::ID && column.type != Token::MUL)
+        {
+            isGatherSelect = true;
+            break;
+        }
+
+    if (!isGatherSelect && groupByColumn.empty())
+    {
+        std::vector<Column> _groupByColumn;
+        for (auto keyName: _keyNames)
+            _groupByColumn.push_back(Column("", keyName, Token::ID));
+        makeGroupBy(_groupByColumn, _keyNames, _entries, _groups);
+    }
+    else
+    {
+        makeGroupBy(groupByColumn, _keyNames, _entries, _groups);
+    }
+    gatherEntriesInGroup(columns, _keyNames, _groups, _resultEntries, isGatherSelect);
     orderEntriesBy(_resultEntries, columns, orderByColumn);
 
     std::vector<std::string> _columns;
@@ -59,12 +98,12 @@ QueryResult DatabaseExt::selectFrom(const std::string &tableName,
 }
 
 void DatabaseExt::gatherEntriesInGroup(const std::vector<Column> &columns, const std::vector<std::string> &keyNames,
-                                       const std::vector<Group> &groups, std::vector<Entry> &resultEntries)
+                                       const std::vector<Group> &groups, std::vector<Entry> &resultEntries, bool isGatherSelect)
 {
     for (auto _group: groups)
     {
         Entry _resultEntry;
-        if (!columns.empty())
+        if (isGatherSelect)
         {
             gatherEntries(columns, keyNames, _group, _resultEntry);
             resultEntries.push_back(_resultEntry);
@@ -83,33 +122,27 @@ void DatabaseExt::gatherEntries(const std::vector<Column> &columns,
                                 Entry &resultEntries)
 {
     int iter_entry = 0;
-    for (auto column: columns)
+    for (auto &column: columns)
     {
+        int pos = 0;
+        for (auto &v: keyNames)
+        {
+            if (v == column.name)
+                break;
+            pos++;
+        }
+        assert(pos < keyNames.size() || column.name == "*");
         switch (column.type)
         {
             case Token::ID:
                 if (!entries.empty())
                     resultEntries.push_back(entries[0][iter_entry ++]);
                 break;
-            case Token::COUNT:
+            case Token::COUNT: case Token::MAX: case Token::MIN: case Token::AVG: case Token::SUM:
             {
-                int countRes = 0;
-                int pos = -1;
-                for (int i = 0; i < keyNames.size(); i++)
-                    if (keyNames[i] == column.name)
-                    {
-                        pos = i;
-                        break;
-                    }
-                if (pos != -1)
-                {
-                    for (auto value: entries[pos])
-                        if (value.type() != Variant::NONE)
-                            countRes++;
-                }
-                else if (column.name == "*")
-                    countRes = entries.size();
-                resultEntries.push_back(countRes);
+                Variant result;
+                gatherFunction(column.type, entries, pos, result);
+                resultEntries.push_back(result);
                 break;
             }
             default:
@@ -120,66 +153,73 @@ void DatabaseExt::gatherEntries(const std::vector<Column> &columns,
     }
 }
 
-/*void DatabaseExt::getCountNames(const std::vector<std::string> &keyNames,
-                   std::vector<std::string> &_keyNames,
-                   std::vector<std::string> &_cntNames,
-                   std::vector<size_t> &_cntPos)
+void DatabaseExt::gatherFunction(const Token::Type &gatherType,
+                                 const std::vector<Entry> &entries,
+                                 int columnPos, Variant &gatherResult)
 {
-    const int COUNT_POS = 7;
-
-    for (int i = 0; i < keyNames.size(); i ++)
-        if (keyNames[i][0] == '\\')
-        {                                               // current key name is a counting one
-            _cntPos.push_back(_keyNames.size());
-            _cntNames.push_back(keyNames[i].substr(COUNT_POS)); // get the counting names
-        }
-        else
+    int totalColumns = entries.empty() ? 0 : entries[0].size();
+    int countAVG = 0;
+    switch (gatherType)
+    {
+        case Token::COUNT: case Token::SUM: case Token::MAX:
+            gatherResult = 0;
+            break;
+        case Token::AVG:
+            gatherResult = .0;
+            break;
+        case Token::MIN:
+            gatherResult = INT32_MAX;
+            break;
+        default:
+            break;
+    }
+    for (auto entry: entries)
+    {
+        if (gatherType != Token::COUNT && columnPos >= totalColumns)
+            throw DatabaseError(Token::name[gatherType] + " error.");
+        Variant var = entry[columnPos];
+        switch (gatherType)
         {
-            _keyNames.push_back(keyNames[i]);
-        }
-}
-
-void DatabaseExt::countEntries(const std::vector<std::string> &keyNames,
-                  const std::vector<std::string> &cntNames,
-                  const std::vector<size_t> &cntPos,
-                  const std::vector<Entry> &entries,
-                  std::vector<Entry> &resultEntries)
-
-{
-    int i = 0;
-    int pos = i < cntPos.size() ? cntPos[i] : -1;
-    for (int j = 0; j < keyNames.size(); j ++)
-        if (j == pos)
-        {
-            int cntResult = 0;
-            if (cntNames[i] == "*")
-                cntResult = entries.size();
-            else
+            case Token::COUNT:
             {
-                int countKey = -1;
-                for (int k = 0; k < keyNames.size(); k ++)
-                    if (keyNames[k] == cntNames[i])
-                    {
-                        countKey = k;
-                        break;
-                    }
-
-                if (countKey == -1)
-                    throw DatabaseError("Counting key " + cntNames[i] + " not found.");
-
-                for (int k = 0; k < entries.size(); k ++)
-                    if (entries[k][countKey].type() != Variant::NONE)
-                        cntResult ++;
+                if (columnPos < totalColumns)
+                    gatherResult = gatherResult + int(var.type() != Variant::NONE);
+                else
+                    gatherResult = gatherResult + 1;
+                break;
             }
-            for (auto &entry: resultEntries)
-                entry.push_back(cntResult);
+            case Token::MAX:
+            {
+                if (var.type() != Variant::NONE)
+                    gatherResult = std::max(gatherResult, var);
+                break;
+            }
+            case Token::MIN:
+            {
+                if (var.type() != Variant::NONE)
+                    gatherResult = std::min(gatherResult, var);
+                break;
+            }
+            case Token::SUM:
+            {
+                if (var.type() != Variant::NONE)
+                    gatherResult = gatherResult + var;
+                break;
+            }
+            case Token::AVG:
+            {
+                if (var.type() != Variant::NONE)
+                {
+                    gatherResult = gatherResult + var;
+                    countAVG ++;
+                }
+                break;
+            }
         }
-        else
-        {
-            for (int k = 0; k < entries.size(); k ++)
-                resultEntries[k].push_back(entries[k][j]);
-        }
-}*/
+    }
+    if (gatherType == Token::AVG)
+        gatherResult = gatherResult / countAVG;
+}
 
 void DatabaseExt::makeGroupBy(const std::vector<Column> &groupByKey,
                               const std::vector<std::string> &keyNames,
@@ -196,7 +236,7 @@ void DatabaseExt::makeGroupBy(const std::vector<Column> &groupByKey,
     }
 
     // TODO: check the count(*) statements.
-    auto _compare = [=] (const Entry &entry1, const Entry &entry2)
+    auto _equal = [=] (const Entry &entry1, const Entry &entry2)
     {
         for (int i : rankOfKey)
             if (i != -1 && entry1[i] != entry2[i])
@@ -208,7 +248,7 @@ void DatabaseExt::makeGroupBy(const std::vector<Column> &groupByKey,
     {
         bool flag = false;
         for (auto &group: groups)
-            if (_compare(entry, group.front()))
+            if (_equal(entry, group.front()))
             {
                 group.push_back(entry);
                 flag = true;
@@ -270,3 +310,13 @@ void DatabaseExt::load(const std::string &tableName, const std::vector< std::map
         _tables[tableName].insertInto(entries[i]);
     }
 }
+
+/*
+bool DatabaseExt::dropDatabase(const std::string &dbName)
+{
+    useDatabase(dbName);
+    for (auto tablePair: _tables)
+        if (isTable(tablePair.first))
+            dropTable(tablePair.first);
+    return Database::dropDatabase(dbName);
+}*/
