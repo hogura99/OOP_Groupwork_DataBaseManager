@@ -6,6 +6,7 @@
 std::map<Token::Type, int> Parser::opPrioMap{
     {Token::MUL, 10},
     {Token::DIV, 10},
+    {Token::MOD, 10},
 
     {Token::PLUS, 9},
     {Token::MINUS, 9},
@@ -16,12 +17,14 @@ std::map<Token::Type, int> Parser::opPrioMap{
     {Token::GEQ, 5},
     {Token::GT, 5},
     {Token::LT, 5},
+    {Token::LIKE, 5},
 
     {Token::NOT, 3},
 
     {Token::AND, 2},
 
     {Token::OR, 1},
+    {Token::XOR, 1},
 
     {Token::SEMICOLON, 0},
     {Token::R_PAREN, 0}};

@@ -151,6 +151,8 @@ Variant Variant::operator+(const Variant &v) const
         return a.toChar() + b.toChar();
     case BOOL:
         return a.toBool() + b.toBool();
+    case NONE:
+        return Variant();
     default:
         throw std::runtime_error("Operator + failed");
     }
@@ -171,6 +173,8 @@ Variant Variant::operator-(const Variant &v) const
         return a.toChar() - b.toChar();
     case BOOL:
         return a.toBool() - b.toBool();
+    case NONE:
+        return Variant();
     default:
         throw std::runtime_error("Operator - failed");
     }
@@ -191,6 +195,8 @@ Variant Variant::operator*(const Variant &v) const
         return a.toChar() * b.toChar();
     case BOOL:
         return a.toBool() * b.toBool();
+    case NONE:
+        return Variant();
     default:
         throw std::runtime_error("Operator - failed");
     }
@@ -204,14 +210,43 @@ Variant Variant::operator/(const Variant &v) const
     switch (a.type())
     {
     case INT:
+        if(b.toInt() == 0)
+            return Variant();
         return a.toInt() / b.toInt();
     case DOUBLE:
+        if(b.toDouble() == 0)
+            return Variant();
         return a.toDouble() / b.toDouble();
     case CHAR:
         return a.toChar() / b.toChar();
     case BOOL:
         return a.toBool() / b.toBool();
+    case NONE:
+        return Variant();
     default:
         throw std::runtime_error("Operator - failed");
+    }
+}
+Variant Variant::operator%(const Variant &v) const
+{
+    auto retType = commonType(_type, v._type);
+    auto a = convertTo(retType);
+    auto b = v.convertTo(retType);
+    switch (a.type())
+    {
+        case INT:
+            if(b.toInt() == 0)
+                return Variant();
+            return a.toInt() % b.toInt();
+        case DOUBLE:
+            throw std::runtime_error("ERROR: Use % on double");
+        case CHAR:
+            throw std::runtime_error("ERROR: Use % on char");
+        case BOOL:
+            throw std::runtime_error("ERROR: Use % on bool");
+        case NONE:
+            return Variant();
+        default:
+            throw std::runtime_error("Operator % failed");
     }
 }
