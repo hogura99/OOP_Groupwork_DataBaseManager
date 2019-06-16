@@ -46,6 +46,7 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"max", Token::MAX},
     {"sum", Token::SUM},
     {"avg", Token::AVG},
+    {"null", Token::NULL_SQL},
 };
 
 std::map<char, Token::Type> Lexer::singleOp{
