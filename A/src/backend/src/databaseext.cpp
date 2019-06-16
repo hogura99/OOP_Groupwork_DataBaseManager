@@ -49,6 +49,58 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
     return QueryResult(queryResult);
 }
 
+QueryResult DatabaseExt::selectFromMultTables(const std::vector<std::string> &tableNames,
+                                            const std::vector<Column> &columns, const Expr &expr, const std::string* fileName,
+                                            const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn)
+{
+    std::vector<Field> fields;
+    for (auto tableName : tableNames)
+    {
+        Table table = _tables[tableName];
+        for (auto field : table.fields())
+        {
+            fields.emplace_back(Field(tableName + "." + field.key(), field.type(), field.isNull(), field.isPrimary()));
+        }
+    }
+    std::string primaryKey = _tables[tableNames[0]].fields()[0].key();
+    const std::string name = "WoBuXinWoQuZheGeMingZiHaiNengChongMing";
+    createTable(name,fields, primaryKey);
+    std::vector<Entry> entries;
+    InsertEntry(_tables[name], tableNames, 0, entries);
+
+    auto queryResult = selectFrom(name, columns, expr, fileName, groupByColumn, orderByColumn);
+
+    dropTable(name);
+    return queryResult;
+}
+
+void DatabaseExt::InsertEntry(Table& currentTable, const std::vector<std::string> &tableNames, int tableNum, std::vector<Entry> &entries)
+{
+    if (tableNum == tableNames.size())
+    {
+        std::vector<Variant> entryInserted;
+        for (auto entriesEach : entries)
+            for (auto entry : entriesEach)
+                entryInserted.emplace_back(entry);
+        
+        currentTable.insertInto(Entry(entryInserted));
+        return;
+    }
+    auto selectResultBase = Database::selectAllFrom(tableNames[tableNum], Expr());
+    auto selectResult = dynamic_cast<QueryResultSelect*>(selectResultBase.result());
+
+    assert(selectResult != nullptr);
+
+    std::vector<std::string> _keyNames = selectResult->keyNames();
+    std::vector<Entry> _entries = selectResult->entries();
+    for (auto entry : _entries)
+    {
+        entries.emplace_back(entry);
+        InsertEntry(currentTable, tableNames, tableNum + 1, entries);
+        entries.pop_back();
+    }
+}
+
 QueryResult DatabaseExt::selectFrom(const std::string &tableName,
                                     const std::vector<Column> &columns, const Expr &expr, const std::string* fileName,
                                     const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn)

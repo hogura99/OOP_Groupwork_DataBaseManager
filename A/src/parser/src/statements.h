@@ -199,7 +199,15 @@ public:
             {
                 _select_all = isSelectAll();
             }
-
+    StatementSelectInto(const std::vector<std::string>& table_names, const std::string& file_name,
+            const std::vector<Column>& group_by_column,
+            const std::vector<Column>& order_by_column,
+            const std::vector<Column>& columns,
+            const Expr &where)
+            : StatementBase(nullptr, SELECT), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column), _order_by_column(order_by_column)
+            {
+              _mult_tables = true;
+            }
     const std::vector<Column> &getColumns() const { return _columns; }
     const Expr &getWhere() const { return _where; }
     const std::string* getFilename() const
@@ -225,6 +233,13 @@ public:
     const std::vector<Column>& getGroupByColumn() const { return _group_by_column; }
     const std::vector<Column>& getOrderByColumn() const { return _order_by_column; }
 
+    bool isMultTables() const
+    {
+      return _mult_tables;
+    }
+
+    const std::vector<std::string>& getTableNames() const { return _table_names; }
+
     bool isSelectAll() const
     {
         /*if (_columns.front().type == Token::COUNT && _columns.front().name == "*" && _columns.size() == 1)//only (* && Count)
@@ -240,8 +255,10 @@ protected:
     std::vector<Column> _columns; // can contain '*'
     std::string _file_name;
     std::vector<Column> _group_by_column, _order_by_column;
+    std::vector<std::string> _table_names;
     Expr _where;
     bool _select_all;
+    bool _mult_tables = false;
 };
 /**
 * Update statement. Consists of id, keys, values and a where expression.

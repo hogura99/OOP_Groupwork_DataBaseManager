@@ -48,6 +48,7 @@ std::map<Token::Type, std::string> Token::name{
     {Token::MIN, "MIN"},
     {Token::SUM, "SUM"},
     {Token::AVG, "AVG"},
+    {Token::DOT, "DOT"}
 };
 
 Token::Token(Type type, const Variant &data)

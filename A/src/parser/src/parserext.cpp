@@ -110,11 +110,13 @@ Statement ParserExt::parseSelect() {
 
     consume(Token::FROM);
     tableId = _token.toId();
+    tableIds.emplace_back(tableId);
     consume(Token::ID);
     while (_token.type() == Token::COMMA)
     {
         consume(Token::COMMA);
         tableId = _token.toId();
+        tableIds.emplace_back(tableId);
         consume(Token::ID);
     }
 
@@ -140,7 +142,10 @@ Statement ParserExt::parseSelect() {
 
     consume(Token::SEMICOLON);
 
-    return Statement(new StatementSelectInto(tableId, fileName, groupByColumn, orderByColumn, columns, where));
+    if (tableIds.size() == 1)
+        return Statement(new StatementSelectInto(tableIds.front(), fileName, groupByColumn, orderByColumn, columns, where));
+    else
+        return Statement(new StatementSelectInto(tableIds.front(), fileName, groupByColumn, orderByColumn, columns, where));
 }
 
 Statement ParserExt::parseLoad()

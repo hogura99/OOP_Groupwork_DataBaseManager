@@ -53,7 +53,8 @@ std::map<char, Token::Type> Lexer::singleOp{
     {'(', Token::L_PAREN},
     {')', Token::R_PAREN},
     {',', Token::COMMA},
-    {';', Token::SEMICOLON}};
+    {';', Token::SEMICOLON},
+    {'.', Token::DOT}};
 
 std::map<std::string, Token::Type> Lexer::ops{
     {"!", Token::NOT},
@@ -71,7 +72,8 @@ std::map<std::string, Token::Type> Lexer::ops{
     {"(", Token::L_PAREN},
     {")", Token::R_PAREN},
     {",", Token::COMMA},
-    {";", Token::SEMICOLON}};
+    {";", Token::SEMICOLON},
+    {".", Token::DOT}};
 
 bool Lexer::isOp(char ch) const
 {
@@ -113,7 +115,7 @@ Token Lexer::next()
             int cnt = 0;
             for (; cnt < BUF_SIZE; cnt++)
             {
-                if (!(isalnum(_peek) || _peek == '_'))
+                if (!(isalnum(_peek) || _peek == '_' || _peek == '.'))
                     break;
                 _buffer[cnt] = advance();
             }
@@ -147,7 +149,7 @@ Token Lexer::next()
                 c = advance();
                 if (c == quote)
                 {
-                    return Token(Token::ID, Variant(content));
+                    return Token(Token::OPERAND, Variant(content));
                 }
                 content = content + c;
 
