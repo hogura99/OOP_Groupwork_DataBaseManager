@@ -28,7 +28,7 @@ public:
                               const Expr &expr, const std::string* fileName,
                               const std::vector<Column>& groupByColumns,
                               const std::vector<Column> &orderByColumns);
-
+                              
     void InsertEntry(Table& currentTable, const std::vector<std::string>& tableNames, int tableNum, std::vector<Entry>& entries);
 
     void gatherEntries(const std::vector<Column> &columns,

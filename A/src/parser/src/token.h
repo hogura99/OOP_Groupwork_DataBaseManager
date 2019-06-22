@@ -98,6 +98,7 @@ class Token
         MAX,
         SUM,
         AVG,
+        TEXT,
         DOT
     };
     Token(Type type = NONE, const Variant &data = Variant());

@@ -51,7 +51,9 @@ class Variant
 
     // operators
     bool operator<(const Variant &v) const { return compare(v) < 0; }
-    bool operator==(const Variant &v) const { return compare(v) == 0; }
+    bool operator==(const Variant &v) const {
+        if (this->type() == NONE && v.type() == NONE) return true;
+        return compare(v) == 0; }
     bool operator>(const Variant &v) const { return compare(v) > 0; }
     bool operator!=(const Variant &v) const { return compare(v) != 0; }
     bool operator>=(const Variant &v) const { return compare(v) >= 0; }
@@ -119,6 +121,8 @@ Variant Variant::convertTo(Variant::Type type, T data) const
         return Variant((char)data);
     case Variant::BOOL:
         return Variant((bool)data);
+    case Variant::STRING:
+        return Variant(data);
     default:
         return Variant();
     }

@@ -8,10 +8,17 @@
 
 #include "parserext.h"
 
-int main()
+int main(int argc, char **argv)
 {
+    std::string SERVER_IP = "127.0.0.1";
+    int SERVER_PORT = 1234;
+    if (argc == 3)
+    {
+        SERVER_IP = argv[1];
+        SERVER_PORT = std::atoi(argv[2]);
+    }
     Client client;
-    client.setServer("127.0.0.1", 1234);
+    client.setServer(SERVER_IP.c_str(), SERVER_PORT);
     std::string cmd;
     std::string sendMsg;
     std::string recvMsg;
