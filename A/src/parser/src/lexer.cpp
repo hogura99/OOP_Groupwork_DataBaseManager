@@ -59,6 +59,7 @@ std::map<char, Token::Type> Lexer::singleOp{
     {')', Token::R_PAREN},
     {',', Token::COMMA},
     {';', Token::SEMICOLON},
+    {'.', Token::DOT}
 };
 
 std::map<std::string, Token::Type> Lexer::ops{
@@ -79,6 +80,7 @@ std::map<std::string, Token::Type> Lexer::ops{
     {")", Token::R_PAREN},
     {",", Token::COMMA},
     {";", Token::SEMICOLON},
+    {".", Token::DOT},
     {"like", Token::LIKE},
 };
 
@@ -122,7 +124,7 @@ Token Lexer::next()
             int cnt = 0;
             for (; cnt < BUF_SIZE; cnt++)
             {
-                if (!(isalnum(_peek) || _peek == '_'))
+                if (!(isalnum(_peek) || _peek == '_' || _peek == '.'))
                     break;
                 _buffer[cnt] = advance();
             }

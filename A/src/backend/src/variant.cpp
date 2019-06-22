@@ -121,8 +121,8 @@ Variant Variant::convertTo(Variant::Type type) const
         return convertTo(type, toChar());
     case BOOL:
         return convertTo(type, toBool());
-        case Variant::STRING:
-            return Variant(toStdString());
+    case STRING:
+        return Variant(toStdString());
     default:
         return Variant();
     }
