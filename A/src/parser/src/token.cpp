@@ -54,6 +54,7 @@ std::map<Token::Type, std::string> Token::name{
     {Token::AVG, "AVG"},
     {Token::DOT, "DOT"},
     {Token::NULL_SQL, "NULL"},
+    {Token::TEXT, "TEXT"},
 };
 
 Token::Token(Type type, const Variant &data)
