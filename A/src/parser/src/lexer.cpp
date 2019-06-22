@@ -156,7 +156,7 @@ Token Lexer::next()
                 c = advance();
                 if (c == quote)
                 {
-                    return Token(Token::ID, Variant(content));
+                    return Token(Token::OPERAND, Variant(content));
                 }
                 content = content + c;
 

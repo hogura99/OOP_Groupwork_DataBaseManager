@@ -16,7 +16,24 @@ int main()
     std::string recvMsg;
     while (std::getline(std::cin, cmd, ';'))
     {
-        ParserExt parser(cmd);
+        try
+        {
+            cmd += ';';
+            ParserExt parser(cmd);
+            auto parserResult = parser.parseStatement();
+            auto statement = parserResult.content();
+            switch (statement->type())
+            {
+                case StatementBase::SELECT:
+                    std::cout << *(dynamic_cast<StatementSelectInto *> (statement)) << std::endl;
+                    break;
+            }
+        }
+        catch (const ParserError &e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+        continue;
         try
         {
             client.sendMsgToServer(cmd);

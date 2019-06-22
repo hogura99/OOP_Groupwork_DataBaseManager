@@ -209,19 +209,48 @@ public:
         else
             return &_file_name;
     }
+
     virtual void print() const override
     {
         StatementBase::print();
         /*std::cout << "Columns:" << _columns << std::endl
                   << "where clause:" << _where << std::endl;*/
     }
-    friend std::ostream &operator<<(std::ostream &out, const StatementSelectInto &s)
+    friend std::ostream &operator<<(std::ostream &out, const StatementSelectInto &s) // to print select command
     {
+        out << "select";
+
+        for (auto column: s._columns)
+            out << " " << toStdString(column);
+        out << std::endl;
+
+        out << "from " << s.id() << std::endl;
+
+        // TODO: print where clause
+
+        if (!s._where.isNull())
+            out << "where " << s._where;
+        out << std::endl;
+
+        if (!s._group_by_column.empty())
+        {
+            out << "group by";
+            for (auto column: s._group_by_column)
+                out << " " << toStdString(column);
+            out << std::endl;
+        }
+
+        if (!s._order_by_column.empty())
+        {
+            out << "order by";
+            for (auto column: s._order_by_column)
+                out << " " << toStdString(column);
+            out << std::endl;
+        }
+
         return out;
-        /*return out << (StatementBase)s << std::endl
-                   << "Columns:" << s._columns << std::endl
-                   << "where clause:" << s._where << std::endl;*/
     }
+
     const std::vector<Column>& getGroupByColumn() const { return _group_by_column; }
     const std::vector<Column>& getOrderByColumn() const { return _order_by_column; }
 

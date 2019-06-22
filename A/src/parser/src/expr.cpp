@@ -1,4 +1,5 @@
 #include "expr.h"
+#include "../../backend/src/regexpr.h"
 
 Expr::Expr(const Expr &other) : _token(other._token)
 {
@@ -131,10 +132,8 @@ Variant Expr::eval(const std::map<std::string, Variant> &varMap) const
             return _left->eval(varMap) / _right->eval(varMap);
         case Token::MOD:
             return _left->eval(varMap) % _right->eval(varMap);
-
-            //TODO : Add LIKE here.
-        //case Token::LIKE:
-        //    return sqlLike(_left->eval(varMap).toStdString(), _right->eval(varMap).toStdString());
+        case Token::LIKE:
+            return sqlLike(_left->eval(varMap).toStdString(), _right->eval(varMap).toStdString());
         default:
             throw std::runtime_error("Expr eval fail");
 

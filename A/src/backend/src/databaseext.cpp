@@ -40,7 +40,7 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
     std::vector<std::string> _columns;
     if (isGatherSelect)
         for (auto column: columns)
-            _columns.push_back(trans2Str(column));
+            _columns.push_back(toStdString(column));
     else
         _columns = _keyNames;
 
@@ -90,7 +90,7 @@ QueryResult DatabaseExt::selectFrom(const std::string &tableName,
 
     std::vector<std::string> _columns;
     for (auto column: columns)
-        _columns.push_back(trans2Str(column));
+        _columns.push_back(toStdString(column));
 
     auto queryResult = new QueryResultSelectInto(_columns, _resultEntries, fileName, groupByColumn, orderByColumn);
 

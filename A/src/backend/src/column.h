@@ -26,17 +26,18 @@ public:
         return table == x.table ? name < x.name : table < x.table;
     }
 
-    friend std::string trans2Str(Column x)
+    friend std::string toStdString(Column x)
     {
         std::string s;
-        if (Token::name.count(x.type) && x.type != Token::ID)
+
+        if (Token::name.count(x.type) && x.type != Token::ID && x.type != Token::MUL)
             s += Token::name[x.type] + "(";
 
         if (x.table != "")
             s += x.table + ".";
         s += x.name;
 
-        if (Token::name.count(x.type) && x.type != Token::ID)
+        if (Token::name.count(x.type) && x.type != Token::ID && x.type != Token::MUL)
             s += ")";
         return s;
     }
