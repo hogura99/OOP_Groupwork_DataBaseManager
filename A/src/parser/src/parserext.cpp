@@ -100,7 +100,7 @@ Statement ParserExt::parseSelect() {
     {
         consume(Token::INTO);
         consume(Token::OUTFILE);
-        fileName = _token.toId();
+        fileName = _token.toOperand().toStdString();
         if (_token.type() == Token::OPERAND)
             consume(Token::OPERAND);
         else
@@ -143,7 +143,7 @@ Statement ParserExt::parseLoad()
     consume(Token::INFILE);
     std::vector<std::vector<Variant> > values;
     parseValueListFromFile(values);
-    consume(Token::ID);
+    consume(Token::OPERAND);
     consume(Token::INTO);
     consume(Token::TABLE);
     std::string tableName = _token.toId();
@@ -162,28 +162,42 @@ Statement ParserExt::parseLoad()
         std::map<std::string, Variant> entry;
         for (size_t j = 0; j < columns.size(); j++)
             entry[columns[j].name] = values[i][j];
+        entries.push_back(entry);
     }
     return Statement(new StatementLoad(tableName, entries));
 }
 
-void ParserExt::parseValueListFromFile(std::vector<std::vector<Variant> > values)
+void ParserExt::parseValueListFromFile(std::vector<std::vector<Variant> > &values)
 {
     std::ifstream infile;
-    std::string fileName = _token.toId();
+    std::string fileName = _token.toOperand().toStdString();
     if (!isFile(fileName)) // not absolute directory
-        fileName = getCwd() + "/../" + fileName;
+        fileName = __ProgramPath + "\\" + fileName;
     infile.clear();
     infile.open(fileName);
     if (!infile.is_open())
-        throw ParserError("File " + _token.toId() + " not found.");   //这里的报错信息先随便写了一个
+        throw ParserError("File " + fileName + " not found.");   //这里的报错信息先随便写了一个
     while(!infile.eof())
     {
+        // TODO: bugs here !!!
         std::string data;
         getline(infile, data);
         ParserExt parserInFile(data);
         std::vector<Variant> value = parserInFile.parseValueListInFile();
-        values.emplace_back(value);
+        if (!value.empty())
+            values.emplace_back(value);
+        /*std::vector<Variant> value;
+        std::stringstream in(data);
+        while (!in.eof())
+        {
+            std::string val;
+            in >> val;
+            value.push_back(val);
+        }
+        if (!value.empty())
+            values.push_back(value);*/
     }
+    infile.close();
 }
 
 std::vector<Variant> ParserExt::parseValueListInFile()
@@ -192,7 +206,18 @@ std::vector<Variant> ParserExt::parseValueListInFile()
     
     while (!isEnd())
     {
-        value.emplace_back(_token.toOperand());
-        consume(Token::OPERAND);
+        // TODO: bugs here! could not recognize string properly
+        if (_token.type() == Token::OPERAND)
+        {
+            value.emplace_back(_token.toOperand());
+            consume(Token::OPERAND);
+        }
+        else
+        {
+            value.emplace_back(_token.toId());
+            consume(Token::ID);
+        }
     }
+
+    return value;
 }

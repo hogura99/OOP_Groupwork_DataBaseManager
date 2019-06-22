@@ -1,6 +1,7 @@
 #pragma once
 
 #include "expr.h"
+#include "exprstrategy.h"
 #include <set>
 #include <iostream>
 #include <string>
@@ -184,6 +185,7 @@ class StatementSelect : public StatementBase
     std::vector<std::string> _columns; // can contain '*'
     Expr _where;
 };
+
 /**
 * ext StatementSelect new
 */
@@ -209,6 +211,10 @@ public:
         else
             return &_file_name;
     }
+    void setFileName(std::string file_name)
+    {
+        _file_name = file_name;
+    }
 
     virtual void print() const override
     {
@@ -220,31 +226,44 @@ public:
     {
         out << "select";
 
-        for (auto column: s._columns)
-            out << " " << toStdString(column);
+        auto printColumn = [&](const std::vector<Column> &columns)
+        {
+            for (auto column = columns.begin(); column != columns.end(); column ++)
+            {
+                if (column == columns.begin())
+                    out << " ";
+                else
+                    out << ",";
+                out << toStdString(*column);
+            }
+        };
+
+        printColumn(s._columns);
         out << std::endl;
+
+        if (s._file_name != "")
+            out << "into outfile '" << s._file_name << "'" << std::endl;
 
         out << "from " << s.id() << std::endl;
 
-        // TODO: print where clause
-
         if (!s._where.isNull())
-            out << "where " << s._where;
+        {
+            ExprPrint where_clause(s._where);
+            out << "where " << where_clause;
+        }
         out << std::endl;
 
         if (!s._group_by_column.empty())
         {
             out << "group by";
-            for (auto column: s._group_by_column)
-                out << " " << toStdString(column);
+            printColumn(s._group_by_column);
             out << std::endl;
         }
 
         if (!s._order_by_column.empty())
         {
             out << "order by";
-            for (auto column: s._order_by_column)
-                out << " " << toStdString(column);
+            printColumn(s._order_by_column);
             out << std::endl;
         }
 
@@ -256,8 +275,6 @@ public:
 
     bool isSelectAll() const
     {
-        /*if (_columns.front().type == Token::COUNT && _columns.front().name == "*" && _columns.size() == 1)//only (* && Count)
-            return true;*/
         for (auto column: _columns)
             if (column.type == Token::ID && column.name == "*")//contain (ID && *)
                 return true;
@@ -272,6 +289,7 @@ protected:
     Expr _where;
     bool _select_all;
 };
+
 /**
 * Update statement. Consists of id, keys, values and a where expression.
 */
@@ -306,7 +324,33 @@ class StatementLoad : public StatementBase
   public:
     StatementLoad(std::string tableName, std::vector< std::map<std::string, Variant> > entries) 
     : _entries(entries), StatementBase(tableName, LOAD) {}
-    const std::vector< std::map<std::string, Variant> > entries() { return _entries; }
+    const std::vector< std::map<std::string, Variant> >& entries() const { return _entries; }
+
+    /**
+     * translate load statement into insert statement
+     */
+    friend std::ostream &operator<<(std::ostream &out, const StatementLoad &s)
+    {
+        for (auto entry: s._entries)
+        {
+            out << "insert into " << s.id() << "(";
+            for (auto iter = entry.begin(); iter != entry.end(); ++ iter)
+            {
+                if (iter != entry.begin())
+                    out << ", ";
+                out << iter->first;
+            }
+            out << ") values (";
+            for (auto iter = entry.begin(); iter != entry.end(); ++ iter)
+            {
+                if (iter != entry.begin())
+                    out << ", ";
+                out << iter->second;
+            }
+            out << ");";
+        }
+        return out;
+    }
 
   protected:
     
