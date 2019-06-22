@@ -103,6 +103,8 @@ int main()
                 auto s = dynamic_cast<StatementSelectInto *>(statement);
                 if (s->isSelectAll())
                     db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
+                else if (s->isMultTables())
+                    db.selectFromMultTables(s->getTableNames(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
                 else
                     db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
                 break;
