@@ -6,6 +6,8 @@
 #include "client.h"
 #include "clientexcept.h"
 
+#include "parserext.h"
+
 int main()
 {
     Client client;
@@ -14,6 +16,7 @@ int main()
     std::string recvMsg;
     while (std::getline(std::cin, cmd, ';'))
     {
+        ParserExt parser(cmd);
         try
         {
             client.sendMsgToServer(cmd);

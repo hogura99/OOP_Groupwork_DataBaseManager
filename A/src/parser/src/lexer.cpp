@@ -29,6 +29,7 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"null", Token::NULL_SQL},
     {"and", Token::AND},
     {"or", Token::OR},
+    {"xor", Token::XOR},
     {"set", Token::SET},
     {"outfile", Token::OUTFILE},
     {"load", Token::LOAD},
@@ -39,10 +40,13 @@ std::map<std::string, Token::Type> Lexer::keywords{
     {"by", Token::BY},
     {"count", Token::COUNT},
     {"infile", Token::INFILE},
+    {"like", Token::LIKE},
+    {"as", Token::AS},
     {"min", Token::MIN},
     {"max", Token::MAX},
     {"sum", Token::SUM},
     {"avg", Token::AVG},
+    {"null", Token::NULL_SQL},
 };
 
 std::map<char, Token::Type> Lexer::singleOp{
@@ -50,11 +54,13 @@ std::map<char, Token::Type> Lexer::singleOp{
     {'-', Token::MINUS},
     {'*', Token::MUL},
     {'/', Token::DIV},
+    {'%', Token::MOD},
     {'(', Token::L_PAREN},
     {')', Token::R_PAREN},
     {',', Token::COMMA},
     {';', Token::SEMICOLON},
     {'.', Token::DOT}};
+};
 
 std::map<std::string, Token::Type> Lexer::ops{
     {"!", Token::NOT},
@@ -69,15 +75,18 @@ std::map<std::string, Token::Type> Lexer::ops{
     {"-", Token::MINUS},
     {"*", Token::MUL},
     {"/", Token::DIV},
+    {"%", Token::MOD},
     {"(", Token::L_PAREN},
     {")", Token::R_PAREN},
     {",", Token::COMMA},
     {";", Token::SEMICOLON},
     {".", Token::DOT}};
+    {"like", Token::LIKE},
+};
 
 bool Lexer::isOp(char ch) const
 {
-    return ch == '!' || ch == '<' || ch == '>' || ch == '=' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')' || ch == ',' || ch == ';';
+    return ch == '!' || ch == '<' || ch == '>' || ch == '=' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')' || ch == ',' || ch == ';' || ch == '%';
 }
 
 Token Lexer::next()
