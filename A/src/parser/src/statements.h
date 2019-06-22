@@ -206,7 +206,7 @@ public:
             const std::vector<Column>& order_by_column,
             const std::vector<Column>& columns,
             const Expr &where)
-            : StatementBase(nullptr, SELECT), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column), _order_by_column(order_by_column)
+            : StatementBase("WoBuXinWoQuZheGeMingZiHaiNengChongMing", SELECT), _table_names(table_names), _columns(columns), _where(where), _file_name(file_name), _group_by_column(group_by_column), _order_by_column(order_by_column)
             {
               _mult_tables = true;
             }
