@@ -24,6 +24,11 @@ public:
                            const std::vector<Column> &keyNames, const Expr &expr, const std::string* fileName,
                            const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn);
 
+    QueryResult selectAllFromMultTables(const std::vector<std::string> &tableNames, const std::vector<Column> &columns,
+                              const Expr &expr, const std::string* fileName,
+                              const std::vector<Column>& groupByColumns,
+                              const std::vector<Column> &orderByColumns);
+
     void InsertEntry(Table& currentTable, const std::vector<std::string>& tableNames, int tableNum, std::vector<Entry>& entries);
 
     void gatherEntries(const std::vector<Column> &columns,
