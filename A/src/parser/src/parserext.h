@@ -16,6 +16,6 @@ public:
     Statement parseLoad() ;
 
     Statement parseStatement();
-    void parseValueListFromFile(std::vector<std::vector<Variant> > values);
+    void parseValueListFromFile(std::vector<std::vector<Variant> > &values);
     std::vector<Variant> parseValueListInFile();
 };

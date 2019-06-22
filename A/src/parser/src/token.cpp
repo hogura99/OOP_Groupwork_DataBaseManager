@@ -28,8 +28,10 @@ std::map<Token::Type, std::string> Token::name{
     {Token::MINUS, "MINUS"},
     {Token::MUL, "MUL"},
     {Token::DIV, "DIV"},
+    {Token::MOD, "MOD"},
     {Token::AND, "AND"},
     {Token::OR, "OR"},
+    {Token::XOR, "XOR"},
     {Token::NOT, "NOT"},
     {Token::L_PAREN, "L_PAREN"},
     {Token::R_PAREN, "R_PAREN"},
@@ -44,11 +46,13 @@ std::map<Token::Type, std::string> Token::name{
     {Token::ORDER, "ORDER"},
     {Token::COUNT, "COUNT"},
     {Token::LOAD, "LOAD"},
+    {Token::LIKE, "LIKE"},
+    {Token::AS, "AS"},
     {Token::MAX, "MAX"},
     {Token::MIN, "MIN"},
     {Token::SUM, "SUM"},
     {Token::AVG, "AVG"},
-    {Token::DOT, "DOT"}
+    {Token::NULL_SQL, "NULL"},
 };
 
 Token::Token(Type type, const Variant &data)

@@ -61,6 +61,7 @@ class Variant
     Variant operator-(const Variant &v) const;
     Variant operator*(const Variant &v) const;
     Variant operator/(const Variant &v) const;
+    Variant operator%(const Variant &v) const;
     /**
      * convert data to specific type
      * @tparam T data type

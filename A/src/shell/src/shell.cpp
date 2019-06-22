@@ -2,14 +2,14 @@
 #include <string>
 #include <ctime>
 
-#include "databaseExt.h"
+#include "databaseext.h"
 #include "entry.h"
 #include "datastream.h"
 #include "parserext.h"
 #include "token.h"
 #include "server.h"
 
-//#define SERVER_ON
+#define SERVER_ON
 
 /**
  * Database shell program.

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdlib.h>
+
 #ifdef WIN32
 #include <io.h>
 #include <direct.h>
@@ -150,3 +152,8 @@ static inline bool changeCwd(const std::string &dir)
 {
     return chdir(dir.c_str()) == 0;
 }
+
+/**
+ * the absolute directory of current executable program
+ */
+static std::string __ProgramPath = getCwd();

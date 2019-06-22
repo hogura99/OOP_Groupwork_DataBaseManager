@@ -1,4 +1,5 @@
 #include "expr.h"
+#include "../../backend/src/regexpr.h"
 
 Expr::Expr(const Expr &other) : _token(other._token)
 {
@@ -87,40 +88,55 @@ Variant Expr::eval(const std::map<std::string, Variant> &varMap) const
 {
     switch (_token.type())
     {
-    case Token::NONE:
-        return true;
-    case Token::OPERAND:
-        return _token.toOperand();
-    case Token::ID:
-        return varMap.at(_token.toId());
-    case Token::AND:
-        return _left->eval(varMap).toBool() && _right->eval(varMap).toBool();
-    case Token::OR:
-        return _left->eval(varMap).toBool() || _right->eval(varMap).toBool();
-    case Token::NOT:
-        return !_right->eval(varMap).toBool();
-    case Token::GT:
-        return _left->eval(varMap) > _right->eval(varMap);
-    case Token::LT:
-        return _left->eval(varMap) < _right->eval(varMap);
-    case Token::EQ:
-        return _left->eval(varMap) == _right->eval(varMap);
-    case Token::NEQ:
-        return _left->eval(varMap) != _right->eval(varMap);
-    case Token::GEQ:
-        return _left->eval(varMap) >= _right->eval(varMap);
-    case Token::LEQ:
-        return _left->eval(varMap) <= _right->eval(varMap);
-    case Token::PLUS:
-        return _left->eval(varMap) + _right->eval(varMap);
-    case Token::MINUS:
-        return _left->eval(varMap) - _right->eval(varMap);
-    case Token::MUL:
-        return _left->eval(varMap) * _right->eval(varMap);
-    case Token::DIV:
-        return _left->eval(varMap) / _right->eval(varMap);
-    default:
-        throw std::runtime_error("Expr eval fail");
+        case Token::NONE:
+            return true;
+        case Token::OPERAND:
+            return _token.toOperand();
+        case Token::ID:
+            return varMap.at(_token.toId());
+        case Token::AND:
+            if (_left->eval(varMap).type() == Variant::NONE || _right->eval(varMap).type() == Variant::NONE)
+                return Variant();
+            return _left->eval(varMap).toBool() && _right->eval(varMap).toBool();
+        case Token::OR:
+            if (_left->eval(varMap).type() == Variant::NONE || _right->eval(varMap).type() == Variant::NONE)
+                return Variant();
+            return _left->eval(varMap).toBool() || _right->eval(varMap).toBool();
+        case Token::NOT:
+            if (_right->eval(varMap).type() == Variant::NONE)
+                return Variant();
+            return !_right->eval(varMap).toBool();
+        case Token::XOR:
+            if (_left->eval(varMap).type() == Variant::NONE || _right->eval(varMap).type() == Variant::NONE)
+                return Variant();
+            return _left->eval(varMap).toBool() xor _right->eval(varMap).toBool();
+        case Token::GT:
+            return _left->eval(varMap) > _right->eval(varMap);
+        case Token::LT:
+            return _left->eval(varMap) < _right->eval(varMap);
+        case Token::EQ:
+            return _left->eval(varMap) == _right->eval(varMap);
+        case Token::NEQ:
+            return _left->eval(varMap) != _right->eval(varMap);
+        case Token::GEQ:
+            return _left->eval(varMap) >= _right->eval(varMap);
+        case Token::LEQ:
+            return _left->eval(varMap) <= _right->eval(varMap);
+        case Token::PLUS:
+            return _left->eval(varMap) + _right->eval(varMap);
+        case Token::MINUS:
+            return _left->eval(varMap) - _right->eval(varMap);
+        case Token::MUL:
+            return _left->eval(varMap) * _right->eval(varMap);
+        case Token::DIV:
+            return _left->eval(varMap) / _right->eval(varMap);
+        case Token::MOD:
+            return _left->eval(varMap) % _right->eval(varMap);
+        case Token::LIKE:
+            return sqlLike(_left->eval(varMap).toStdString(), _right->eval(varMap).toStdString());
+        default:
+            throw std::runtime_error("Expr eval fail");
+
     }
 }
 
