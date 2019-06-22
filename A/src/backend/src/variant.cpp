@@ -80,6 +80,8 @@ DataStream &operator<<(DataStream &ds, const Variant &var)
         return ds << var.toChar();
     case Variant::DOUBLE:
         return ds << var.toDouble();
+        case Variant::STRING:
+            return ds << var._str;
     default:
         return ds;
     }
@@ -100,6 +102,8 @@ DataStream &operator>>(DataStream &ds, Variant &var)
         return ds >> var._data.c;
     case Variant::DOUBLE:
         return ds >> var._data.d;
+        case Variant::STRING:
+            return ds >> var._str;
     default:
         return ds;
     }
@@ -117,6 +121,8 @@ Variant Variant::convertTo(Variant::Type type) const
         return convertTo(type, toChar());
     case BOOL:
         return convertTo(type, toBool());
+        case Variant::STRING:
+            return Variant(toStdString());
     default:
         return Variant();
     }
@@ -133,7 +139,7 @@ Variant::Type Variant::commonType(Variant::Type a, Variant::Type b) const
     if (a == Variant::BOOL && b == Variant::BOOL)
         return Variant::BOOL;
 
-    throw std::runtime_error("Variant math operation failed");
+    //throw std::runtime_error("Variant math operation failed");
 }
 
 Variant Variant::operator+(const Variant &v) const

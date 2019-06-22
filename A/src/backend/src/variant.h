@@ -51,7 +51,9 @@ class Variant
 
     // operators
     bool operator<(const Variant &v) const { return compare(v) < 0; }
-    bool operator==(const Variant &v) const { return compare(v) == 0; }
+    bool operator==(const Variant &v) const {
+        if (this->type() == NONE && v.type() == NONE) return true;
+        return compare(v) == 0; }
     bool operator>(const Variant &v) const { return compare(v) > 0; }
     bool operator!=(const Variant &v) const { return compare(v) != 0; }
     bool operator>=(const Variant &v) const { return compare(v) >= 0; }

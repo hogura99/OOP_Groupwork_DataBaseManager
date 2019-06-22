@@ -14,7 +14,9 @@ public:
     Statement parseSelect();
 
     Statement parseLoad() ;
-
+    void parseFieldList(std::vector<Field> &fields, std::string &keys);
+    void parseField(std::vector<Field> &fields, std::string &keys);
+    Statement parseCreate() ;
     Statement parseStatement();
     void parseValueListFromFile(std::vector<std::vector<Variant> > &values);
     std::vector<Variant> parseValueListInFile();

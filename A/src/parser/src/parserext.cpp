@@ -14,6 +14,8 @@ Statement ParserExt::parseStatement()
             return parseLoad();
         case Token::SELECT:
             return parseSelect();
+        case Token::CREATE:
+            return parseCreate();
         default:
             return Parser::parseStatement();
     }
@@ -220,4 +222,127 @@ std::vector<Variant> ParserExt::parseValueListInFile()
     }
 
     return value;
+}
+
+Statement ParserExt::parseCreate()
+{
+    consume(Token::CREATE);
+
+    switch (_token.type())
+    {
+        case Token::TABLE:
+        {
+            consume(Token::TABLE);
+            std::string table_id = _token.toId();
+            consume(Token::ID);
+            consume(Token::L_PAREN);
+            std::vector<Field> fields;
+            std::string priKey;
+            parseFieldList(fields, priKey);
+            consume(Token::R_PAREN);
+            consume(Token::SEMICOLON);
+            return Statement(new StatementCreateTable(table_id, fields, priKey));
+        }
+
+        case Token::DATABASE:
+        {
+            consume(Token::DATABASE);
+            std::string databaseId = _token.toId();
+            consume(Token::ID);
+            consume(Token::SEMICOLON);
+            return Statement(new StatementCreateDatabase(databaseId));
+        }
+
+        default:
+            throw ParserError("Syntax error");
+    }
+}
+
+void ParserExt::parseFieldList(std::vector<Field> &fields, std::string &priKey)
+{
+    switch (_token.type())
+    {
+        case Token::ID:
+        case Token::PRIMARY:
+            parseField(fields, priKey);
+
+            while (_token.type() != Token::R_PAREN)
+            {
+                consume(Token::COMMA);
+                parseField(fields, priKey);
+            }
+
+            break;
+
+        default:
+            throw ParserError("Syntax error");
+    }
+}
+
+void ParserExt::parseField(std::vector<Field> &fields, std::string &priKey)
+{
+    switch (_token.type())
+    {
+        case Token::ID:
+        {
+            std::string name = _token.toId();
+            consume(Token::ID);
+
+            switch (_token.type())
+            {
+                case Token::INT:
+                    fields.push_back(Field(name, Variant::INT));
+                    break;
+
+                case Token::CHAR:
+                    fields.push_back(Field(name, Variant::CHAR));
+                    break;
+
+                case Token::DOUBLE:
+                    fields.push_back(Field(name, Variant::DOUBLE));
+                    break;
+
+                case Token::TEXT:
+                    fields.push_back(Field(name, Variant::STRING));
+                    break;
+
+            }
+
+            consume(_token.type());
+
+            if (_token.type() == Token::NOT)
+            {
+                if (fields.empty())
+                    throw ParserError("Not Null error");
+
+                consume(Token::NOT);
+                consume(Token::NULL_SQL);
+                fields.back().setNull(false);
+            }
+
+            break;
+        }
+
+        case Token::PRIMARY:
+        {
+            consume(Token::PRIMARY);
+            consume(Token::KEY);
+            consume(Token::L_PAREN);
+            priKey = _token.toId();
+            consume(Token::ID);
+            auto it = std::find_if(fields.begin(), fields.end(), [=](const Field &f) {
+                return f.key() == priKey;
+            });
+
+            if (it == fields.end())
+                throw ParserError("Primary key not found");
+
+            it->setPrimary(true);
+            consume(Token::R_PAREN);
+            break;
+        }
+
+        default:
+            throw ParserError("Syntax error");
+    }
 }

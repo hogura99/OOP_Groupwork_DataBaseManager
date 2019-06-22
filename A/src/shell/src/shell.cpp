@@ -9,7 +9,7 @@
 #include "token.h"
 #include "server.h"
 
-#define SERVER_ON
+//#define SERVER_ON
 
 /**
  * Database shell program.

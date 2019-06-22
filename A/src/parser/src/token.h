@@ -98,6 +98,7 @@ class Token
         MAX,
         SUM,
         AVG,
+        TEXT,
     };
     Token(Type type = NONE, const Variant &data = Variant());
     Token(const Token &other) : _type(other._type), _data(other._data) {}
