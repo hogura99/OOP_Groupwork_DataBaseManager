@@ -20,6 +20,10 @@ public:
                            const std::vector<Column> &keyNames, const Expr &expr, const std::string* fileName,
                            const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn);
 
+    QueryResult selectAllFromMultTables(const std::vector<std::string> &tableNames, const std::vector<Column> &columns,
+                                        const Expr &expr, const std::string* fileName,
+                                        const std::vector<Column>& groupByColumn,
+                                        const std::vector<Column>& orderByColumns);
     QueryResult selectFromMultTables(const std::vector<std::string> &tableNames,
                            const std::vector<Column> &keyNames, const Expr &expr, const std::string* fileName,
                            const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn);
