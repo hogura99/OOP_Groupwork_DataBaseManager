@@ -6,8 +6,9 @@ ADD_EXECUTABLE(client src/shellclient.cpp)
 
 TARGET_LINK_LIBRARIES(main sqlparser)
 TARGET_LINK_LIBRARIES(main backend)
-TARGET_LINK_LIBRARIES(client sqlparser)
+
 TARGET_LINK_LIBRARIES(client backend)
+TARGET_LINK_LIBRARIES(client sqlparser)
 
 IF(WIN32)
     TARGET_LINK_LIBRARIES(main -lws2_32)

@@ -59,6 +59,7 @@ std::map<char, Token::Type> Lexer::singleOp{
     {')', Token::R_PAREN},
     {',', Token::COMMA},
     {';', Token::SEMICOLON},
+    {'.', Token::DOT}};
 };
 
 std::map<std::string, Token::Type> Lexer::ops{
@@ -79,6 +80,7 @@ std::map<std::string, Token::Type> Lexer::ops{
     {")", Token::R_PAREN},
     {",", Token::COMMA},
     {";", Token::SEMICOLON},
+    {".", Token::DOT}};
     {"like", Token::LIKE},
 };
 
