@@ -98,6 +98,18 @@ It provides methods to insert / delete / search entries in the b-tree.
 
 It is never used, but we provides this API for possible future requirements. 
 
+### 二阶段新增文件：client.h
+
+提供了远程链接时的客户端类。
+
+### 二阶段新增文件：server.h
+
+提供了远程链接时的服务器类。
+
+### 二阶段新增文件：databaseext.h
+
+实现了继承自database的databaseext类，用于实现二阶段相关的功能。
+
 ## License
 
 This project is licensed under the Apache License - see the [LICENSE](../../LICENSE) file for details

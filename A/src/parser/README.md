@@ -54,7 +54,6 @@ StatementBase 类为所有 SQL 指令的基类，该类储存了某条指令的�
 - Statement parseStatement()：按照语句中的第一个关键字的不同(CREATE, DROP, SHOW, USE, UPDATE, INSERT，SELECT)分类，分别用相应函数进行解析处理。最后将解析结果存在Statement类型中返回，含有不同关键字的语句分别按照其语法，用相应的构造函数构造Statement变量。
 - Statement parseCreate()：实现对CREATE关键字语句的解析。对于读入的语句，需要读入下一个关键字后按照DATABASE和TABLE分两种情况处理，对于DATABASE的情况，接下来只需读入数据库的名称databaseId即可，最终返回用StatementCreateDatabase(databaseId)构造的Statement；对于TABLE的情况，则在读取表格名称table_id之后，通过函数void parseFieldList()读入表格的各项属性名和可能存在的primary key，并分别将其存在向量fields和std::string priKey之中,最后返回用StatementCreateTable(table_id, fields, priKey)构造的Statement。
 - Expr parseWhereClause()：实现对whereclauses的解析。主要通过栈的数据结构实现。主要涉及两个栈：运算符栈ops和运算数栈vals。运算数栈存运算符对应的数值，运算符栈存opPrioMap中约定的关键字一一对应的数值。自左向右地扫描whereclause，遇到运算数则将其入运算数栈vals，遇到运算符时，则需要先将其与ops栈顶的运算符比较优先级，若当前运算符优先级较低，则运算数栈ops中弹出运算数，先执行栈顶运算符的运算，并将运算结果入vals栈。不断如此，直至ops中新的栈顶运算符的优先级低于当前运算符的优先级时，再将当前运算符入ops栈。执行运算时，需要按照运算符是一元运算符、二元运算符分别考虑。运算结束后，最终vals栈将仅剩下一个元素，将其作为该whereclause对应的表达式返回。
-
 - Statement parseDelete()：实现对DELETE关键字语句的解析。对于读入的语句，首先读入FROM关键字后的表格名称table_id，之后，若有WHERE关键字，则通过函数Expr parseWhereClause()解析whereclauses，解析结果存入where；反之，若不含WHERE关键字，则将where设为空值。最后返回用StatementDelete(table_id,where)构造的Statement。
 - Statement parseInsert()：实现对INSERT关键字语句的解析。对于读入的语句，首先读入INTO关键字后的表格名称tableId,再读取左括号后通过函数std::vector\<std::string\> parseColumnList()读取属性名的序列，并将其存入向量columns中，读取右括号后通过函数std::vector\<Variant\> parseColumnList()读取待插入值的序列，并将其存入向量values中。再用名为entry的map将columns与values中的每一个元素按照顺序一一对应。最后返回用StatementInsert(tableId,entry)构造的Statement。
 - Statement parseUse()：实现对USE关键字语句的解析。对于读入的语句，读入USE关键字后的数据库名称dbName，最后返回用StatementUseDatabase(dbName)构造的Statement。
@@ -63,6 +62,27 @@ StatementBase 类为所有 SQL 指令的基类，该类储存了某条指令的�
 - Statement parseUpdate()：实现对UPDATE关键字语句的解析。对于读入的语句，首先读入UPDATE关键字后的表格名tableName，之后用void parseSetList(keys, values)函数读取属性名和值，并将属性名序列存入std::vector\<std::string\> keys，将值存入std::vector\<Variant\> values之中。之后，若有WHERE关键字，则通过函数Expr parseWhereClause()解析WHERE关键字后的whereclauses，将解析结果存入expr中；反之若不含WHERE关键字，则将expr设为空值。最后返回用StatementUpdate(table, keys, values, expr)构造的Statement。
 - Statement parseSelect()：实现对SELECT关键字语句的解析。对于读入的语句，首先通过函数std::vector \<std::string\>parseSelectList()读入要返回的属性名列表，并将其存入向量columns中，再读入FROM关键字后的表格名称table_id。之后，若有WHERE关键字，则用Expr parseWhereClause()函数解析whereclauses，解析结果存入where；反之，若不含WHERE关键字，则将where设为约定的空值NULL_EXPR。最后返回用StatementSelect(table_id, columns, where)构造的Statement。
 
+### 二阶段新增文件：parserext.h
+
+实现了继承自Parser类的ParserExt类，用于处理更多的命令。
+
+* Statement parseSelect()：重写了parser的parseSelect，支持了如下完整的Select格式：
+
+  ```sql
+  SELECT
+  
+   {[*|table.]field1[,[*|table.]field2[,…]]} 
+  
+  FROM table[,…]
+  
+  [INTO OUTFILE fileName]
+  
+  [WHERE whereClause] 
+  
+  [GROUP BY GroupByColumns]
+  
+  [ORDER BY OrderByColumns]
+  ```
 
 ## License
 
