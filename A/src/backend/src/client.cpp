@@ -21,7 +21,7 @@ void Client::recvMsgFromServer(std::string &msg)
 #include <winsock2.h>
 #pragma comment (lib, "ws2_32.lib")
 
-void Client::setServer(char *serverIpAddress, int port)
+void Client::setServer(const char *serverIpAddress, int port)
 {
     _serverIpAddr = serverIpAddress;
     _serverPort = port;

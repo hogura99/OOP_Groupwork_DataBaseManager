@@ -9,8 +9,6 @@
 #include "token.h"
 #include "server.h"
 
-#define SERVER_ON
-
 /**
  * Database shell program.
  * This program accepts SQL commands from keyboard, calls parser to parse the commands into SQL statements,
@@ -22,13 +20,11 @@ int main()
     std::string cmd;
 #ifdef SERVER_ON
     Server server;
-    server.init("127.0.0.1", 1234);
+    server.init(SERVER_IP, SERVER_PORT);
 #endif
     while (true)
     {
 #ifdef SERVER_ON
-        //std::string client = server.connectClient();
-        //server.recvMsgFrom(client, cmd);
         server.recvMsg(cmd);
 
         auto streamBufCout = std::cout.rdbuf();
@@ -101,10 +97,10 @@ int main()
             case StatementBase::SELECT:
             {
                 auto s = dynamic_cast<StatementSelectInto *>(statement);
-                if (s->isSelectAll())
-                    db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
-                else if (s->isMultTables())
+                if (s->isMultTables())
                     db.selectFromMultTables(s->getTableNames(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
+                else if (s->isSelectAll())
+                    db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
                 else
                     db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
                 break;

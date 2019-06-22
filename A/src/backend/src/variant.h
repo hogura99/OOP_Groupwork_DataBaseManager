@@ -119,6 +119,8 @@ Variant Variant::convertTo(Variant::Type type, T data) const
         return Variant((char)data);
     case Variant::BOOL:
         return Variant((bool)data);
+    case Variant::STRING:
+        return Variant(data);
     default:
         return Variant();
     }
