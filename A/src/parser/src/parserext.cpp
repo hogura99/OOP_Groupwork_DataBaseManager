@@ -147,7 +147,7 @@ Statement ParserExt::parseSelect() {
     if (tableIds.size() == 1)
         return Statement(new StatementSelectInto(tableIds.front(), fileName, groupByColumn, orderByColumn, columns, where));
     else
-        return Statement(new StatementSelectInto(tableIds.front(), fileName, groupByColumn, orderByColumn, columns, where));
+        return Statement(new StatementSelectInto(tableIds, fileName, groupByColumn, orderByColumn, columns, where));
 }
 
 Statement ParserExt::parseLoad()

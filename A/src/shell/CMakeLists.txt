@@ -1,6 +1,3 @@
-
-
-
 FIND_LIBRARY(sqlparser REQUIRED)
 FIND_LIBRARY(backend REQUIRED)
 

@@ -97,12 +97,20 @@ int main()
             case StatementBase::SELECT:
             {
                 auto s = dynamic_cast<StatementSelectInto *>(statement);
-                if (s->isMultTables())
-                    db.selectFromMultTables(s->getTableNames(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
-                else if (s->isSelectAll())
-                    db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
+                if (s->isSelectAll())
+                {
+                    if (s->isMultTables())
+                        db.selectAllFromMultTables(s->getTableNames(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
+                    else
+                        db.selectAllFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
+                }
                 else
-                    db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
+                {
+                    if (s->isMultTables())
+                        db.selectFromMultTables(s->getTableNames(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
+                    else
+                        db.selectFrom(s->id(), s->getColumns(), s->getWhere(), s->getFilename(), s->getGroupByColumn(), s->getOrderByColumn()).result()->print();
+                }
                 break;
             }
             case StatementBase::LOAD:
