@@ -19,7 +19,7 @@ void Server::sendMsg(const std::string &msg)
 #include <winsock2.h>
 #pragma comment (lib, "ws2_32.lib")
 
-void Server::init(char *ipAddress, int port)
+void Server::init(const char *ipAddress, int port)
 {
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -92,7 +92,7 @@ void Server::sendMsgTo(const std::string &client, const std::string &msg)
 #include <sys/shm.h>
 #include <thread>
 
-void Server::init(char *ipAddress, int port)
+void Server::init(const char *ipAddress, int port)
 {
     serverSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     sockaddr_in sockAddr;

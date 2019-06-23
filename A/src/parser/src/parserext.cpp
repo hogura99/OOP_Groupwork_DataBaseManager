@@ -147,7 +147,7 @@ Statement ParserExt::parseSelect() {
     if (tableIds.size() == 1)
         return Statement(new StatementSelectInto(tableIds.front(), fileName, groupByColumn, orderByColumn, columns, where));
     else
-        return Statement(new StatementSelectInto(tableIds.front(), fileName, groupByColumn, orderByColumn, columns, where));
+        return Statement(new StatementSelectInto(tableIds, fileName, groupByColumn, orderByColumn, columns, where));
 }
 
 Statement ParserExt::parseLoad()
@@ -186,7 +186,7 @@ void ParserExt::parseValueListFromFile(std::vector<std::vector<Variant> > &value
     std::ifstream infile;
     std::string fileName = _token.toOperand().toStdString();
     if (!isFile(fileName)) // not absolute directory
-        fileName = __ProgramPath + "\\" + fileName;
+        fileName = __ProgramPath + "/" + fileName;
     infile.clear();
     infile.open(fileName);
     if (!infile.is_open())

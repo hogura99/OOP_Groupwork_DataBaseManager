@@ -9,7 +9,7 @@
 class Server
 {
 public:
-    void init(char *ipAddress = "127.0.0.1", int port = 1234);
+    void init(const char *ipAddress = "127.0.0.1", int port = 1234);
     void close();
     std::string connectClient();
     void disconnectClient(const std::string &client);

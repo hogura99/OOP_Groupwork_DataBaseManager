@@ -79,9 +79,17 @@ QueryResult Table::selectAllFrom(const Expr &expr)
     assert(!_name.empty());
     loadIndex();
     std::vector<std::string> keyNames;
+    bool first = true;
+    const std::string name = "WoBuXinWoQuZheGeMingZiHaiNengChongMing";
     for (auto &f : _fields)
+    {
+        if (first && _name == name)
+        {
+            first = false;
+            continue;
+        }
         keyNames.emplace_back(f.key());
-
+    }
     return selectFrom(keyNames, expr);
 }
 
