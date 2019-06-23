@@ -1,12 +1,16 @@
 #include <iostream>
+#include <sstream>
 #include <cstring>
 #include <string>
 #include <cstdio>
 
+#include "databaseext.h"
+#include "entry.h"
+#include "datastream.h"
+#include "parserext.h"
+#include "token.h"
 #include "client.h"
 #include "clientexcept.h"
-
-#include "parserext.h"
 
 int main(int argc, char **argv)
 {
