@@ -51,34 +51,36 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
 }
 
 QueryResult DatabaseExt::selectAllFromMultTables(const std::vector<std::string> &tableNames, const std::vector<Column> &columns,
-                                       const Expr &expr, const std::string* fileName,
-                                       const std::vector<Column>& groupByColumn,
-                                       const std::vector<Column>& orderByColumns)
+                                                 const Expr &expr, const std::string* fileName,
+                                                 const std::vector<Column>& groupByColumn,
+                                                 const std::vector<Column>& orderByColumns)
 {
     std::vector<Field> fields;
     fields.emplace_back(Field("priKey", Variant::INT, false, true));
-        for (auto tableName : tableNames)
+    for (auto tableName : tableNames)
+    {
+        Table &table = _tables[tableName];
+        for (auto field : table.fields())
         {
-            Table &table = _tables[tableName];
-            for (auto field : table.fields())
-            {
-                fields.emplace_back(Field(tableName + "." + field.key(), field.type(), field.isNull(), false));
-            }
+            fields.emplace_back(Field(tableName + "." + field.key(), field.type(), field.isNull(), false));
         }
-        std::string primaryKey = "priKey";
-        const std::string name = "WoBuXinWoQuZheGeMingZiHaiNengChongMing";
-        createTable(name,fields, primaryKey);
-        std::vector<Entry> entries;
-        InsertEntry(_tables[name], tableNames, 0, entries);
-        auto queryResult = selectAllFrom(name, columns, expr, fileName, groupByColumn, orderByColumns);
-
+    }
+    std::string primaryKey = "priKey";
+    const std::string name = "WoBuXinWoQuZheGeMingZiHaiNengChongMing";
+    if (isTable(name))
         dropTable(name);
-        return queryResult;
+    createTable(name,fields, primaryKey);
+    std::vector<Entry> entries;
+    InsertEntry(_tables[name], tableNames, 0, entries);
+    auto queryResult = selectAllFrom(name, columns, expr, fileName, groupByColumn, orderByColumns);
+
+    dropTable(name);
+    return queryResult;
 }
 
 QueryResult DatabaseExt::selectFromMultTables(const std::vector<std::string> &tableNames,
-                                            const std::vector<Column> &columns, const Expr &expr, const std::string* fileName,
-                                            const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn)
+                                              const std::vector<Column> &columns, const Expr &expr, const std::string* fileName,
+                                              const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn)
 {
     std::vector<Field> fields;
     fields.emplace_back(Field("priKey", Variant::INT, false, true));
@@ -92,6 +94,8 @@ QueryResult DatabaseExt::selectFromMultTables(const std::vector<std::string> &ta
     }
     std::string primaryKey = "priKey";
     const std::string name = "WoBuXinWoQuZheGeMingZiHaiNengChongMing";
+    if (isTable(name))
+        dropTable(name);
     createTable(name,fields, primaryKey);
     std::vector<Entry> entries;
     InsertEntry(_tables[name], tableNames, 0, entries);
