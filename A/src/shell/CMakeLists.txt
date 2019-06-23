@@ -2,7 +2,7 @@ FIND_LIBRARY(sqlparser REQUIRED)
 FIND_LIBRARY(backend REQUIRED)
 
 ADD_EXECUTABLE(main src/shell.cpp)
-ADD_EXECUTABLE(main1 src/shell.cpp)
+ADD_EXECUTABLE(main1 src/shell_stage_1.cpp)
 ADD_EXECUTABLE(main2 src/shell.cpp)
 #ADD_EXECUTABLE(client src/shellclient.cpp)
 ADD_EXECUTABLE(server src/shellserver.cpp)

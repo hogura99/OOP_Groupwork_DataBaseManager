@@ -51,9 +51,9 @@ QueryResult DatabaseExt::selectAllFrom(const std::string &tableName, const std::
 }
 
 QueryResult DatabaseExt::selectAllFromMultTables(const std::vector<std::string> &tableNames, const std::vector<Column> &columns,
-                                       const Expr &expr, const std::string* fileName,
-                                       const std::vector<Column>& groupByColumn,
-                                       const std::vector<Column>& orderByColumns)
+                                                 const Expr &expr, const std::string* fileName,
+                                                 const std::vector<Column>& groupByColumn,
+                                                 const std::vector<Column>& orderByColumns)
 {
     std::vector<Field> fields;
     fields.emplace_back(Field("priKey", Variant::INT, false, true));
@@ -67,6 +67,8 @@ QueryResult DatabaseExt::selectAllFromMultTables(const std::vector<std::string> 
     }
     std::string primaryKey = "priKey";
     const std::string name = "WoBuXinWoQuZheGeMingZiHaiNengChongMing";
+    if (isTable(name))
+        dropTable(name);
     createTable(name,fields, primaryKey);
     std::vector<Entry> entries;
     InsertEntry(_tables[name], tableNames, 0, entries);
@@ -77,8 +79,8 @@ QueryResult DatabaseExt::selectAllFromMultTables(const std::vector<std::string> 
 }
 
 QueryResult DatabaseExt::selectFromMultTables(const std::vector<std::string> &tableNames,
-                                            const std::vector<Column> &columns, const Expr &expr, const std::string* fileName,
-                                            const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn)
+                                              const std::vector<Column> &columns, const Expr &expr, const std::string* fileName,
+                                              const std::vector<Column> &groupByColumn, const std::vector<Column>& orderByColumn)
 {
     std::vector<Field> fields;
     fields.emplace_back(Field("priKey", Variant::INT, false, true));
@@ -92,6 +94,8 @@ QueryResult DatabaseExt::selectFromMultTables(const std::vector<std::string> &ta
     }
     std::string primaryKey = "priKey";
     const std::string name = "WoBuXinWoQuZheGeMingZiHaiNengChongMing";
+    if (isTable(name))
+        dropTable(name);
     createTable(name,fields, primaryKey);
     std::vector<Entry> entries;
     InsertEntry(_tables[name], tableNames, 0, entries);
@@ -383,12 +387,6 @@ void DatabaseExt::orderEntriesBy(std::vector<Entry> &entries,
 
 void DatabaseExt::load(const std::string &tableName, const std::vector< std::map<std::string, Variant> > &entries)
 {
-    std::ifstream infile;
-    infile.open("output_file");
-    if (!infile.is_open())
-    {
-        throw DatabaseError("open file failed");
-    }
     assertDatabaseSelected();
     assertTableExist(tableName);
 
