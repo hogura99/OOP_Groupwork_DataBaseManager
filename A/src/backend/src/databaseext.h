@@ -26,8 +26,8 @@ public:
 
     void InsertEntry(Table& currentTable, const std::vector<std::string>& tableNames, int tableNum, std::vector<Entry>& entries);
 
-    void gatherEntries(const std::vector<Column> &columns,
-                       const std::vector<std::string> &keyNames,
+    void gatherEntries(std::vector<Column> columns,
+                       std::vector<std::string> keyNames,
                        const std::vector<Entry> &entries,
                        Entry &resultEntries);
     void gatherEntriesInGroup(const std::vector<Column> &columns,

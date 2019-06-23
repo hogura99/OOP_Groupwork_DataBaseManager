@@ -86,7 +86,7 @@ void Client::stopConversation()
 #include <fcntl.h>
 #include <sys/shm.h>
 
-void Client::setServer(char *serverIpAddress, int port)
+void Client::setServer(const char *serverIpAddress, int port)
 {
     _serverIpAddr = serverIpAddress;
     _serverPort = port;

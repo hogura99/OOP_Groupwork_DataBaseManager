@@ -186,7 +186,7 @@ void ParserExt::parseValueListFromFile(std::vector<std::vector<Variant> > &value
     std::ifstream infile;
     std::string fileName = _token.toOperand().toStdString();
     if (!isFile(fileName)) // not absolute directory
-        fileName = __ProgramPath + "\\" + fileName;
+        fileName = __ProgramPath + "/" + fileName;
     infile.clear();
     infile.open(fileName);
     if (!infile.is_open())
